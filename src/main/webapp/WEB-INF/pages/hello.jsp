@@ -54,6 +54,6 @@ color: green;
 	<h2><span class="blueText">Enemy encounters left until next difficulty:</span> <span class="redText">${leftEnemies}</span></h2>
 	<h2 style="color:red;">${enemyInfo}</h2>
 	<a href="http://localhost:8081/AdventureGame/fight" class="button">FIGHT</a>
-	<a href="http://localhost:8081/AdventureGame/flee" class="button2">ATTEMP TO FLEE </a>
+	<a href="http://localhost:8081/AdventureGame/flee" class="button2">ATTEMP TO FLEE</a>
 </body>
 </html>

@@ -44,9 +44,13 @@ public class FleeController {
 	String resource="";
 	String maxHealth="";
 	@RequestMapping(method = RequestMethod.GET)
-	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie)
+	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie)
 	{
-		
+		if(passedCookie.equals("failed"))
+		{
+			model.addAttribute("cheater","No Cheating : )");
+			return "failedToFlee";
+		}
 		int escape=flee(1,2);
 		if(escape==1)
 		{
@@ -54,6 +58,7 @@ public class FleeController {
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
+			
 			return "escaped";
 		}
 		
@@ -201,6 +206,10 @@ public class FleeController {
 		model.addAttribute("message2", leCookie+"%");
 		model.addAttribute("enemyDamage2",String.valueOf(enemyDamage));
 		model.addAttribute("resource",resourceCookie);
+		Cookie passed= new Cookie("passed","failed");
+		passed.setMaxAge(60*60*24*2);
+		passed.setPath("/");
+		response.addCookie(passed);
 		return "failedToFlee";
 		
 	}

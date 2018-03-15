@@ -21,6 +21,7 @@ public class PlayController {
 	String strToResource;
 	Enemy theBoss;
 	Settlement theSettlement;
+	int settlementTimer=101;
 	int chooseZone(int min, int max)
 	{
 	   int range = (max - min) + 1;     
@@ -32,8 +33,7 @@ public class PlayController {
 	@RequestMapping(value="/play",method=RequestMethod.GET)
 	public String plays(ModelMap model, HttpServletResponse response)
 	{
-		
-		
+		settlementTimer=101;
 		String health=String.valueOf(hero.hp);
 		String maxHealth=String.valueOf(hero.maxHp);
 		String attackMin=String.valueOf(hero.attackMin);
@@ -67,6 +67,10 @@ public class PlayController {
 	@RequestMapping("/hello")
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)
 	{
+		Cookie passed=new Cookie("passed","passed");
+		passed.setPath("/");
+		passed.setMaxAge(60*60*24*2);
+		response.addCookie(passed);
 		if(bossStateCookie.equals("alive"))
 		{
 			model.addAttribute("cheater","No cheating : )");
@@ -82,7 +86,8 @@ public class PlayController {
 			return "helloSettlement";
 		}
 		int enemiesLeftCount=Integer.parseInt(leftEnemiesString);
-		if(enemiesLeftCount%2==0)
+		settlementTimer--;
+		if(settlementTimer%3==0)
 		{
 			int settlementIndex=chooseZone(0,settlements.size()-1);
 			theSettlement=settlements.get(settlementIndex);
@@ -155,10 +160,13 @@ public class PlayController {
 		if(count==1)
 		{
 			Settlement snowyCastle=new Settlement("snowyCastle","Snowy Castle");
-			
-			
+			Settlement cliffTown=new Settlement("cliffTown","Cliff Town");
+			Settlement caveTown=new Settlement("caveTown","Cave Town");
+			Settlement ancientTemple=new Settlement("ancientTemple","Ancient Temple");
 			settlements.add(snowyCastle);
-			
+			settlements.add(cliffTown);
+			settlements.add(caveTown);
+			settlements.add(ancientTemple);
 			
 		}
 		
