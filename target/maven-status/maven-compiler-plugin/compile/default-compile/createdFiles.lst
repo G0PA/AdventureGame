@@ -1,0 +1,4 @@
+com\aarestu\controller\PlayController.class
+com\aarestu\controller\FightController.class
+com\aarestu\controller\Hero.class
+com\aarestu\controller\FightVictoryController.class
