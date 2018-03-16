@@ -4,8 +4,8 @@ import javax.servlet.http.Cookie;
 
 public class Hero {
 	int hp=110;
-	int attackMin=10;
-	int attackMax=15;
+	int attackMin=13;
+	int attackMax=18;
 	int armor=5;
 	int magicResist=5;
 	int gold=5;

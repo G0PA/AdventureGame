@@ -137,18 +137,20 @@ public class SettlementController {
 		gold = Integer.parseInt(heroAttributes[4].trim());
 		critChance=Integer.parseInt(heroAttributes[5].trim());
 		Item smallPotion=new Item("Small Potion",25,0,0,0,0,0,0,9);
-		Item magicBoots=new Item("Magic Boots",0,0,0,0,0,2,0,15);
-		Item woodenShield=new Item("Wooden Shield",0,0,0,0,2,0,0,15);
-		Item woodenSword=new Item("Wooden Sword",0,0,2,2,0,0,0,15);
+		Item magicBoots=new Item("Magic Boots",0,0,0,0,0,2,0,17);
+		Item woodenShield=new Item("Wooden Shield",0,0,0,0,2,0,0,17);
+		Item woodenSword=new Item("Wooden Sword",0,0,2,2,0,0,0,19);
 		Item smallVest=new Item("Small Vest",15,15,0,0,0,0,0,14);
-		Item swordSharpener=new Item("Sword Sharpener",0,0,0,0,0,0,3,12);
-		Item woodenBow=new Item("Woden Bow",0,0,0,5,0,0,0,20);
-		Item strawHat=new Item("Straw Hat",11,0,0,0,1,0,0,12);
-		Item ironSword=new Item("Iron Sword",0,0,4,4,0,0,0,25);
+		Item swordSharpener=new Item("Sword Sharpener",0,0,0,0,0,0,3,14);
+		Item woodenBow=new Item("Woden Bow",0,0,0,4,0,0,0,20);
+		Item strawHat=new Item("Straw Hat",15,0,0,0,1,0,0,14);
+		Item ironSword=new Item("Iron Sword",0,0,4,4,0,0,0,30);
 		Item mediumPotion=new Item("Medium Potion",50,0,0,0,0,0,0,16);
 		Item energyBoost=new Item("Energy Boost",10,0,1,1,1,1,2,24);
-		Item leatherArmor=new Item("Leather Armor",0,0,0,0,2,2,0,24);
-		Item kunai=new Item("Kunai",0,0,0,2,0,0,0,10);
+		Item leatherArmor=new Item("Leather Armor",0,0,0,0,2,2,0,26);
+		Item vitalityBoost=new Item("Vitality Boost",25,0,0,2,0,0,0,17);
+		Item handMadeArrows=new Item("Hand-made Arrows",0,0,1,1,0,0,1,14);
+		Item kunai=new Item("Kunai",0,0,0,2,0,0,0,12);
 		model.addAttribute("message",heroCookie+"%");
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -163,6 +165,8 @@ public class SettlementController {
 		items.add(energyBoost);
 		items.add(leatherArmor);
 		items.add(kunai);
+		items.add(handMadeArrows);
+		items.add(vitalityBoost);
 		if(!bossStateCookie.equals("shopping")) {
 		 shop=new ArrayList<Item>();
 		getFourItems(0,items.size()-1,shop);
