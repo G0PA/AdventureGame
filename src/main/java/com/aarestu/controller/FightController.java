@@ -111,7 +111,7 @@ public class FightController {
 		}
 		if((attack(attackMin,attackMax)*multiply - enemyArmor)<0)
 		{
-			//do nothing
+			enemyHealth=enemyHealth-1;
 		}else {
 		enemyHealth = enemyHealth - (attack(attackMin,attackMax)*multiply - enemyArmor);
 		}
@@ -151,7 +151,7 @@ public class FightController {
 		}
 		if((attack(enemyAttackMin,enemyAttackMax) - armor)<0)
 		{
-			//do nothing
+			health=health-1;
 		}else {
 		health = health - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense);
 		}

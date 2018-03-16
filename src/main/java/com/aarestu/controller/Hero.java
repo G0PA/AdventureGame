@@ -3,14 +3,14 @@ package com.aarestu.controller;
 import javax.servlet.http.Cookie;
 
 public class Hero {
-	int hp=100;
+	int hp=110;
 	int attackMin=10;
 	int attackMax=15;
 	int armor=5;
 	int magicResist=5;
-	int gold=0;
+	int gold=5;
 	int critChance=5;
-	int maxHp=100;
+	int maxHp=110;
 	public Hero()
 	{
 		

@@ -81,7 +81,7 @@ public class PlayController {
 			String[] cookieArr=settlementCookie.split(",");
 			model.addAttribute("resource",cookieArr[0]);
 			model.addAttribute("settlementName",cookieArr[1]);
-			model.addAttribute("message",cookie+"%");
+			model.addAttribute("message",fooCookie+"%");
 			model.addAttribute("cheating","No Cheating : )");
 			return "helloSettlement";
 		}
@@ -101,7 +101,7 @@ public class PlayController {
 			response.addCookie(resource);
 			model.addAttribute("resource",theSettlement.resource);
 			model.addAttribute("settlementName",theSettlement.name);
-			model.addAttribute("message",cookie+"%");
+			model.addAttribute("message",fooCookie+"%");
 			Cookie bossState=new Cookie("bossState","inSettlement");
 			bossState.setPath("/");
 			bossState.setMaxAge(60*60*24*2);
@@ -118,16 +118,24 @@ public class PlayController {
 		count++;
 		logger.debug("Hello Cookie is: "+fooCookie);
 		if(count==1) {
-		Enemy boundEntity= new Enemy("boundEntity","Bound Entity",1, 80, 12, 16, 3, 15,10);
-		Enemy orochi=new Enemy("Orochi","Orochi",1, 75, 14, 18, 2, 18,13);
-		Enemy undeadArmy=new Enemy("undeadArmy","Undead Army",1, 55, 6, 10, 2, 8,2);
-		Enemy darkKnights=new Enemy("darkKnights","Dark Knights",1, 66, 10, 13, 3, 10,3);
-		Enemy insectoid=new Enemy("Insectoid","Insectoid",1,92,8,15,4,18,12);
+		Enemy boundEntity= new Enemy("boundEntity","Bound Entity",1, 78, 12, 15, 3, 20,10);
+		Enemy orochi=new Enemy("Orochi","Orochi",1, 73, 14, 17, 2, 20,13);
+		Enemy undeadArmy=new Enemy("undeadArmy","Undead Army",1, 53, 6, 10, 2, 7,2);
+		Enemy darkKnights=new Enemy("darkKnights","Dark Knights",1, 66, 10, 13, 3, 11,3);
+		Enemy insectoid=new Enemy("Insectoid","Insectoid",1,88,8,13,4,20,12);
 		Enemy lampLighter=new Enemy("lampLighter","Lamp Lighter",2, 45, 11, 15, 2, 9,7);
 		Enemy elementalist=new Enemy("elementalist","Elementalist",2, 59,9,13,3,10,15);
 		Enemy warlock=new Enemy("warlock","Warlock",2,52,7,10,2,8,5);
 		Enemy tribeMen=new Enemy("tribeMen","Tribe men",1,58,7,11,2,9,5);
-		Enemy mutatedWolf=new Enemy("mutatedWolf","Mutated Wolf",1,82,12,15,3,16,16);
+		Enemy mutatedWolf=new Enemy("mutatedWolf","Mutated Wolf",1,82,12,15,3,20,13);
+		Enemy slugLord=new Enemy("slugLord","Slug Lord",1,78,11,15,2,17,6);
+		Enemy fireKnight=new Enemy("fireKnight","Fire Knight",2,87,9,14,5,22,15);
+		Enemy fireMage=new Enemy("fireMage","Fire Mage",2,60,9,12,2,11,9);
+		Enemy evolvedHumanoid=new Enemy("evolvedHumanoid","Evolved Humanoid",1,57,8,10,2,9,5);
+		Enemy swampInsect=new Enemy("swampInsect","Swamp Insect",1,68,9,12,2,14,8);
+		Enemy assassin=new Enemy("assassin","Assassin",1,50,7,11,2,8,5);
+		Enemy scorpionMother=new Enemy("scorpionMother","Scorpion Mother",1,70,13,15,3,18,8);
+		Enemy dispeller=new Enemy("dispeller","Dispeller",2,57,10,13,6,14,9);
 		enemies.add(boundEntity);
 		enemies.add(orochi);
 		enemies.add(undeadArmy);
@@ -135,27 +143,20 @@ public class PlayController {
 		enemies.add(insectoid);
 		enemies.add(elementalist);
 		enemies.add(warlock);
-		//enemies.add(treeMonster);
+		enemies.add(slugLord);
 		enemies.add(lampLighter);
 		enemies.add(tribeMen);
 		enemies.add(mutatedWolf);
+		enemies.add(fireKnight);
+		enemies.add(fireMage);
+		enemies.add(evolvedHumanoid);
+		enemies.add(swampInsect);
+		enemies.add(assassin);
+		enemies.add(scorpionMother);
+		enemies.add(dispeller);
 		}
 		
-		if(count==1)
-		{
-			Item smallPotion=new Item("Small Potion",20,0,0,0,0,0,0,10);
-			Item magicBoots=new Item("Magic Boots",0,0,0,0,0,2,0,15);
-			Item woodenShield=new Item("Wooden Shield",0,0,0,0,2,0,0,15);
-			Item woodenSword=new Item("Wooden Sword",0,0,2,2,0,0,0,15);
-			Item smallVest=new Item("Small Vest",10,10,0,0,0,0,0,22);
-			Item swordSharpener=new Item("Sword Sharpener",0,0,0,0,0,0,3,13);
-			items.add(smallPotion);
-			items.add(magicBoots);
-			items.add(woodenShield);
-			items.add(woodenSword);
-			items.add(smallVest);
-			items.add(swordSharpener);
-		}
+		
 		
 		if(count==1)
 		{
@@ -163,10 +164,14 @@ public class PlayController {
 			Settlement cliffTown=new Settlement("cliffTown","Cliff Town");
 			Settlement caveTown=new Settlement("caveTown","Cave Town");
 			Settlement ancientTemple=new Settlement("ancientTemple","Ancient Temple");
+			Settlement riverSideCastle=new Settlement("riverSideCastle","Riverside Castle");
+			Settlement monkTown=new Settlement("monkTown","Monk Town");
 			settlements.add(snowyCastle);
 			settlements.add(cliffTown);
 			settlements.add(caveTown);
 			settlements.add(ancientTemple);
+			settlements.add(riverSideCastle);
+			settlements.add(monkTown);
 			
 		}
 		
