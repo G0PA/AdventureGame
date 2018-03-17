@@ -1,4 +1,3 @@
-
 <html>
 <style>
 .button {font-size: 24px;}
@@ -26,6 +25,7 @@ height: 100%;
   background-size: cover;
 
 }
+
 .button2 {font-size: 24px;}
 .button2 {
 padding: 30px 40px;
@@ -42,9 +42,31 @@ line-height: 5em;
 background-color: #1E90FF; /* Green */
     color: black;
 }
-.redText
-{
-color: Crimson;
+.redText{
+color: crimson;
+}
+.greenText{
+color:Chartreuse;
+}
+
+.button3 {font-size: 24px;}
+.button3 {
+position:relative;
+padding: 30px 40px;
+border-radius: 2px;
+background-color: #1E90FF;
+    color: black;
+    border: 2px solid red;
+    margin-top:50px;
+    bottom: -125px
+
+}
+.button3{
+line-height: 5em;
+}
+.button3:hover {
+background-color: red; /* Green */
+    color: black;
 }
 </style>
 <head>
@@ -52,10 +74,11 @@ color: Crimson;
 </head>
 <body background= "resources/images/${resource}.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<h1>${cheating}</h1>
-	<h1 style="color:Chartreuse;">SETTLEMENT</h1>
-	<h1 style="color:Chartreuse;"> You came across ${settlementName}</h1>
-	<a href="http://localhost:8081/AdventureGame/settlement" class="button">GO IN</a>
-	<a href="http://localhost:8081/AdventureGame/skipSettlement" class="button2">SKIP SETTLEMENT(+1 enemy encounter until next difficulty)</a>
+	<h2 style="color:Chartreuse;"> ${event}</h2>
+		
+	
+	
+	<a href="http://localhost:8081/AdventureGame/hello" class="button">CONTINUE</a>
+	
 </body>
 </html>

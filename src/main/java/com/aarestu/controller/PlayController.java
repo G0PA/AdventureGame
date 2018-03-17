@@ -28,6 +28,13 @@ public class PlayController {
 	   int range = (max - min) + 1;     
 	   return (int)(Math.random() * range) + min;
 	}
+	boolean eventChance(int critChance) {
+		int range= (100 / critChance) + 1;
+		if ((int)(Math.random() * range) + 0 == 1) {
+			return true;
+		}
+		return false;
+	}
 	final static Logger logger=Logger.getLogger(PlayController.class);
 	Hero hero=new Hero();
 	Hero hero2;
@@ -63,6 +70,10 @@ public class PlayController {
 		logger.debug("Cookie name: "+c.getName()); 
 		logger.debug("the cookie in PlayController is : "+c.getValue());
 		model.addAttribute("message", hero.createDisplayText());
+		Cookie passedEvents=new Cookie("passedEvents","-9");
+		passedEvents.setMaxAge(60*60*24*2);
+		passedEvents.setPath("/");
+		response.addCookie(passedEvents);
 		return "play";
 	}
 	String cookie;
@@ -156,72 +167,74 @@ public class PlayController {
 			model.addAttribute("bossFight","BOSS FIGHT ");
 			return "hello";
 		}
+		//Event
+		if(eventChance(10))
+		{
+			settlementTimer++;
+			return "eventHello";
+		}
 	
-		model.addAttribute("leftEnemies",leftEnemiesString);
-		int numberOfEnemiesLeft=Integer.parseInt(leftEnemiesString)-1;
-		Cookie a=new Cookie("leftEnemies",String.valueOf(numberOfEnemiesLeft));
-		a.setPath("/");
-		a.setMaxAge(60*60*24*2);
-		response.addCookie(a);
+		
+		hero2.enemyEncountersLeft -= 1;
 		count++;
-		logger.debug("Hello Cookie is: "+fooCookie);
-		if(count==1) {
-		Enemy boundEntity= new Enemy("boundEntity","Bound Entity",1, 78, 14, 17, 3, 20,10);
-		Enemy orochi=new Enemy("Orochi","Orochi",1, 73, 14, 17, 2, 20,13);
-		Enemy undeadArmy=new Enemy("undeadArmy","Undead Army",1, 53, 8, 12, 2, 7,2);
-		Enemy darkKnights=new Enemy("darkKnights","Dark Knights",1, 66, 12, 15, 3, 11,3);
-		Enemy insectoid=new Enemy("Insectoid","Insectoid",1,88,10,15,4,20,12);
-		Enemy lampLighter=new Enemy("lampLighter","Lamp Lighter",2, 64, 13, 17, 2, 12,9);
-		Enemy elementalist=new Enemy("elementalist","Elementalist",2, 59,9,13,3,10,15);
-		Enemy warlock=new Enemy("warlock","Warlock",2,52,11,13,2,8,5);
-		Enemy tribeMen=new Enemy("tribeMen","Tribe men",1,58,9,13,2,9,5);
-		Enemy mutatedWolf=new Enemy("mutatedWolf","Mutated Wolf",1,82,14,17,3,20,13);
-		Enemy slugLord=new Enemy("slugLord","Slug Lord",1,78,13,17,2,17,6);
-		Enemy fireKnight=new Enemy("fireKnight","Fire Knight",2,87,11,16,5,22,15);
-		Enemy fireMage=new Enemy("fireMage","Fire Mage",2,60,11,14,2,11,9);
-		Enemy evolvedHumanoid=new Enemy("evolvedHumanoid","Evolved Humanoid",1,57,10,12,2,9,5);
-		Enemy swampInsect=new Enemy("swampInsect","Swamp Insect",1,68,11,14,2,14,8);
-		Enemy assassin=new Enemy("assassin","Assassin",1,50,9,13,2,8,5);
-		Enemy scorpionMother=new Enemy("scorpionMother","Scorpion Mother",1,70,15,17,3,18,8);
-		Enemy dispeller=new Enemy("dispeller","Dispeller",2,57,12,15,6,14,9);
-		Enemy spectre=new Enemy("spectre","Spectre",2,67,13,17,3,17,9);
-		Enemy evolvedReptiles=new Enemy("evolvedReptiles","Evolved Reptiles",1,75,12,15,2,16,11);
-		Enemy disciple=new Enemy("disciple","Disciple",2,59,11,14,2,11,8);
-		Enemy trollWarrior=new Enemy("trollWarrior","Troll Warrior",1,56,10,13,3,10,7);
-		Enemy cutthroat=new Enemy("cutthroat","Cutthroat",1,54,9,13,2,8,5);
-		Enemy madMan=new Enemy("madMan","Madman",1,54,9,13,2,10,20);
-		Enemy alienRefugee=new Enemy("alienRefugee","Alien Refugee",2,68,12,15,2,14,7);
-		Enemy corruptedCentaur=new Enemy("corruptedCentaur","Corrupted Centaur",1,62,12,14,2,12,6);
-		Enemy riteOfTheStorm=new Enemy("riteOfTheStorm","Rite of the Storm",2,74,14,18,4,19,8);
-		Enemy iceLizard=new Enemy("iceLizard","Ice Lizard",2,72,12,15,4,17,6);
-		enemies.add(boundEntity);
-		enemies.add(orochi);
-		enemies.add(spectre);
-		enemies.add(undeadArmy);
-		enemies.add(darkKnights);
-		enemies.add(insectoid);
-		enemies.add(elementalist);
-		enemies.add(warlock);
-		enemies.add(slugLord);
-		enemies.add(lampLighter);
-		enemies.add(tribeMen);
-		enemies.add(mutatedWolf);
-		enemies.add(fireKnight);
-		enemies.add(fireMage);
-		enemies.add(evolvedHumanoid);
-		enemies.add(swampInsect);
-		enemies.add(assassin);
-		enemies.add(scorpionMother);
-		enemies.add(dispeller);
-		enemies.add(evolvedReptiles);
-		enemies.add(disciple);
-		enemies.add(trollWarrior);
-		enemies.add(cutthroat);
-		enemies.add(madMan);
-		enemies.add(alienRefugee);
-		enemies.add(corruptedCentaur);
-		enemies.add(riteOfTheStorm);
-		enemies.add(iceLizard);
+		logger.debug("Hello Cookie is: " + fooCookie);
+		if (count == 1) {
+			Enemy boundEntity = new Enemy("boundEntity", "Bound Entity", 1, 82, 15, 18, 3, 20, 10);
+			Enemy orochi = new Enemy("Orochi", "Orochi", 1, 77, 15, 18, 2, 20, 13);
+			Enemy undeadArmy = new Enemy("undeadArmy", "Undead Army", 1, 52, 9, 13, 2, 7, 2);
+			Enemy darkKnights = new Enemy("darkKnights", "Dark Knights", 1, 68, 13, 16, 3, 11, 3);
+			Enemy insectoid = new Enemy("Insectoid", "Insectoid", 1, 92, 11, 16, 4, 20, 12);
+			Enemy lampLighter = new Enemy("lampLighter", "Lamp Lighter", 2, 66, 14, 18, 2, 12, 9);
+			Enemy elementalist = new Enemy("elementalist", "Elementalist", 2, 61, 10, 14, 3, 10, 15);
+			Enemy warlock = new Enemy("warlock", "Warlock", 2, 54, 12, 14, 2, 8, 5);
+			Enemy tribeMen = new Enemy("tribeMen", "Tribe men", 1, 60, 10, 14, 2, 9, 5);
+			Enemy mutatedWolf = new Enemy("mutatedWolf", "Mutated Wolf", 1, 86, 15, 18, 3, 20, 13);
+			Enemy slugLord = new Enemy("slugLord", "Slug Lord", 1, 82, 14, 18, 2, 17, 6);
+			Enemy fireKnight = new Enemy("fireKnight", "Fire Knight", 2, 91, 13, 18, 5, 22, 14);
+			Enemy fireMage = new Enemy("fireMage", "Fire Mage", 2, 62, 12, 15, 2, 11, 9);
+			Enemy evolvedHumanoid = new Enemy("evolvedHumanoid", "Evolved Humanoid", 1, 59, 11, 13, 2, 9, 5);
+			Enemy swampInsect = new Enemy("swampInsect", "Swamp Insect", 1, 70, 12, 15, 2, 14, 8);
+			Enemy assassin = new Enemy("assassin", "Assassin", 1, 52, 10, 14, 2, 8, 5);
+			Enemy scorpionMother = new Enemy("scorpionMother", "Scorpion Mother", 1, 74, 16, 18, 3, 18, 8);
+			Enemy dispeller = new Enemy("dispeller", "Dispeller", 2, 59, 13, 16, 6, 14, 9);
+			Enemy spectre = new Enemy("spectre", "Spectre", 2, 70, 14, 18, 3, 17, 9);
+			Enemy evolvedReptiles = new Enemy("evolvedReptiles", "Evolved Reptiles", 1, 89, 15, 19, 3, 20, 13);
+			Enemy disciple = new Enemy("disciple", "Disciple", 2, 61, 12, 15, 2, 11, 8);
+			Enemy trollWarrior = new Enemy("trollWarrior", "Troll Warrior", 1, 58, 11, 14, 3, 10, 7);
+			Enemy cutthroat = new Enemy("cutthroat", "Cutthroat", 1, 56, 10, 14, 2, 8, 5);
+			Enemy madMan = new Enemy("madMan", "Madman", 1, 56, 10, 14, 2, 10, 20);
+			Enemy alienRefugee = new Enemy("alienRefugee", "Alien Refugee", 2, 70, 13, 16, 2, 14, 7);
+			Enemy corruptedCentaur = new Enemy("corruptedCentaur", "Corrupted Centaur", 1, 64, 13, 15, 2, 12, 6);
+			Enemy riteOfTheStorm = new Enemy("riteOfTheStorm", "Rite of the Storm", 2, 78, 15, 19, 4, 20, 10);
+			Enemy iceLizard = new Enemy("iceLizard", "Ice Lizard", 2, 75, 13, 17, 4, 17, 6);
+			enemies.add(boundEntity);
+			enemies.add(orochi);
+			enemies.add(spectre);
+			enemies.add(undeadArmy);
+			enemies.add(darkKnights);
+			enemies.add(insectoid);
+			enemies.add(elementalist);
+			enemies.add(warlock);
+			enemies.add(slugLord);
+			enemies.add(lampLighter);
+			enemies.add(tribeMen);
+			enemies.add(mutatedWolf);
+			enemies.add(fireKnight);
+			enemies.add(fireMage);
+			enemies.add(evolvedHumanoid);
+			enemies.add(swampInsect);
+			enemies.add(assassin);
+			enemies.add(scorpionMother);
+			enemies.add(dispeller);
+			enemies.add(evolvedReptiles);
+			enemies.add(disciple);
+			enemies.add(trollWarrior);
+			enemies.add(cutthroat);
+			enemies.add(madMan);
+			enemies.add(alienRefugee);
+			enemies.add(corruptedCentaur);
+			enemies.add(riteOfTheStorm);
+			enemies.add(iceLizard);
 		}
 		
 		
@@ -244,6 +257,7 @@ public class PlayController {
 			settlements.add(mountainPassSanctuary);
 			
 		}
+
 		
 		int theZone=0;
 		int bosses=enemies.size()+2;

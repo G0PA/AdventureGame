@@ -150,7 +150,7 @@ public class FleeController {
 			images.add("defeat3");
 			images.add("defeat4");
 			images.add("defeat5");
-			
+			images.add("defeat6");
 			int theIndex=attack(0,images.size()-1);
 			model.addAttribute("defeatScreen",images.get(theIndex));
 			return "defeat";

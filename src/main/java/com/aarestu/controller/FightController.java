@@ -27,6 +27,10 @@ public class FightController {
 		resource=resourceCookie;
 		logger.debug("the bad Cookie is: "+badCookie);
 		hero = Hero.fromCookie(fooCookie);
+//		hero = new Hero(fooCookie);
+		if (hero == null) {
+			return "defeat";
+		}
 		model.addAttribute("resource",resourceCookie);
 		logger.debug("enemy123:  "+badCookie);
 		theBadCookie=badCookie.replaceAll("[A-Za-z=]+","");
@@ -125,6 +129,7 @@ public class FightController {
 			images.add("defeat3");
 			images.add("defeat4");
 			images.add("defeat5");
+			images.add("defeat6");
 			
 			int theIndex=attack(0,images.size()-1);
 			model.addAttribute("defeatScreen",images.get(theIndex));

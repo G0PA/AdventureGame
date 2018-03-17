@@ -38,60 +38,51 @@ public class SettlementController {
 		}
 	    return theItems;
 	}
-	@RequestMapping(value="/skipSettlement",method=RequestMethod.GET)
-	String hello(ModelMap model,HttpServletResponse response,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState)
-	{
-		if(!bossState.equals("dead"))
-		{
-		int count=Integer.parseInt(fooCookie)+1;
-		
-		Cookie c=new Cookie("leftEnemies",String.valueOf(count));
-		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
-		response.addCookie(c);
-		model.addAttribute("enemiesLeft",String.valueOf(count));
-		model.addAttribute("resource",resourceCookie);
-		
-		Cookie d=new Cookie("bossState","dead");
-		d.setPath("/");
-		d.setMaxAge(60*60*24*2);
-		response.addCookie(d);
+
+	@RequestMapping(value = "/skipSettlement", method = RequestMethod.GET)
+	String hello(ModelMap model, HttpServletResponse response, @CookieValue("hero") String heroCookie,
+			@CookieValue("resource") String resourceCookie, @CookieValue("bossState") String bossState) {
+		if (!bossState.equals("dead")) {
+			hero = Hero.fromCookie(heroCookie);
+			hero.enemyEncountersLeft += 1;
+			model.addAttribute("enemiesLeft", hero.enemyEncountersLeft);
+			model.addAttribute("resource", resourceCookie);
+
+			Cookie d = new Cookie("bossState", "dead");
+			d.setPath("/");
+			d.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(d);
 		}
 		return "skippedSettlement";
 	}
-	
-	@RequestMapping(value="/sleep",method=RequestMethod.GET)
-	String sleep(ModelMap model,HttpServletResponse response,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState,@CookieValue("hero")String heroCookie)
-	{
-		if(!bossState.equals("dead"))
-		{
-		int count=Integer.parseInt(fooCookie)-1;
-		hero = Hero.fromCookie(heroCookie);
-		Cookie c=new Cookie("leftEnemies",String.valueOf(count));
-		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
-		response.addCookie(c);
-		model.addAttribute("enemiesLeft",String.valueOf(count));
-		model.addAttribute("resource",resourceCookie);
-		if(hero.hp + 15 <= hero.maxHp) {
-			hero.hp += 15;
-		} else {
-			hero.hp = hero.maxHp;
-		}
-		
-		Cookie d=new Cookie("bossState","dead");
-		Cookie cc = hero.createCookie();
-		cc.setPath("/");
-		cc.setMaxAge(60*60*24*2);
-		response.addCookie(cc);
-		d.setPath("/");
-		d.setMaxAge(60*60*24*2);
-		model.addAttribute("sleep","You decide to sleep Restoring 15 Health");
-		response.addCookie(d);
+
+	@RequestMapping(value = "/sleep", method = RequestMethod.GET)
+	String sleep(ModelMap model, HttpServletResponse response, @CookieValue("resource") String resourceCookie,
+			@CookieValue("bossState") String bossState, @CookieValue("hero") String heroCookie) {
+		if (!bossState.equals("dead")) {
+			hero = Hero.fromCookie(heroCookie);
+			hero.enemyEncountersLeft -= 1;
+			model.addAttribute("enemiesLeft", hero.enemyEncountersLeft);
+			model.addAttribute("resource", resourceCookie);
+			if (hero.hp + 15 <= hero.maxHp) {
+				hero.hp += 15;
+			} else {
+				hero.hp = hero.maxHp;
+			}
+
+			Cookie d = new Cookie("bossState", "dead");
+			Cookie cc = hero.createCookie();
+			cc.setPath("/");
+			cc.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(cc);
+			d.setPath("/");
+			d.setMaxAge(60 * 60 * 24 * 2);
+			model.addAttribute("sleep", "You decide to sleep Restoring 15 Health");
+			response.addCookie(d);
 		}
 		return "leaveSettlement";
 	}
-	
+
 	@RequestMapping(value="/leaveSettlement",method=RequestMethod.GET)
 	String bye(ModelMap model,HttpServletResponse response,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState)
 	{
@@ -117,21 +108,22 @@ public class SettlementController {
 		hero=Hero.fromCookie(heroCookie);
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
-		Item smallPotion = new Item("Small Potion", 25, 0, 0, 0, 0, 0, 0, 9);
-		Item magicBoots = new Item("Magic Boots", 0, 0, 0, 0, 0, 2, 0, 17);
-		Item woodenShield = new Item("Wooden Shield", 0, 0, 0, 0, 2, 0, 0, 17);
-		Item woodenSword = new Item("Wooden Sword", 0, 0, 2, 2, 0, 0, 0, 19);
-		Item smallVest = new Item("Small Vest", 15, 15, 0, 0, 0, 0, 0, 14);
-		Item swordSharpener = new Item("Sword Sharpener", 0, 0, 0, 0, 0, 0, 3, 16);
-		Item woodenBow = new Item("Woden Bow", 0, 0, 0, 4, 0, 0, 0, 20);
-		Item strawHat = new Item("Straw Hat", 15, 0, 0, 0, 1, 0, 0, 14);
-		Item ironSword = new Item("Iron Sword", 0, 0, 4, 4, 0, 0, 0, 30);
-		Item mediumPotion = new Item("Medium Potion", 50, 0, 0, 0, 0, 0, 0, 16);
-		Item energyBoost = new Item("Energy Boost", 10, 0, 1, 1, 1, 1, 2, 24);
-		Item leatherArmor = new Item("Leather Armor", 0, 0, 0, 0, 2, 2, 0, 26);
-		Item vitalityBoost = new Item("Vitality Boost", 25, 0, 0, 2, 0, 0, 0, 17);
-		Item handMadeArrows = new Item("Hand-made Arrows", 0, 0, 1, 1, 0, 0, 1, 14);
-		Item kunai = new Item("Kunai", 0, 0, 0, 2, 0, 0, 0, 12);
+//		Item smallPotion = new Item("Small Potion", 25, 0, 0, 0, 0, 0, 0, 9);
+		Item smallPotion = new Item("Small Potion", 9).setCurrentHealth(25);
+		Item magicBoots = new Item("Magic Boots", 17).setMagicResist(2);
+		Item woodenShield = new Item("Wooden Shield", 17).setArmor(2);
+		Item woodenSword = new Item("Wooden Sword", 19).setAttackMin(2).setAttackMax(2);
+		Item smallVest = new Item("Small Vest", 14).setHealthLimit(15).setAttackMax(15);
+		Item swordSharpener = new Item("Sword Sharpener", 16).setCritChance(3);
+		Item woodenBow = new Item("Woden Bow", 20).setAttackMax(4);
+		Item strawHat = new Item("Straw Hat", 14).setArmor(1).setCurrentHealth(15);
+		Item ironSword = new Item("Iron Sword", 30).setAttackMin(4).setAttackMax(4);
+		Item mediumPotion = new Item("Medium Potion", 16).setCurrentHealth(50);
+		Item energyBoost = new Item("Energy Boost", 24).setCurrentHealth(10).setAttackMin(1).setAttackMax(1).setArmor(1).setMagicResist(1).setCritChance(2);
+		Item leatherArmor = new Item("Leather Armor", 26).setArmor(2).setMagicResist(2);
+		Item vitalityBoost = new Item("Vitality Boost", 17).setCurrentHealth(25).setAttackMax(2);
+		Item handMadeArrows = new Item("Hand-made Arrows", 14).setAttackMin(1).setAttackMax(1).setCritChance(1);
+		Item kunai = new Item("Kunai", 12).setAttackMax(2);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
