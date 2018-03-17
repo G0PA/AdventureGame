@@ -75,6 +75,7 @@ background-color: red; /* Green */
 </head>
 <body background= "resources/images/${resource}.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
+	<h1 style="color:Chartreuse;">Enemy encounters left until next <span class="redText">Boss Fight: ${leftEnemies}</span></h1>
 	<h1>${cheating}</h1>
 	<h1 style="color:Chartreuse;"> ${settlementName}</h1>
 		<h2 style="color:Chartreuse;">You can shop</h2>

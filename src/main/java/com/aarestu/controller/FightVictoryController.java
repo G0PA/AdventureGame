@@ -15,10 +15,7 @@ public class FightVictoryController {
 	int count=0;
 	final static Logger logger = Logger.getLogger(FightVictoryController.class);
 	@RequestMapping(method = RequestMethod.GET)
-	public String fightVictory(ModelMap model,@CookieValue("hero") String fooCookie)
-	{
-		
-		
+	public String fightVictory(ModelMap model,@CookieValue("hero") String fooCookie) {
 		String cookie=fooCookie;
 		model.addAttribute("message", cookie+"%");
 		return "fightvictory";

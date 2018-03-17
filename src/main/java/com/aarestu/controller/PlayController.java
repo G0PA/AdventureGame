@@ -30,24 +30,25 @@ public class PlayController {
 	}
 	final static Logger logger=Logger.getLogger(PlayController.class);
 	Hero hero=new Hero();
-	
+	Hero hero2;
 	@RequestMapping(value="/play",method=RequestMethod.GET)
 	public String plays(ModelMap model, HttpServletResponse response)
 	{
+		
 		settlementTimer=101;
-		String health=String.valueOf(hero.hp);
-		String maxHealth=String.valueOf(hero.maxHp);
-		String attackMin=String.valueOf(hero.attackMin);
-		String attackMax=String.valueOf(hero.attackMax);
-		String armor=String.valueOf(hero.armor);
-		String magicResist=String.valueOf(hero.magicResist);
-		String gold=String.valueOf(hero.gold);
-		String critChance=String.valueOf(hero.critChance);
+//		String health=String.valueOf(hero.hp);
+//		String maxHealth=String.valueOf(hero.maxHp);
+//		String attackMin=String.valueOf(hero.attackMin);
+//		String attackMax=String.valueOf(hero.attackMax);
+//		String armor=String.valueOf(hero.armor);
+//		String magicResist=String.valueOf(hero.magicResist);
+//		String gold=String.valueOf(hero.gold);
+//		String critChance=String.valueOf(hero.critChance);
 		Cookie leftEnemies=new Cookie("leftEnemies","25");
 		leftEnemies.setPath("/");
 		leftEnemies.setMaxAge(60*60*24*2);
 		response.addCookie(leftEnemies);
-		Cookie c = new Cookie("hero","health = "+health+"/"+maxHealth+",   attack = "+attackMin+"-"+attackMax+",   armor = "+armor+",   magic resist = "+magicResist+",   gold = "+gold+",   critical chance = "+critChance);
+		Cookie c = hero.createCookie();
 		Cookie passedMaps2=new Cookie("passedMaps","-9");
 		Cookie bossState2=new Cookie("bossState","dead");
 		bossState2.setPath("/");
@@ -61,13 +62,14 @@ public class PlayController {
 		response.addCookie(bossState2);
 		logger.debug("Cookie name: "+c.getName()); 
 		logger.debug("the cookie in PlayController is : "+c.getValue());
-		model.addAttribute("message", c.getValue()+"%");
+		model.addAttribute("message", hero.createDisplayText());
 		return "play";
 	}
 	String cookie;
 	@RequestMapping("/hello")
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)
 	{
+		hero2=Hero.fromCookie(fooCookie);
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");
 		passed.setMaxAge(60*60*24*2);
@@ -82,7 +84,7 @@ public class PlayController {
 			String[] cookieArr=settlementCookie.split(",");
 			model.addAttribute("resource",cookieArr[0]);
 			model.addAttribute("settlementName",cookieArr[1]);
-			model.addAttribute("message",fooCookie+"%");
+			model.addAttribute("message",hero2.createDisplayText());
 			model.addAttribute("cheating","No Cheating : )");
 			return "helloSettlement";
 		}
@@ -102,7 +104,8 @@ public class PlayController {
 			response.addCookie(resource);
 			model.addAttribute("resource",theSettlement.resource);
 			model.addAttribute("settlementName",theSettlement.name);
-			model.addAttribute("message",fooCookie+"%");
+			model.addAttribute("message",hero2.createDisplayText());
+			model.addAttribute("leftEnemies",leftEnemiesString);
 			Cookie bossState=new Cookie("bossState","inSettlement");
 			bossState.setPath("/");
 			bossState.setMaxAge(60*60*24*2);
@@ -130,15 +133,13 @@ public class PlayController {
 			strToResource=theBoss.resourcePath;
 			logger.debug("the resource path is: "+strToResource);
 			String theEnemy="Name: "+theBoss.name+", Attack Type: "+attackType+",  health = "+theBoss.health+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", critical chance = "+theBoss.critChance+"%"+", Gold reward = "+theBoss.dropsGold;
-			cookie=fooCookie;
 			String theEnemy2="Name: "+theBoss.name+",  health = "+theBoss.health+", "+type+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", Gold reward = "+theBoss.dropsGold+", critical chance = "+theBoss.critChance;
-			model.addAttribute("message",cookie+"%");
+			model.addAttribute("message",hero2.createDisplayText());
 			model.addAttribute("enemyInfo",theEnemy);
 			model.addAttribute("resource",strToResource);
-			Cookie c2=new Cookie("hero",cookie);
+			Cookie c2=hero2.createCookie();
 			Cookie c3=new Cookie("resource",strToResource);
 			Cookie c4=new Cookie("enemy",theEnemy2);
-			//Cookie passedRegions=new Cookie("passedMaps",passedMaps+String.valueOf(theZone));
 			Cookie bossState=new Cookie("bossState","alive");
 			bossState.setPath("/");
 			bossState.setMaxAge(60*60*24*2);
@@ -148,12 +149,9 @@ public class PlayController {
 			c3.setMaxAge(60*60*24*2);
 			c2.setPath("/");
 			c2.setMaxAge(60*60*24*2);
-			//passedRegions.setPath("/");
-			//passedRegions.setMaxAge(60*60*24*2);
 			response.addCookie(c2);
 			response.addCookie(c3);
 			response.addCookie(c4);
-			//response.addCookie(passedRegions);
 			response.addCookie(bossState);
 			model.addAttribute("bossFight","BOSS FIGHT ");
 			return "hello";
@@ -173,7 +171,7 @@ public class PlayController {
 		Enemy undeadArmy=new Enemy("undeadArmy","Undead Army",1, 53, 8, 12, 2, 7,2);
 		Enemy darkKnights=new Enemy("darkKnights","Dark Knights",1, 66, 12, 15, 3, 11,3);
 		Enemy insectoid=new Enemy("Insectoid","Insectoid",1,88,10,15,4,20,12);
-		Enemy lampLighter=new Enemy("lampLighter","Lamp Lighter",2, 45, 13, 17, 2, 9,7);
+		Enemy lampLighter=new Enemy("lampLighter","Lamp Lighter",2, 64, 13, 17, 2, 12,9);
 		Enemy elementalist=new Enemy("elementalist","Elementalist",2, 59,9,13,3,10,15);
 		Enemy warlock=new Enemy("warlock","Warlock",2,52,11,13,2,8,5);
 		Enemy tribeMen=new Enemy("tribeMen","Tribe men",1,58,9,13,2,9,5);
@@ -279,11 +277,12 @@ public class PlayController {
 		logger.debug("the resource path is: "+strToResource);
 		String theEnemy="Name: "+theBoss.name+", Attack Type: "+attackType+",  health = "+theBoss.health+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", critical chance = "+theBoss.critChance+"%"+", Gold reward = "+theBoss.dropsGold;
 		cookie=fooCookie;
+		logger.debug("hero2 attack = "+hero2.attackMin);
 		String theEnemy2="Name: "+theBoss.name+",  health = "+theBoss.health+", "+type+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", Gold reward = "+theBoss.dropsGold+", critical chance = "+theBoss.critChance;
-		model.addAttribute("message",cookie+"%");
+		model.addAttribute("message",hero2.createDisplayText());
 		model.addAttribute("enemyInfo",theEnemy);
 		model.addAttribute("resource",strToResource);
-		Cookie c2=new Cookie("hero",cookie);
+		Cookie c2=hero2.createCookie();
 		Cookie c3=new Cookie("resource",strToResource);
 		Cookie c4=new Cookie("enemy",theEnemy2);
 		Cookie passedRegions=new Cookie("passedMaps",passedMaps+","+String.valueOf(theZone));

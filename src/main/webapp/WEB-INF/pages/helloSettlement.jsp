@@ -42,6 +42,10 @@ line-height: 5em;
 background-color: #1E90FF; /* Green */
     color: black;
 }
+.redText
+{
+color: Crimson;
+}
 </style>
 <head>
 <title>Settlement</title>
@@ -49,6 +53,7 @@ background-color: #1E90FF; /* Green */
 <body background= "resources/images/${resource}.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<h1>${cheating}</h1>
+	<h1 style="color:Chartreuse;">Enemy encounters left until next <span class="redText">Boss Fight: ${leftEnemies}</span></h1>
 	<h1 style="color:Chartreuse;">SETTLEMENT</h1>
 	<h1 style="color:Chartreuse;"> You came across ${settlementName}</h1>
 	<a href="http://localhost:8081/AdventureGame/settlement" class="button">GO IN</a>

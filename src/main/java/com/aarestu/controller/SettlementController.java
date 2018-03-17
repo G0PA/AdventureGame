@@ -14,17 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class SettlementController {
-	int health;
-	int attackMin;
-	int armor;
-	int magicResist;
-	int gold;
-	String[] attacks;
-	int attackMax;
-	int critChance;
+	Hero hero;
 	String theBadCookie="";
 	String resource="";
-	int maxHealth;
 	int count;
 	Item tempItem;
 	Item tempItem2;
@@ -32,21 +24,19 @@ public class SettlementController {
 	Item tempItem4;
 	ArrayList<Item> items=new ArrayList<Item>();
 	ArrayList<Item> shop;
-	ArrayList<Item> getFourItems(int min, int max,ArrayList<Item> theItems)
-	{
+	ArrayList<Item> getFourItems(int min, int max,ArrayList<Item> theItems) {
 		for(int i=1; i<=4; i++)
 		{
-	   int range = (max - min) + 1;
-	   int theIndex=(int)(Math.random() * range) + min;
-	   if(theItems.contains(items.get(theIndex)))
-	   {
-		   i--;
-		   continue;
-	   }
-	   theItems.add(items.get(theIndex));
-	   //items.remove(theIndex);
+	    int range = (max - min) + 1;
+	    int theIndex=(int)(Math.random() * range) + min;
+	    if(theItems.contains(items.get(theIndex))) {
+		    i--;
+		    continue;
+	    }
+	    theItems.add(items.get(theIndex));
+	    //items.remove(theIndex);
 		}
-	   return theItems;
+	    return theItems;
 	}
 	@RequestMapping(value="/skipSettlement",method=RequestMethod.GET)
 	String hello(ModelMap model,HttpServletResponse response,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState)
@@ -76,22 +66,21 @@ public class SettlementController {
 		if(!bossState.equals("dead"))
 		{
 		int count=Integer.parseInt(fooCookie)-1;
-		
+		hero = Hero.fromCookie(heroCookie);
 		Cookie c=new Cookie("leftEnemies",String.valueOf(count));
 		c.setPath("/");
 		c.setMaxAge(60*60*24*2);
 		response.addCookie(c);
 		model.addAttribute("enemiesLeft",String.valueOf(count));
 		model.addAttribute("resource",resourceCookie);
-		if(health+15<=maxHealth) {
-		health+=15;
-		}else {
-			health=maxHealth;
+		if(hero.hp + 15 <= hero.maxHp) {
+			hero.hp += 15;
+		} else {
+			hero.hp = hero.maxHp;
 		}
-		String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-				+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
+		
 		Cookie d=new Cookie("bossState","dead");
-		Cookie cc = new Cookie("hero", leCookie);
+		Cookie cc = hero.createCookie();
 		cc.setPath("/");
 		cc.setMaxAge(60*60*24*2);
 		response.addCookie(cc);
@@ -119,39 +108,31 @@ public class SettlementController {
 	}
 	
 	@RequestMapping(value="/settlement", method=RequestMethod.GET)
-	String insideSettlement(ModelMap model,HttpServletResponse response,@CookieValue("hero")String heroCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossStateCookie)
+	String insideSettlement(ModelMap model,HttpServletResponse response,@CookieValue("hero")String heroCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossStateCookie,@CookieValue("leftEnemies")String leftEnemiesCookie)
 	{
-		
+		if(Integer.parseInt(leftEnemiesCookie)<0)
+		{
+			leftEnemiesCookie="0";
+		}
+		hero=Hero.fromCookie(heroCookie);
+		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
-		String theCookie = heroCookie.replaceAll("[A-Za-z=]+", "");
-		String[] heroAttributes = theCookie.split(",");
-		String currentHealth=heroAttributes[0].trim();
-		String[] healthArr =currentHealth.split("/");
-		maxHealth=Integer.parseInt(healthArr[1]);
-		health=Integer.parseInt(healthArr[0]);
-		attacks=heroAttributes[1].trim().split("-");
-		attackMin = Integer.parseInt(attacks[0]);
-		attackMax = Integer.parseInt(attacks[1]);
-		armor = Integer.parseInt(heroAttributes[2].trim());
-		magicResist = Integer.parseInt(heroAttributes[3].trim());
-		gold = Integer.parseInt(heroAttributes[4].trim());
-		critChance=Integer.parseInt(heroAttributes[5].trim());
-		Item smallPotion=new Item("Small Potion",25,0,0,0,0,0,0,9);
-		Item magicBoots=new Item("Magic Boots",0,0,0,0,0,2,0,17);
-		Item woodenShield=new Item("Wooden Shield",0,0,0,0,2,0,0,17);
-		Item woodenSword=new Item("Wooden Sword",0,0,2,2,0,0,0,19);
-		Item smallVest=new Item("Small Vest",15,15,0,0,0,0,0,14);
-		Item swordSharpener=new Item("Sword Sharpener",0,0,0,0,0,0,3,14);
-		Item woodenBow=new Item("Woden Bow",0,0,0,4,0,0,0,20);
-		Item strawHat=new Item("Straw Hat",15,0,0,0,1,0,0,14);
-		Item ironSword=new Item("Iron Sword",0,0,4,4,0,0,0,30);
-		Item mediumPotion=new Item("Medium Potion",50,0,0,0,0,0,0,16);
-		Item energyBoost=new Item("Energy Boost",10,0,1,1,1,1,2,24);
-		Item leatherArmor=new Item("Leather Armor",0,0,0,0,2,2,0,26);
-		Item vitalityBoost=new Item("Vitality Boost",25,0,0,2,0,0,0,17);
-		Item handMadeArrows=new Item("Hand-made Arrows",0,0,1,1,0,0,1,14);
-		Item kunai=new Item("Kunai",0,0,0,2,0,0,0,12);
-		model.addAttribute("message",heroCookie+"%");
+		Item smallPotion = new Item("Small Potion", 25, 0, 0, 0, 0, 0, 0, 9);
+		Item magicBoots = new Item("Magic Boots", 0, 0, 0, 0, 0, 2, 0, 17);
+		Item woodenShield = new Item("Wooden Shield", 0, 0, 0, 0, 2, 0, 0, 17);
+		Item woodenSword = new Item("Wooden Sword", 0, 0, 2, 2, 0, 0, 0, 19);
+		Item smallVest = new Item("Small Vest", 15, 15, 0, 0, 0, 0, 0, 14);
+		Item swordSharpener = new Item("Sword Sharpener", 0, 0, 0, 0, 0, 0, 3, 16);
+		Item woodenBow = new Item("Woden Bow", 0, 0, 0, 4, 0, 0, 0, 20);
+		Item strawHat = new Item("Straw Hat", 15, 0, 0, 0, 1, 0, 0, 14);
+		Item ironSword = new Item("Iron Sword", 0, 0, 4, 4, 0, 0, 0, 30);
+		Item mediumPotion = new Item("Medium Potion", 50, 0, 0, 0, 0, 0, 0, 16);
+		Item energyBoost = new Item("Energy Boost", 10, 0, 1, 1, 1, 1, 2, 24);
+		Item leatherArmor = new Item("Leather Armor", 0, 0, 0, 0, 2, 2, 0, 26);
+		Item vitalityBoost = new Item("Vitality Boost", 25, 0, 0, 2, 0, 0, 0, 17);
+		Item handMadeArrows = new Item("Hand-made Arrows", 0, 0, 1, 1, 0, 0, 1, 14);
+		Item kunai = new Item("Kunai", 0, 0, 0, 2, 0, 0, 0, 12);
+		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
 		items.add(woodenShield);
@@ -167,9 +148,11 @@ public class SettlementController {
 		items.add(kunai);
 		items.add(handMadeArrows);
 		items.add(vitalityBoost);
-		if(!bossStateCookie.equals("shopping")) {
-		 shop=new ArrayList<Item>();
-		getFourItems(0,items.size()-1,shop);
+		
+
+		if (!bossStateCookie.equals("shopping")) {
+			shop = new ArrayList<Item>();
+			getFourItems(0, items.size() - 1, shop);
 		}
 		
 			 tempItem=shop.get(0);
@@ -309,244 +292,200 @@ public class SettlementController {
 	@RequestMapping(value="/item1",method=RequestMethod.GET)
 	String theItem(ModelMap model,HttpServletResponse response,@CookieValue("resource")String resourceCookie)
 	{
-		if(gold-tempItem.costsGold>=0) {
-		gold-=tempItem.costsGold;
-		}else {
-			String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-					+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-			Cookie c = new Cookie("hero", leCookie);
+		if(hero.gold-tempItem.costsGold>=0) {
+			hero.gold-=tempItem.costsGold;
+		} else {
+			Cookie c = hero.createCookie();
 			model.addAttribute("resource",resourceCookie);
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
-			model.addAttribute("message",leCookie+"%");
+			model.addAttribute("message",hero.createDisplayText());
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
-		if(tempItem.currentHealth!=0)
-		{
-			if(health+tempItem.currentHealth<maxHealth) {
-			health+=tempItem.currentHealth;
-			}else {
-				health=maxHealth;
+		if (tempItem.currentHealth!=0) {
+			if(hero.hp + tempItem.currentHealth < hero.maxHp) {
+				hero.hp += tempItem.currentHealth;
+			} else {
+				hero.hp = hero.maxHp;
 			}
 		}
-		if(tempItem.healthLimit!=0)
-		{
-			maxHealth+=tempItem.healthLimit;
+		if (tempItem.healthLimit != 0) {
+			hero.maxHp += tempItem.healthLimit;
 		}
-		if(tempItem.attackMin!=0)
-		{
-			attackMin+=tempItem.attackMin;
+		if (tempItem.attackMin != 0) {
+			hero.attackMin += tempItem.attackMin;
 		}
-		if(tempItem.attackMax!=0)
-		{
-			attackMax+=tempItem.attackMax;
+		if (tempItem.attackMax != 0) {
+			hero.attackMax += tempItem.attackMax;
 		}
-		if(tempItem.armor!=0)
-		{
-			armor+=tempItem.armor;
+		if (tempItem.armor != 0) {
+			hero.armor += tempItem.armor;
 		}
-		if(tempItem.magicResist!=0)
-		{
-			magicResist+=tempItem.magicResist;
+		if (tempItem.magicResist != 0) {
+			hero.magicResist += tempItem.magicResist;
 		}
-		if(tempItem.critChance!=0)
-		{
-			critChance+=tempItem.critChance;
+		if (tempItem.critChance != 0) {
+			hero.critChance+=tempItem.critChance;
 		}
 		
-		String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-				+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-		Cookie c = new Cookie("hero", leCookie);
-		model.addAttribute("resource",resourceCookie);
+		Cookie c = hero.createCookie();
+		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
+		c.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(c);
-		model.addAttribute("message",leCookie+"%");
+		model.addAttribute("message", hero.createDisplayText());
 		return "shopped";
 	}
 	
 	@RequestMapping(value="/item2",method=RequestMethod.GET)
 	String theItem2(ModelMap model,HttpServletResponse response,@CookieValue("resource")String resourceCookie)
 	{
-		if(gold-tempItem2.costsGold>=0) {
-		gold-=tempItem2.costsGold;
-		}else {
-			String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-					+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-			Cookie c = new Cookie("hero", leCookie);
+		if(hero.gold-tempItem2.costsGold>=0) {
+			hero.gold-=tempItem2.costsGold;
+		} else {
+			Cookie c = hero.createCookie();
 			model.addAttribute("resource",resourceCookie);
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
-			model.addAttribute("message",leCookie+"%");
+			model.addAttribute("message",hero.createDisplayText());
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
-		if(tempItem2.currentHealth!=0)
-		{
-			if(health+tempItem2.currentHealth<maxHealth) {
-			health+=tempItem2.currentHealth;
-			}else {
-				health=maxHealth;
+		if (tempItem2.currentHealth!=0) {
+			if(hero.hp + tempItem2.currentHealth < hero.maxHp) {
+				hero.hp += tempItem2.currentHealth;
+			} else {
+				hero.hp = hero.maxHp;
 			}
 		}
-		if(tempItem2.healthLimit!=0)
-		{
-			maxHealth+=tempItem2.healthLimit;
+		if (tempItem2.healthLimit != 0) {
+			hero.maxHp += tempItem2.healthLimit;
 		}
-		if(tempItem2.attackMin!=0)
-		{
-			attackMin+=tempItem2.attackMin;
+		if (tempItem2.attackMin != 0) {
+			hero.attackMin += tempItem2.attackMin;
 		}
-		if(tempItem2.attackMax!=0)
-		{
-			attackMax+=tempItem2.attackMax;
+		if (tempItem2.attackMax != 0) {
+			hero.attackMax += tempItem2.attackMax;
 		}
-		if(tempItem2.armor!=0)
-		{
-			armor+=tempItem2.armor;
+		if (tempItem2.armor != 0) {
+			hero.armor += tempItem2.armor;
 		}
-		if(tempItem2.magicResist!=0)
-		{
-			magicResist+=tempItem2.magicResist;
+		if (tempItem2.magicResist != 0) {
+			hero.magicResist += tempItem2.magicResist;
 		}
-		if(tempItem2.critChance!=0)
-		{
-			critChance+=tempItem2.critChance;
+		if (tempItem2.critChance != 0) {
+			hero.critChance+=tempItem2.critChance;
 		}
 		
-		String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-				+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-		Cookie c = new Cookie("hero", leCookie);
-		model.addAttribute("resource",resourceCookie);
+		Cookie c = hero.createCookie();
+		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
+		c.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(c);
-		model.addAttribute("message",leCookie+"%");
+		model.addAttribute("message", hero.createDisplayText());
 		return "shopped";
 	}
 	
 	@RequestMapping(value="/item3",method=RequestMethod.GET)
 	String theItem3(ModelMap model,HttpServletResponse response,@CookieValue("resource")String resourceCookie)
 	{
-		if(gold-tempItem3.costsGold>=0) {
-		gold-=tempItem3.costsGold;
-		}else {
-			String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-					+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-			Cookie c = new Cookie("hero", leCookie);
+		if(hero.gold-tempItem3.costsGold>=0) {
+			hero.gold-=tempItem3.costsGold;
+		} else {
+			Cookie c = hero.createCookie();
 			model.addAttribute("resource",resourceCookie);
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
-			model.addAttribute("message",leCookie+"%");
+			model.addAttribute("message",hero.createDisplayText());
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
-		if(tempItem3.currentHealth!=0)
-		{
-			if(health+tempItem3.currentHealth<maxHealth) {
-			health+=tempItem3.currentHealth;
-			}else {
-				health=maxHealth;
+		if (tempItem3.currentHealth!=0) {
+			if(hero.hp + tempItem3.currentHealth < hero.maxHp) {
+				hero.hp += tempItem3.currentHealth;
+			} else {
+				hero.hp = hero.maxHp;
 			}
 		}
-		if(tempItem3.healthLimit!=0)
-		{
-			maxHealth+=tempItem3.healthLimit;
+		if (tempItem3.healthLimit != 0) {
+			hero.maxHp += tempItem3.healthLimit;
 		}
-		if(tempItem3.attackMin!=0)
-		{
-			attackMin+=tempItem3.attackMin;
+		if (tempItem3.attackMin != 0) {
+			hero.attackMin += tempItem3.attackMin;
 		}
-		if(tempItem3.attackMax!=0)
-		{
-			attackMax+=tempItem3.attackMax;
+		if (tempItem3.attackMax != 0) {
+			hero.attackMax += tempItem3.attackMax;
 		}
-		if(tempItem3.armor!=0)
-		{
-			armor+=tempItem3.armor;
+		if (tempItem3.armor != 0) {
+			hero.armor += tempItem3.armor;
 		}
-		if(tempItem3.magicResist!=0)
-		{
-			magicResist+=tempItem3.magicResist;
+		if (tempItem3.magicResist != 0) {
+			hero.magicResist += tempItem3.magicResist;
 		}
-		if(tempItem3.critChance!=0)
-		{
-			critChance+=tempItem3.critChance;
+		if (tempItem3.critChance != 0) {
+			hero.critChance+=tempItem3.critChance;
 		}
 		
-		String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-				+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-		Cookie c = new Cookie("hero", leCookie);
-		model.addAttribute("resource",resourceCookie);
+		Cookie c = hero.createCookie();
+		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
+		c.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(c);
-		model.addAttribute("message",leCookie+"%");
+		model.addAttribute("message", hero.createDisplayText());
 		return "shopped";
 	}
 	
 	@RequestMapping(value="/item4",method=RequestMethod.GET)
 	String theItem4(ModelMap model,HttpServletResponse response,@CookieValue("resource")String resourceCookie)
 	{
-		if(gold-tempItem4.costsGold>=0) {
-		gold-=tempItem4.costsGold;
-		}else {
-			String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-					+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-			Cookie c = new Cookie("hero", leCookie);
+		if(hero.gold-tempItem4.costsGold>=0) {
+			hero.gold-=tempItem4.costsGold;
+		} else {
+			Cookie c = hero.createCookie();
 			model.addAttribute("resource",resourceCookie);
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
-			model.addAttribute("message",leCookie+"%");
+			model.addAttribute("message",hero.createDisplayText());
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
-		if(tempItem4.currentHealth!=0)
-		{
-			if(health+tempItem4.currentHealth<maxHealth) {
-			health+=tempItem4.currentHealth;
-			}else {
-				health=maxHealth;
+		if (tempItem4.currentHealth!=0) {
+			if(hero.hp + tempItem4.currentHealth < hero.maxHp) {
+				hero.hp += tempItem4.currentHealth;
+			} else {
+				hero.hp = hero.maxHp;
 			}
 		}
-		if(tempItem4.healthLimit!=0)
-		{
-			maxHealth+=tempItem4.healthLimit;
+		if (tempItem4.healthLimit != 0) {
+			hero.maxHp += tempItem4.healthLimit;
 		}
-		if(tempItem4.attackMin!=0)
-		{
-			attackMin+=tempItem4.attackMin;
+		if (tempItem4.attackMin != 0) {
+			hero.attackMin += tempItem4.attackMin;
 		}
-		if(tempItem4.attackMax!=0)
-		{
-			attackMax+=tempItem4.attackMax;
+		if (tempItem4.attackMax != 0) {
+			hero.attackMax += tempItem4.attackMax;
 		}
-		if(tempItem4.armor!=0)
-		{
-			armor+=tempItem4.armor;
+		if (tempItem4.armor != 0) {
+			hero.armor += tempItem4.armor;
 		}
-		if(tempItem4.magicResist!=0)
-		{
-			magicResist+=tempItem4.magicResist;
+		if (tempItem4.magicResist != 0) {
+			hero.magicResist += tempItem4.magicResist;
 		}
-		if(tempItem4.critChance!=0)
-		{
-			critChance+=tempItem4.critChance;
+		if (tempItem4.critChance != 0) {
+			hero.critChance+=tempItem4.critChance;
 		}
 		
-		String leCookie = "health = " + health +"/"+maxHealth+ ",   attack = " + attackMin +"-"+attackMax+",   armor = " + armor
-				+ ",   magic resist = " + magicResist + ",   gold = " + gold+",   critical chance = "+critChance;
-		Cookie c = new Cookie("hero", leCookie);
-		model.addAttribute("resource",resourceCookie);
+		Cookie c = hero.createCookie();
+		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
-		c.setMaxAge(60*60*24*2);
+		c.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(c);
-		model.addAttribute("message",leCookie+"%");
+		model.addAttribute("message", hero.createDisplayText());
 		return "shopped";
 	}
 	

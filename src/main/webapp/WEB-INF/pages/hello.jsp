@@ -46,12 +46,12 @@ height: 100%;
 color: red;
 }
 .blueText{
-color: green;
+color: Chartreuse;
 }
 </style>
 <body background= "resources/images/${resource}.jpg" class=bg>
 	<h1 style="background-color:Chartreuse;">${cheater}${message}</h1>
-	<h2><span class="blueText">Enemy encounters left until next difficulty:</span> <span class="redText">${leftEnemies}</span></h2>
+	<h1><span class="blueText">Enemy encounters left until next </span><span class="redText">Boss fight: ${leftEnemies}</span></h1>
 	<h1 style= "color:red;">${bossFight}</h1>
 	<h2 style="color:red;">${enemyInfo}</h2>
 	<a href="http://localhost:8081/AdventureGame/fight" class="button">FIGHT</a>
