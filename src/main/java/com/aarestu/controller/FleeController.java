@@ -38,6 +38,7 @@ public class FleeController {
 	String resource="";
 
 	Hero hero;
+	Enemy enemy;
 	@RequestMapping(method = RequestMethod.GET)
 	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie)
 	{
@@ -57,21 +58,22 @@ public class FleeController {
 			
 			return "escaped";
 		}
-
-		model.addAttribute("resource",resourceCookie);		
-		theBadCookie=badCookie.replaceAll("[A-Za-z=]+","");
-		String []enemyAttributes=theBadCookie.split(",");
-		int attackType=Integer.parseInt(enemyAttributes[2].trim());
-		int enemyHealth=Integer.parseInt(enemyAttributes[1].trim());
-		String[] enemyAttacks=enemyAttributes[3].split("-");
-		int enemyAttackMin=Integer.parseInt(enemyAttacks[0].trim());
-		int enemyAttackMax=Integer.parseInt(enemyAttacks[1].trim());
-		int enemyArmor=Integer.parseInt(enemyAttributes[4].trim());
-		int dropsGold=Integer.parseInt(enemyAttributes[5].trim());
-		int enemyCritChance=Integer.parseInt(enemyAttributes[6].trim());
+		
+		model.addAttribute("resource",resourceCookie);	
+		enemy=enemy.fromCookie(badCookie);
+//		theBadCookie=badCookie.replaceAll("[A-Za-z=]+","");
+//		String []enemyAttributes=theBadCookie.split(",");
+//		int attackType=Integer.parseInt(enemyAttributes[2].trim());
+//		int enemyHealth=Integer.parseInt(enemyAttributes[1].trim());
+//		String[] enemyAttacks=enemyAttributes[3].split("-");
+//		int enemyAttackMin=Integer.parseInt(enemyAttacks[0].trim());
+//		int enemyAttackMax=Integer.parseInt(enemyAttacks[1].trim());
+//		int enemyArmor=Integer.parseInt(enemyAttributes[4].trim());
+//		int dropsGold=Integer.parseInt(enemyAttributes[5].trim());
+//		int enemyCritChance=Integer.parseInt(enemyAttributes[6].trim());
 		int defense;
 		//1st attack
-		if(attackType==1)
+		if(enemy.attackType==1)
 		{
 			defense=hero.armor;
 		}else
@@ -79,7 +81,7 @@ public class FleeController {
 			defense=hero.magicResist;
 		}
 		int tempHealth=hero.hp;
-		boolean crit=critical(enemyCritChance);
+		boolean crit=critical(enemy.critChance);
 		int multiply=1;
 		if(crit==true)
 		{
@@ -89,11 +91,11 @@ public class FleeController {
 		else {
 			model.addAttribute("enemyCritically","");
 		}
-		if((attack(enemyAttackMin,enemyAttackMax) - hero.armor)<0)
+		if((attack(enemy.damageMin,enemy.damageMax) - hero.armor)<0)
 		{
 			//do nothing
 		}else {
-		hero.hp = hero.hp - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense);
+		hero.hp = hero.hp - (attack(enemy.damageMin,enemy.damageMax)*multiply - defense);
 		}
 		if (hero.hp <= 0) {
 
@@ -120,7 +122,7 @@ public class FleeController {
 		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
 		//2nd attack
 		 tempHealth=hero.hp;
-		 crit=critical(enemyCritChance);
+		 crit=critical(enemy.critChance);
 		 multiply=1;
 		if(crit==true)
 		{
@@ -130,11 +132,11 @@ public class FleeController {
 		else {
 			model.addAttribute("enemyCritically2","");
 		}
-		if((attack(enemyAttackMin,enemyAttackMax) - hero.armor)<0)
+		if((attack(enemy.damageMin,enemy.damageMax) - hero.armor)<0)
 		{
 			//do nothing
 		}else {
-		hero.hp = hero.hp - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense);
+		hero.hp = hero.hp - (attack(enemy.damageMin,enemy.damageMax)*multiply - defense);
 		}
 		if (hero.hp <= 0) {
 

@@ -75,6 +75,7 @@ background-color: red; /* Green */
 <body background= "resources/images/${resource}.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<h2 style="color:Chartreuse;"> ${event}</h2>
+	<h2 style="color:red;"> ${event2}</h2>
 		
 	
 	

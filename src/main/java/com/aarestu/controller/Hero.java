@@ -8,10 +8,10 @@ public class Hero {
 	int attackMax=18;
 	int armor=5;
 	int magicResist=5;
-	int gold = 5;
+	int gold = 10;
 	int critChance = 5;
 	int maxHp = 110;
-	int enemyEncountersLeft=25;
+	int enemyEncountersLeft=23;
 	boolean isValid = true;
 
 	public Hero() {

@@ -13,13 +13,14 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import java.util.Random;
 @Controller
 @RequestMapping("/fight")
 public class FightController {
 	String theBadCookie="";
 	String resource="";
 	Hero hero;
+	Enemy enemy;
 	final static Logger logger=Logger.getLogger(FightController.class);
 	@RequestMapping(method = RequestMethod.GET)
 	public String fight(ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,
@@ -33,19 +34,9 @@ public class FightController {
 		}
 		model.addAttribute("resource",resourceCookie);
 		logger.debug("enemy123:  "+badCookie);
-		theBadCookie=badCookie.replaceAll("[A-Za-z=]+","");
-		logger.debug("enemy Cookie is: "+theBadCookie);
-		String []enemyAttributes=theBadCookie.split(",");
-		int attackType=Integer.parseInt(enemyAttributes[2].trim());
-		int enemyHealth=Integer.parseInt(enemyAttributes[1].trim());
-		String[] enemyAttacks=enemyAttributes[3].split("-");
-		int enemyAttackMin=Integer.parseInt(enemyAttacks[0].trim());
-		int enemyAttackMax=Integer.parseInt(enemyAttacks[1].trim());
-		int enemyArmor=Integer.parseInt(enemyAttributes[4].trim());
-		int dropsGold=Integer.parseInt(enemyAttributes[5].trim());
-		int enemyCritChance=Integer.parseInt(enemyAttributes[6].trim());
+		enemy = Enemy.fromCookie(badCookie);
 
-		String fightOutcome=fight(enemyHealth,attackType,enemyAttackMin,enemyAttackMax,enemyArmor,dropsGold,enemyCritChance, response,model);
+		String fightOutcome=fight(enemy.health,enemy.attackType,enemy.damageMin,enemy.damageMax,enemy.armor,enemy.dropsGold,enemy.critChance, response,model);
 		if(fightOutcome.equals("nobodyDied"))
 		{
 			return "fight";
@@ -57,14 +48,12 @@ public class FightController {
 	int attack(int min, int max) {
 	   int range = (max - min) + 1;     
 	   return (int)(Math.random() * range) + min;
+
 	}
 	boolean critical(int critChance) {
-		int range= (100 / critChance) + 1;
-		if ((int)(Math.random() * range) + 0 == 1) {
-			return true;
-		}
-		return false;
+		return Math.random() * 100 < critChance;
 	}
+
 	
 	String fight(int enemyHealth,int attackType, int enemyAttackMin, int enemyAttackMax, 
 			int enemyArmor, int dropsGold, int enemyCritChance, HttpServletResponse response, ModelMap model) {
@@ -137,7 +126,8 @@ public class FightController {
 
 		}
 		Cookie c = hero.createCookie();
-		theBadCookie=theBadCookie.replaceFirst("[0-9]+", String.valueOf(enemyHealth));
+		enemy.health=enemyHealth;
+		theBadCookie=enemy.toCookie();
 		Cookie e = new Cookie("enemy", theBadCookie);
 		e.setMaxAge(60 * 60 * 24 * 2);
 		e.setPath("/");
@@ -149,7 +139,7 @@ public class FightController {
 		int enemyDamage=tempHealth-hero.hp;
 		model.addAttribute("message2", hero.createDisplayText());
 		model.addAttribute("damageDealt", String.valueOf(damageDealt));
-		model.addAttribute("enemy", String.valueOf(enemyHealth));
+		model.addAttribute("enemy", String.valueOf(enemy.health));
 		model.addAttribute("enemyName",resource);
 		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
 		return "nobodyDied";

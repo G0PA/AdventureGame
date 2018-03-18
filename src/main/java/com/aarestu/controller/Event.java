@@ -36,12 +36,7 @@ public class Event {
 
 	boolean outcome(int successRate) {
 
-		int range = (100 / successRate) + 1;
-		if ((int) (Math.random() * range) + 0 == 1) {
-			return true;
-		}
-
-			return false;
+		return Utils.randomBool(successRate);
 		
 	}
 	public Hero updateHero(Hero currentHero, Hero changedHero)
@@ -54,6 +49,10 @@ public class Event {
 		currentHero.magicResist+=changedHero.magicResist;
 		currentHero.critChance+=changedHero.critChance;
 		currentHero.gold+=changedHero.gold;
+		if(currentHero.gold<0)
+		{
+			currentHero.gold=0;
+		}
 		return currentHero;
 		
 		

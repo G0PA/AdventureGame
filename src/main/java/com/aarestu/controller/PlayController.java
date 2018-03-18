@@ -23,25 +23,13 @@ public class PlayController {
 	Settlement theSettlement;
 	ArrayList<Enemy> bosses= new ArrayList<Enemy>();
 	int settlementTimer=101;
-	int chooseZone(int min, int max)
-	{
-	   int range = (max - min) + 1;     
-	   return (int)(Math.random() * range) + min;
-	}
-	boolean eventChance(int critChance) {
-		int range= (100 / critChance) + 1;
-		if ((int)(Math.random() * range) + 0 == 1) {
-			return true;
-		}
-		return false;
-	}
+	
+	
 	final static Logger logger=Logger.getLogger(PlayController.class);
 	Hero hero=new Hero();
 	Hero hero2;
 	@RequestMapping(value="/play",method=RequestMethod.GET)
-	public String plays(ModelMap model, HttpServletResponse response)
-	{
-		
+	public String plays(ModelMap model, HttpServletResponse response) {
 		settlementTimer=101;
 //		String health=String.valueOf(hero.hp);
 //		String maxHealth=String.valueOf(hero.maxHp);
@@ -76,7 +64,6 @@ public class PlayController {
 		response.addCookie(passedEvents);
 		return "play";
 	}
-	String cookie;
 	@RequestMapping("/hello")
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)
 	{
@@ -99,11 +86,11 @@ public class PlayController {
 			model.addAttribute("cheating","No Cheating : )");
 			return "helloSettlement";
 		}
-		int enemiesLeftCount=Integer.parseInt(leftEnemiesString);
+
 		settlementTimer--;
 		if(settlementTimer%3==0)
 		{
-			int settlementIndex=chooseZone(0,settlements.size()-1);
+			int settlementIndex=Utils.attack(0,settlements.size()-1);
 			theSettlement=settlements.get(settlementIndex);
 			Cookie settlement=new Cookie("settlement",theSettlement.resource+","+theSettlement.name);
 			settlement.setPath("/");
@@ -124,27 +111,23 @@ public class PlayController {
 			return "helloSettlement";
 		}
 		//finalBoss
-		if(Integer.parseInt(leftEnemiesString)<=0)
-		{
+		if(hero2.enemyEncountersLeft<=0) {
 			Enemy islandShark=new Enemy("islandShark","Island Shark",1,140,25,31,8,50,14);
 			Enemy whiteScaleDragon=new Enemy("whiteScaleDragon","Whitescale Dragon",2,145,26,32,7,50,11);
 			bosses.add(islandShark);
 			bosses.add(whiteScaleDragon);
-			theBoss=bosses.get(chooseZone(0,bosses.size()-1));
+			theBoss=bosses.get(Utils.attack(0,bosses.size()-1));
 			int type=theBoss.attackType;
 			String attackType="";
-			if(type==1)
-			{
-				attackType="PHYSICAL";
-			}
-			else 
-			{
-				attackType="MAGIC";
+			if (type == 1) {
+				attackType = "PHYSICAL";
+			} else {
+				attackType = "MAGIC";
 			}
 			strToResource=theBoss.resourcePath;
 			logger.debug("the resource path is: "+strToResource);
-			String theEnemy="Name: "+theBoss.name+", Attack Type: "+attackType+",  health = "+theBoss.health+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", critical chance = "+theBoss.critChance+"%"+", Gold reward = "+theBoss.dropsGold;
-			String theEnemy2="Name: "+theBoss.name+",  health = "+theBoss.health+", "+type+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", Gold reward = "+theBoss.dropsGold+", critical chance = "+theBoss.critChance;
+			String theEnemy=theBoss.displayText();
+			String theEnemy2=theBoss.toCookie();
 			model.addAttribute("message",hero2.createDisplayText());
 			model.addAttribute("enemyInfo",theEnemy);
 			model.addAttribute("resource",strToResource);
@@ -168,79 +151,50 @@ public class PlayController {
 			return "hello";
 		}
 		//Event
-		if(eventChance(10))
+		if(Utils.randomBool(10))
 		{
+			Cookie eligebleForEvent=new Cookie("eventState","eligebleForNewEvent");
+			eligebleForEvent.setPath("/");
+			eligebleForEvent.setMaxAge(60*60*24*2);
+			response.addCookie(eligebleForEvent);
 			settlementTimer++;
 			return "eventHello";
 		}
-	
-		
+
+
 		hero2.enemyEncountersLeft -= 1;
 		count++;
 		logger.debug("Hello Cookie is: " + fooCookie);
 		if (count == 1) {
-			Enemy boundEntity = new Enemy("boundEntity", "Bound Entity", 1, 82, 15, 18, 3, 20, 10);
-			Enemy orochi = new Enemy("Orochi", "Orochi", 1, 77, 15, 18, 2, 20, 13);
-			Enemy undeadArmy = new Enemy("undeadArmy", "Undead Army", 1, 52, 9, 13, 2, 7, 2);
-			Enemy darkKnights = new Enemy("darkKnights", "Dark Knights", 1, 68, 13, 16, 3, 11, 3);
-			Enemy insectoid = new Enemy("Insectoid", "Insectoid", 1, 92, 11, 16, 4, 20, 12);
-			Enemy lampLighter = new Enemy("lampLighter", "Lamp Lighter", 2, 66, 14, 18, 2, 12, 9);
-			Enemy elementalist = new Enemy("elementalist", "Elementalist", 2, 61, 10, 14, 3, 10, 15);
-			Enemy warlock = new Enemy("warlock", "Warlock", 2, 54, 12, 14, 2, 8, 5);
-			Enemy tribeMen = new Enemy("tribeMen", "Tribe men", 1, 60, 10, 14, 2, 9, 5);
-			Enemy mutatedWolf = new Enemy("mutatedWolf", "Mutated Wolf", 1, 86, 15, 18, 3, 20, 13);
-			Enemy slugLord = new Enemy("slugLord", "Slug Lord", 1, 82, 14, 18, 2, 17, 6);
-			Enemy fireKnight = new Enemy("fireKnight", "Fire Knight", 2, 91, 13, 18, 5, 22, 14);
-			Enemy fireMage = new Enemy("fireMage", "Fire Mage", 2, 62, 12, 15, 2, 11, 9);
-			Enemy evolvedHumanoid = new Enemy("evolvedHumanoid", "Evolved Humanoid", 1, 59, 11, 13, 2, 9, 5);
-			Enemy swampInsect = new Enemy("swampInsect", "Swamp Insect", 1, 70, 12, 15, 2, 14, 8);
-			Enemy assassin = new Enemy("assassin", "Assassin", 1, 52, 10, 14, 2, 8, 5);
-			Enemy scorpionMother = new Enemy("scorpionMother", "Scorpion Mother", 1, 74, 16, 18, 3, 18, 8);
-			Enemy dispeller = new Enemy("dispeller", "Dispeller", 2, 59, 13, 16, 6, 14, 9);
-			Enemy spectre = new Enemy("spectre", "Spectre", 2, 70, 14, 18, 3, 17, 9);
-			Enemy evolvedReptiles = new Enemy("evolvedReptiles", "Evolved Reptiles", 1, 89, 15, 19, 3, 20, 13);
-			Enemy disciple = new Enemy("disciple", "Disciple", 2, 61, 12, 15, 2, 11, 8);
-			Enemy trollWarrior = new Enemy("trollWarrior", "Troll Warrior", 1, 58, 11, 14, 3, 10, 7);
-			Enemy cutthroat = new Enemy("cutthroat", "Cutthroat", 1, 56, 10, 14, 2, 8, 5);
-			Enemy madMan = new Enemy("madMan", "Madman", 1, 56, 10, 14, 2, 10, 20);
-			Enemy alienRefugee = new Enemy("alienRefugee", "Alien Refugee", 2, 70, 13, 16, 2, 14, 7);
-			Enemy corruptedCentaur = new Enemy("corruptedCentaur", "Corrupted Centaur", 1, 64, 13, 15, 2, 12, 6);
-			Enemy riteOfTheStorm = new Enemy("riteOfTheStorm", "Rite of the Storm", 2, 78, 15, 19, 4, 20, 10);
-			Enemy iceLizard = new Enemy("iceLizard", "Ice Lizard", 2, 75, 13, 17, 4, 17, 6);
-			enemies.add(boundEntity);
-			enemies.add(orochi);
-			enemies.add(spectre);
-			enemies.add(undeadArmy);
-			enemies.add(darkKnights);
-			enemies.add(insectoid);
-			enemies.add(elementalist);
-			enemies.add(warlock);
-			enemies.add(slugLord);
-			enemies.add(lampLighter);
-			enemies.add(tribeMen);
-			enemies.add(mutatedWolf);
-			enemies.add(fireKnight);
-			enemies.add(fireMage);
-			enemies.add(evolvedHumanoid);
-			enemies.add(swampInsect);
-			enemies.add(assassin);
-			enemies.add(scorpionMother);
-			enemies.add(dispeller);
-			enemies.add(evolvedReptiles);
-			enemies.add(disciple);
-			enemies.add(trollWarrior);
-			enemies.add(cutthroat);
-			enemies.add(madMan);
-			enemies.add(alienRefugee);
-			enemies.add(corruptedCentaur);
-			enemies.add(riteOfTheStorm);
-			enemies.add(iceLizard);
-		}
-		
-		
-		
-		if(count==1)
-		{
+			enemies.add(new Enemy("boundEntity", "Bound Entity", 1, 82, 14, 17, 3, 20, 8));
+			enemies.add(new Enemy("Orochi", "Orochi", 1, 77, 14, 17, 2, 20, 13));
+			enemies.add(new Enemy("undeadArmy", "Undead Army", 1, 52, 9, 13, 2, 7, 2));
+			enemies.add(new Enemy("spectre", "Spectre", 2, 70, 14, 17, 3, 17, 9));
+			enemies.add(new Enemy("darkKnights", "Dark Knights", 1, 66, 13, 15, 3, 11, 3));
+			enemies.add(new Enemy("Insectoid", "Insectoid", 1, 92, 10, 15, 4, 20, 10));
+			enemies.add(new Enemy("elementalist", "Elementalist", 2, 61, 10, 14, 3, 10, 13));
+			enemies.add(new Enemy("warlock", "Warlock", 2, 54, 12, 14, 2, 8, 5));
+			enemies.add(new Enemy("slugLord", "Slug Lord", 1, 82, 13, 17, 2, 17, 6));
+			enemies.add(new Enemy("lampLighter", "Lamp Lighter", 2, 66, 13, 17, 2, 12, 8));
+			enemies.add(new Enemy("tribeMen", "Tribe men", 1, 60, 10, 14, 2, 9, 5));
+			enemies.add(new Enemy("mutatedWolf", "Mutated Wolf", 1, 86, 14, 17, 3, 20, 11));
+			enemies.add(new Enemy("fireKnight", "Fire Knight", 2, 91, 13, 17, 5, 22, 11));
+			enemies.add(new Enemy("fireMage", "Fire Mage", 2, 62, 12, 15, 2, 11, 8));
+			enemies.add(new Enemy("evolvedHumanoid", "Evolved Humanoid", 1, 59, 11, 13, 2, 9, 5));
+			enemies.add(new Enemy("swampInsect", "Swamp Insect", 1, 70, 12, 15, 2, 14, 8));
+			enemies.add(new Enemy("assassin", "Assassin", 1, 52, 10, 14, 2, 8, 5));
+			enemies.add(new Enemy("scorpionMother", "Scorpion Mother", 1, 74, 15, 18, 3, 18, 8));
+			enemies.add(new Enemy("dispeller", "Dispeller", 2, 59, 13, 16, 6, 14, 9));
+			enemies.add(new Enemy("evolvedReptiles", "Evolved Reptiles", 1, 89, 14, 18, 3, 20, 11));
+			enemies.add(new Enemy("disciple", "Disciple", 2, 61, 12, 15, 2, 11, 8));
+			enemies.add(new Enemy("trollWarrior", "Troll Warrior", 1, 58, 11, 14, 3, 10, 7));
+			enemies.add(new Enemy("cutthroat", "Cutthroat", 1, 56, 10, 14, 2, 8, 5));
+			enemies.add(new Enemy("madMan", "Madman", 1, 56, 10, 14, 2, 10, 18));
+			enemies.add(new Enemy("alienRefugee", "Alien Refugee", 2, 70, 13, 16, 2, 14, 7));
+			enemies.add(new Enemy("corruptedCentaur", "Corrupted Centaur", 1, 64, 13, 15, 2, 12, 6));
+			enemies.add(new Enemy("riteOfTheStorm", "Rite of the Storm", 2, 78, 14, 18, 4, 20, 9));
+			enemies.add(new Enemy("iceLizard", "Ice Lizard", 2, 75, 13, 17, 4, 17, 6));
+
 			Settlement snowyCastle=new Settlement("snowyCastle","Snowy Castle");
 			Settlement cliffTown=new Settlement("cliffTown","Cliff Town");
 			Settlement caveTown=new Settlement("caveTown","Cave Town");
@@ -255,7 +209,6 @@ public class PlayController {
 			settlements.add(riverSideCastle);
 			settlements.add(monkTown);
 			settlements.add(mountainPassSanctuary);
-			
 		}
 
 		
@@ -264,7 +217,7 @@ public class PlayController {
 		String[] encounteredBosses=passedMaps.split(",");
 		int randomCount=0;
 		while (true) {
-			theZone = chooseZone(0, enemies.size() - 1);
+			theZone = Utils.attack(0, enemies.size() - 1);
 			for (int i = 0; i < encounteredBosses.length; i++) {
 				if (encounteredBosses[i].equals(String.valueOf(theZone))) {
 					randomCount++;
@@ -279,21 +232,16 @@ public class PlayController {
 		theBoss=enemies.get(theZone);
 		int type=theBoss.attackType;
 		String attackType="";
-		if(type==1)
-		{
-			attackType="PHYSICAL";
-		}
-		else 
-		{
-			attackType="MAGIC";
+		if (type == 1) {
+			attackType = "PHYSICAL";
+		} else {
+			attackType = "MAGIC";
 		}
 		strToResource=theBoss.resourcePath;
 		logger.debug("the resource path is: "+strToResource);
-		String theEnemy="Name: "+theBoss.name+", Attack Type: "+attackType+",  health = "+theBoss.health+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", critical chance = "+theBoss.critChance+"%"+", Gold reward = "+theBoss.dropsGold;
-		cookie=fooCookie;
+		String theEnemy=theBoss.displayText();
 		logger.debug("hero2 attack = "+hero2.attackMin);
-		String theEnemy2="Name: "+theBoss.name+",  health = "+theBoss.health+", "+type+", attack = "+theBoss.damageMin+"-"+theBoss.damageMax+", armor = "+theBoss.armor+", Gold reward = "+theBoss.dropsGold+", critical chance = "+theBoss.critChance;
-		model.addAttribute("message",hero2.createDisplayText());
+		String theEnemy2=theBoss.toCookie();
 		model.addAttribute("enemyInfo",theEnemy);
 		model.addAttribute("resource",strToResource);
 		Cookie c2=hero2.createCookie();
@@ -316,6 +264,7 @@ public class PlayController {
 		response.addCookie(c4);
 		response.addCookie(passedRegions);
 		response.addCookie(bossState);
+		model.addAttribute("message",hero2.createDisplayText());
 		return "hello";
 	}
 }

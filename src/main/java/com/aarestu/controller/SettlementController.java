@@ -108,22 +108,24 @@ public class SettlementController {
 		hero=Hero.fromCookie(heroCookie);
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
-//		Item smallPotion = new Item("Small Potion", 25, 0, 0, 0, 0, 0, 0, 9);
 		Item smallPotion = new Item("Small Potion", 9).setCurrentHealth(25);
 		Item magicBoots = new Item("Magic Boots", 17).setMagicResist(2);
 		Item woodenShield = new Item("Wooden Shield", 17).setArmor(2);
-		Item woodenSword = new Item("Wooden Sword", 19).setAttackMin(2).setAttackMax(2);
-		Item smallVest = new Item("Small Vest", 14).setHealthLimit(15).setAttackMax(15);
-		Item swordSharpener = new Item("Sword Sharpener", 16).setCritChance(3);
+		Item woodenSword = new Item("Wooden Sword", 20).setAttackMin(2).setAttackMax(2);
+		Item smallVest = new Item("Small Vest", 14).setHealthLimit(15).setCurrentHealth(15);
+		Item swordSharpener = new Item("Sword Sharpener", 17).setCritChance(3);
 		Item woodenBow = new Item("Woden Bow", 20).setAttackMax(4);
 		Item strawHat = new Item("Straw Hat", 14).setArmor(1).setCurrentHealth(15);
-		Item ironSword = new Item("Iron Sword", 30).setAttackMin(4).setAttackMax(4);
+		Item ironSword = new Item("Iron Sword", 33).setAttackMin(4).setAttackMax(4);
 		Item mediumPotion = new Item("Medium Potion", 16).setCurrentHealth(50);
 		Item energyBoost = new Item("Energy Boost", 24).setCurrentHealth(10).setAttackMin(1).setAttackMax(1).setArmor(1).setMagicResist(1).setCritChance(2);
-		Item leatherArmor = new Item("Leather Armor", 26).setArmor(2).setMagicResist(2);
-		Item vitalityBoost = new Item("Vitality Boost", 17).setCurrentHealth(25).setAttackMax(2);
+		Item leatherArmor = new Item("Leather Armor", 27).setArmor(2).setMagicResist(2);
+		Item vitalityBoost = new Item("Vitality Boost", 19).setCurrentHealth(20).setAttackMax(2);
 		Item handMadeArrows = new Item("Hand-made Arrows", 14).setAttackMin(1).setAttackMax(1).setCritChance(1);
-		Item kunai = new Item("Kunai", 12).setAttackMax(2);
+		Item kunai = new Item("Kunai", 13).setAttackMax(2);
+		Item largePotion=new Item("Large Potion", 29).setCurrentHealth(100);
+		Item linenShirt=new Item("Linen Shirt",16).setArmor(1).setMagicResist(1);
+		Item mediumVest=new Item("Medium Vest",22).setCurrentHealth(30).setHealthLimit(30);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -140,6 +142,9 @@ public class SettlementController {
 		items.add(kunai);
 		items.add(handMadeArrows);
 		items.add(vitalityBoost);
+		items.add(largePotion);
+		items.add(linenShirt);
+		items.add(mediumVest);
 		
 
 		if (!bossStateCookie.equals("shopping")) {
