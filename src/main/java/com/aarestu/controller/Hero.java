@@ -11,7 +11,7 @@ public class Hero {
 	int gold = 10;
 	int critChance = 5;
 	int maxHp = 110;
-	int enemyEncountersLeft=23;
+	int enemyEncountersLeft=25;
 	boolean isValid = true;
 
 	public Hero() {

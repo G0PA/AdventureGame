@@ -62,7 +62,7 @@ public class PlayController {
 		passedEvents.setMaxAge(60*60*24*2);
 		passedEvents.setPath("/");
 		response.addCookie(passedEvents);
-		return "play";
+		return "chooseClass";//"play";
 	}
 	@RequestMapping("/hello")
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)

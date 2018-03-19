@@ -125,7 +125,7 @@ public class SettlementController {
 		Item kunai = new Item("Kunai", 13).setAttackMax(2);
 		Item largePotion=new Item("Large Potion", 29).setCurrentHealth(100);
 		Item linenShirt=new Item("Linen Shirt",16).setArmor(1).setMagicResist(1);
-		Item mediumVest=new Item("Medium Vest",22).setCurrentHealth(30).setHealthLimit(30);
+		Item mediumVest=new Item("Medium Vest",24).setCurrentHealth(30).setHealthLimit(30);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
