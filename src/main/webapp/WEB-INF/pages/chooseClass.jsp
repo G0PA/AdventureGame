@@ -58,7 +58,7 @@ function redirect4(){
 <title>Insert title here</title>
 </head>
 <body style="background-color:black">
-<h1 class="header"style="color:yellow">Choose a Class</h1>
+<h1 class="header"style="color:yellow"><i>Choose a Class</i></h1>
 
 <input class="images" type="image" onClick="redirect()" src="https://i.gyazo.com/e7168fd9d60a735c04e3728d7fc1a8d1.png" alt="Submit" width="470" height="1000">
 

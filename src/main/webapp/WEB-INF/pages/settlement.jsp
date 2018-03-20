@@ -79,19 +79,19 @@ background-color: red; /* Green */
 	<h1 style="color:Chartreuse;"> ${settlementName}</h1>
 		<h2 style="color:Chartreuse;">You can shop</h2>
 	<div id="zdr">
-	<a href="http://localhost:8081/AdventureGame/item1" class="button">${name}<span class="greenText">${currentHealth}${maxHealth}${attackMin}${attackMax}${armor}${magicResist}${critChance}</span><span class="redText">${costsGold}</span></a>
+	<a href="http://localhost:8081/AdventureGame/item1" class="button">${name}<span class="greenText">${currentHealth}${maxHealth}${mana}${maxMana}${attackMin}${attackMax}${armor}${magicResist}${critChance}</span><span class="redText">${costsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item2" class="button">${secondName}<span class="greenText">${secondCurrentHealth}${secondMaxHealth}${secondAttackMin}${secondAttackMax}${secondArmor}${secondMagicResist}${secondCritChance}</span><span class="redText">${secondCostsGold}</span></a>
+	<a href="http://localhost:8081/AdventureGame/item2" class="button">${secondName}<span class="greenText">${secondCurrentHealth}${secondMaxHealth}${secondMana}${secondMaxMana}${secondAttackMin}${secondAttackMax}${secondArmor}${secondMagicResist}${secondCritChance}</span><span class="redText">${secondCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item3" class="button">${thirdName}<span class="greenText">${thirdCurrentHealth}${thirdMaxHealth}${thirdAttackMin}${thirdAttackMax}${thirdArmor}${thirdMagicResist}${thirdCritChance}</span><span class="redText">${thirdCostsGold}</span></a>
+	<a href="http://localhost:8081/AdventureGame/item3" class="button">${thirdName}<span class="greenText">${thirdCurrentHealth}${thirdMaxHealth}${thirdMana}${thirdMaxMana}${thirdAttackMin}${thirdAttackMax}${thirdArmor}${thirdMagicResist}${thirdCritChance}</span><span class="redText">${thirdCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item4" class="button">${fourthName}<span class="greenText">${fourthCurrentHealth}${fourthMaxHealth}${fourthAttackMin}${fourthAttackMax}${fourthArmor}${fourthMagicResist}${fourthCritChance}</span><span class="redText">${fourthCostsGold}</span></a>
+	<a href="http://localhost:8081/AdventureGame/item4" class="button">${fourthName}<span class="greenText">${fourthCurrentHealth}${fourthMaxHealth}${fourthMana}${fourthMaxMana}${fourthAttackMin}${fourthAttackMax}${fourthArmor}${fourthMagicResist}${fourthCritChance}</span><span class="redText">${fourthCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/sleep" class="button">SLEEP: <span class="greenText">+15 Health</span> <span class="redText">-1 Enemy Encounter</span></a>
+	<a href="http://localhost:8081/AdventureGame/sleep" class="button">SLEEP: <span class="greenText">+15 Health, +5 Mana</span> <span class="redText">-1 Enemy Encounter</span></a>
 	</div>
 	<a href="http://localhost:8081/AdventureGame/leaveSettlement" class="button2">LEAVE SETTLEMENT</a>
 	

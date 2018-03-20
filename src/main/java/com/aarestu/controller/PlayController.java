@@ -31,14 +31,6 @@ public class PlayController {
 	@RequestMapping(value="/play",method=RequestMethod.GET)
 	public String plays(ModelMap model, HttpServletResponse response) {
 		settlementTimer=101;
-//		String health=String.valueOf(hero.hp);
-//		String maxHealth=String.valueOf(hero.maxHp);
-//		String attackMin=String.valueOf(hero.attackMin);
-//		String attackMax=String.valueOf(hero.attackMax);
-//		String armor=String.valueOf(hero.armor);
-//		String magicResist=String.valueOf(hero.magicResist);
-//		String gold=String.valueOf(hero.gold);
-//		String critChance=String.valueOf(hero.critChance);
 		Cookie leftEnemies=new Cookie("leftEnemies","25");
 		leftEnemies.setPath("/");
 		leftEnemies.setMaxAge(60*60*24*2);
@@ -68,6 +60,10 @@ public class PlayController {
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)
 	{
 		hero2=Hero.fromCookie(fooCookie);
+		if(hero2.heroClass.equals("Mage"))
+		{
+			model.addAttribute("spell","Fireball");
+		}
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");
 		passed.setMaxAge(60*60*24*2);

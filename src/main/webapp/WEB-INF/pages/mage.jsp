@@ -35,8 +35,9 @@ text-align:center;
 </head>
 <body background= "http://localhost:8081/AdventureGame/resources/images/mageWallpaper.jpg"class=bg>
 <div class="asd">
+	<h1 style="color:yellow"><font size="10"><i>Mage</i></font></h1>
 	<h1><i>Passive: every 2 points of Magic Resist increases Attack Damage Min and Max with 1</i></h1>
-	<h1><i>Active: Cast a spell dealing damage equal to 20% of your Maximum Mana</i></h1>
+	<h1><i>Active: Cast a Fireball dealing damage equal to 20% of your Maximum Mana</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE MAGE</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>

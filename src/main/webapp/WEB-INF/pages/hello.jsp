@@ -53,7 +53,8 @@ color: Chartreuse;
 	<h1 style="background-color:Chartreuse;">${cheater}${message}</h1>
 	<h1 style= "color:red;">${bossFight}</h1>
 	<h2 style="color:red;">${enemyInfo}</h2>
-	<a href="http://localhost:8081/AdventureGame/fight" class="button">FIGHT</a>
-	<a href="http://localhost:8081/AdventureGame/flee" class="button2">ATTEMP TO FLEE</a>
+	<a href="http://localhost:8081/AdventureGame/fight" class="button"><i>FIGHT</i></a>
+	<a href="http://localhost:8081/AdventureGame/fightWithSpell" class="button"><i>Cast ${spell}</i></a>
+	<a href="http://localhost:8081/AdventureGame/flee" class="button2"><i>ATTEMP TO FLEE</i></a>
 </body>
 </html>

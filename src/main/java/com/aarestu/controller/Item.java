@@ -4,6 +4,8 @@ public class Item {
 	String name;
 	int currentHealth;
 	int healthLimit;
+	int mana;
+	int maxMana;
 	int attackMin;
 	int attackMax;
 	int armor;
@@ -12,7 +14,7 @@ public class Item {
 	int costsGold;
 	
 	public Item(String name, int price) {
-		this(name, 0, 0, 0, 0, 0, 0, 0, price);
+		this(name, 0, 0, 0, 0, 0, 0, 0,0,0, price);
 	}
 	
 	Item setCurrentHealth(int currentHealth) {
@@ -22,6 +24,16 @@ public class Item {
 	
 	Item setHealthLimit(int healthLimit) {
 		this.healthLimit = healthLimit;
+		return this;
+	}
+	
+	Item setMana(int mana) {
+		this.mana = mana;
+		return this;
+	}
+	
+	Item setMaxMana(int maxMana) {
+		this.maxMana = maxMana;
 		return this;
 	}
 	
@@ -50,11 +62,13 @@ public class Item {
 		return this;
 	}
 
-	public Item(String name, int currentHealth, int healthLimit, int attackMin, int attackMax, int armor,
+	public Item(String name, int currentHealth, int healthLimit,int mana, int maxMana, int attackMin, int attackMax, int armor,
 			int magicResist, int critChance, int costsGold) {
 		this.name = name;
 		this.currentHealth = currentHealth;
 		this.healthLimit = healthLimit;
+		this.mana=mana;
+		this.maxMana=maxMana;
 		this.attackMin = attackMin;
 		this.attackMax = attackMax;
 		this.armor = armor;

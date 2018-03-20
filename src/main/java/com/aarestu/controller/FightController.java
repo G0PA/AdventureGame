@@ -15,20 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Random;
 @Controller
-@RequestMapping("/fight")
 public class FightController {
 	String theBadCookie="";
 	String resource="";
 	Hero hero;
 	Enemy enemy;
 	final static Logger logger=Logger.getLogger(FightController.class);
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value="/fight",method = RequestMethod.GET)
 	public String fight(ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,
 			HttpServletResponse response) {
+	
 		resource=resourceCookie;
 		logger.debug("the bad Cookie is: "+badCookie);
 		hero = Hero.fromCookie(fooCookie);
-//		hero = new Hero(fooCookie);
 		if (hero == null) {
 			return "defeat";
 		}
@@ -36,7 +35,7 @@ public class FightController {
 		logger.debug("enemy123:  "+badCookie);
 		enemy = Enemy.fromCookie(badCookie);
 
-		String fightOutcome=fight(enemy.health,enemy.attackType,enemy.damageMin,enemy.damageMax,enemy.armor,enemy.dropsGold,enemy.critChance, response,model);
+		String fightOutcome=fight(enemy.health,enemy.attackType,enemy.damageMin,enemy.damageMax,enemy.armor,enemy.dropsGold,enemy.critChance,response,model,hero);
 		if(fightOutcome.equals("nobodyDied"))
 		{
 			return "fight";
@@ -48,7 +47,6 @@ public class FightController {
 	int attack(int min, int max) {
 	   int range = (max - min) + 1;     
 	   return (int)(Math.random() * range) + min;
-
 	}
 	boolean critical(int critChance) {
 		return Math.random() * 100 < critChance;
@@ -56,8 +54,14 @@ public class FightController {
 
 	
 	String fight(int enemyHealth,int attackType, int enemyAttackMin, int enemyAttackMax, 
-			int enemyArmor, int dropsGold, int enemyCritChance, HttpServletResponse response, ModelMap model) {
+			int enemyArmor, int dropsGold, int enemyCritChance, HttpServletResponse response, ModelMap model,Hero hero) {
 		int defense;
+		if(hero.heroClass.equals("Mage"))
+		{
+			hero.attackMin+=hero.magicResist/2;
+			hero.attackMax+=hero.magicResist/2;
+			model.addAttribute("spell","Fireball");
+		}
 		if(attackType==1) {
 			defense=hero.armor;
 		} else {
@@ -65,20 +69,25 @@ public class FightController {
 		}
 		int tempEnemyHealth=enemyHealth;
 		boolean crit=critical(hero.critChance);
-		int multiply=1;
+		double multiply=1;
 		if(crit==true) {
 			model.addAttribute("critically","CRITICALLY ");
-			multiply=2;
+			multiply=1.8;
 		} else {
 			model.addAttribute("critically","");
 		}
 		if ((attack(hero.attackMin,hero.attackMax)*multiply - enemyArmor)<0) {
 			enemyHealth=enemyHealth-1;
 		} else {
-			enemyHealth = enemyHealth - (attack(hero.attackMin, hero.attackMax) * multiply - enemyArmor);
+			enemyHealth =(int) (enemyHealth - (attack(hero.attackMin, hero.attackMax) * multiply - enemyArmor));
 		}
 		if (enemyHealth <= 0) {
 			hero.gold += dropsGold;
+			if(hero.heroClass.equals("Mage"))
+			{
+				hero.attackMin-=hero.magicResist/2;
+				hero.attackMax-=hero.magicResist/2;
+			}
 			Cookie c = hero.createCookie();
 
 			c.setPath("/");
@@ -103,7 +112,7 @@ public class FightController {
 		if ((attack(enemyAttackMin,enemyAttackMax) - hero.armor) < 0) {
 			hero.hp = hero.hp - 1;
 		} else {
-			hero.hp = hero.hp - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense);
+			hero.hp =(int) (hero.hp - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense));
 		}
 		if (hero.hp <= 0) {
 			Cookie c = hero.createCookie();
@@ -125,6 +134,11 @@ public class FightController {
 			return "defeat";
 
 		}
+		if(hero.heroClass.equals("Mage"))
+		{
+			hero.attackMin-=hero.magicResist/2;
+			hero.attackMax-=hero.magicResist/2;
+		}
 		Cookie c = hero.createCookie();
 		enemy.health=enemyHealth;
 		theBadCookie=enemy.toCookie();
@@ -143,5 +157,37 @@ public class FightController {
 		model.addAttribute("enemyName",resource);
 		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
 		return "nobodyDied";
+	}
+	
+	@RequestMapping(value="/fightWithSpell",method=RequestMethod.GET)
+	 String fightWithSpell(ModelMap model, HttpServletResponse response,@CookieValue("enemy")String enemyCookie,@CookieValue("resource")String resourceCookie,@CookieValue("hero")String heroCookie)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		model.addAttribute("resource",resourceCookie);
+		if(hero.heroClass.equals("Mage"))
+			if(hero.mana-20<0)
+			{
+				model.addAttribute("message",hero.createDisplayText());
+				return "noMana";
+				
+			}
+				hero.mana-=20;
+				Enemy enemy=Enemy.fromCookie(enemyCookie);
+				int currentEnemyHealth=enemy.health;
+				enemy.health-=hero.maxMana*0.20;
+				currentEnemyHealth=currentEnemyHealth-enemy.health;
+				model.addAttribute("spellDamage","You cast Fireball Dealing "+String.valueOf(currentEnemyHealth)+" Damage");
+				Cookie leHeroCookie=hero.createCookie();
+				leHeroCookie.setPath("/");
+				leHeroCookie.setMaxAge(60*60*24*2);
+				response.addCookie(leHeroCookie);
+				String fightOutcome=fight(enemy.health,enemy.attackType,enemy.damageMin,enemy.damageMax,enemy.armor,enemy.dropsGold,enemy.critChance, response,model,hero);
+				if(fightOutcome.equals("nobodyDied"))
+				{
+					return "fight";
+				}
+				return fightOutcome;
+		
+		
 	}
 }

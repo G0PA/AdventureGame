@@ -69,6 +69,12 @@ public class SettlementController {
 			} else {
 				hero.hp = hero.maxHp;
 			}
+			if (hero.mana+5<=hero.maxMana)
+			{
+				hero.mana+=5;
+			}else {
+				hero.mana=hero.maxMana;
+			}
 
 			Cookie d = new Cookie("bossState", "dead");
 			Cookie cc = hero.createCookie();
@@ -77,7 +83,7 @@ public class SettlementController {
 			response.addCookie(cc);
 			d.setPath("/");
 			d.setMaxAge(60 * 60 * 24 * 2);
-			model.addAttribute("sleep", "You decide to sleep Restoring 15 Health");
+			model.addAttribute("sleep", "You decide to sleep Restoring 15 Health and 5 Mana");
 			response.addCookie(d);
 		}
 		return "leaveSettlement";
@@ -108,7 +114,7 @@ public class SettlementController {
 		hero=Hero.fromCookie(heroCookie);
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
-		Item smallPotion = new Item("Small Potion", 9).setCurrentHealth(25);
+		Item smallPotion = new Item("Small Health Potion", 9).setCurrentHealth(25);
 		Item magicBoots = new Item("Magic Boots", 17).setMagicResist(2);
 		Item woodenShield = new Item("Wooden Shield", 17).setArmor(2);
 		Item woodenSword = new Item("Wooden Sword", 20).setAttackMin(2).setAttackMax(2);
@@ -117,15 +123,23 @@ public class SettlementController {
 		Item woodenBow = new Item("Woden Bow", 20).setAttackMax(4);
 		Item strawHat = new Item("Straw Hat", 14).setArmor(1).setCurrentHealth(15);
 		Item ironSword = new Item("Iron Sword", 33).setAttackMin(4).setAttackMax(4);
-		Item mediumPotion = new Item("Medium Potion", 16).setCurrentHealth(50);
+		Item mediumPotion = new Item("Medium Health Potion", 16).setCurrentHealth(50);
 		Item energyBoost = new Item("Energy Boost", 24).setCurrentHealth(10).setAttackMin(1).setAttackMax(1).setArmor(1).setMagicResist(1).setCritChance(2);
 		Item leatherArmor = new Item("Leather Armor", 27).setArmor(2).setMagicResist(2);
 		Item vitalityBoost = new Item("Vitality Boost", 19).setCurrentHealth(20).setAttackMax(2);
 		Item handMadeArrows = new Item("Hand-made Arrows", 14).setAttackMin(1).setAttackMax(1).setCritChance(1);
 		Item kunai = new Item("Kunai", 13).setAttackMax(2);
-		Item largePotion=new Item("Large Potion", 29).setCurrentHealth(100);
+		Item largePotion=new Item("Large Health Potion", 29).setCurrentHealth(100);
 		Item linenShirt=new Item("Linen Shirt",16).setArmor(1).setMagicResist(1);
 		Item mediumVest=new Item("Medium Vest",24).setCurrentHealth(30).setHealthLimit(30);
+		Item smallManaPotion=new Item("Small Mana Potion",8).setMana(12);
+		Item mediumManaPotion=new Item("Medium Mana Potion",15).setMana(25);
+		Item largeManaPotion=new Item("Large Mana Potion",28).setMana(50);
+		Item smallMixedPotion=new Item("Small Mixed Potion",16).setCurrentHealth(25).setMana(12);
+		Item mediumMixedPotion=new Item("Medium Mixed Potion",29).setCurrentHealth(50).setMana(25);
+		Item smallCape=new Item("Small Cape",18).setMaxMana(10).setMana(10);
+		Item mediumCape=new Item("Medium Cape",32).setMaxMana(20).setMana(20);
+		Item woodenStaff=new Item("Wooden Staff",32).setMana(5).setMaxMana(15).setMagicResist(2);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -145,7 +159,14 @@ public class SettlementController {
 		items.add(largePotion);
 		items.add(linenShirt);
 		items.add(mediumVest);
-		
+		items.add(smallManaPotion);
+		items.add(mediumManaPotion);
+		items.add(largeManaPotion);
+		items.add(smallMixedPotion);
+		items.add(mediumMixedPotion);
+		items.add(smallCape);
+		items.add(mediumCape);
+		items.add(woodenStaff);
 
 		if (!bossStateCookie.equals("shopping")) {
 			shop = new ArrayList<Item>();
@@ -161,6 +182,14 @@ public class SettlementController {
 			if(tempItem.healthLimit!=0)
 			{
 				model.addAttribute("maxHealth","Max Health +"+String.valueOf(tempItem.healthLimit)+" ");
+			}
+			if(tempItem.mana!=0)
+			{
+				model.addAttribute("mana","Mana +"+String.valueOf(tempItem.mana)+" ");
+			}
+			if(tempItem.maxMana!=0)
+			{
+				model.addAttribute("maxMana","Max Mana +"+String.valueOf(tempItem.maxMana)+" ");
 			}
 			if(tempItem.attackMin!=0)
 			{
@@ -194,6 +223,15 @@ public class SettlementController {
 			{
 				model.addAttribute("secondMaxHealth","Max Health +"+String.valueOf(tempItem2.healthLimit)+" ");
 			}
+			
+			if(tempItem2.mana!=0)
+			{
+				model.addAttribute("secondMana","Mana +"+String.valueOf(tempItem2.mana)+" ");
+			}
+			if(tempItem2.maxMana!=0)
+			{
+				model.addAttribute("secondMaxMana","Max Mana +"+String.valueOf(tempItem2.maxMana)+" ");
+			}
 			if(tempItem2.attackMin!=0)
 			{
 				model.addAttribute("secondAttackMin","Attack Minimum +"+String.valueOf(tempItem2.attackMin)+" ");
@@ -226,6 +264,14 @@ public class SettlementController {
 			{
 				model.addAttribute("thirdMaxHealth","Max Health +"+String.valueOf(tempItem3.healthLimit)+" ");
 			}
+			if(tempItem3.mana!=0)
+			{
+				model.addAttribute("thirdMana","Mana +"+String.valueOf(tempItem3.mana)+" ");
+			}
+			if(tempItem3.maxMana!=0)
+			{
+				model.addAttribute("thirdMaxMana","Max Mana +"+String.valueOf(tempItem3.maxMana)+" ");
+			}
 			if(tempItem3.attackMin!=0)
 			{
 				model.addAttribute("thirdAttackMin","Attack Minimum +"+String.valueOf(tempItem3.attackMin)+" ");
@@ -257,6 +303,14 @@ public class SettlementController {
 			if(tempItem4.healthLimit!=0)
 			{
 				model.addAttribute("fourthMaxHealth","Max Health +"+String.valueOf(tempItem4.healthLimit)+" ");
+			}
+			if(tempItem4.mana!=0)
+			{
+				model.addAttribute("fourthMana","Mana +"+String.valueOf(tempItem4.mana)+" ");
+			}
+			if(tempItem4.maxMana!=0)
+			{
+				model.addAttribute("fourthMaxMana","Max Mana +"+String.valueOf(tempItem4.maxMana)+" ");
 			}
 			if(tempItem4.attackMin!=0)
 			{
@@ -301,6 +355,10 @@ public class SettlementController {
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
+
+		if (tempItem.healthLimit != 0) {
+			hero.maxHp += tempItem.healthLimit;
+		}
 		if (tempItem.currentHealth!=0) {
 			if(hero.hp + tempItem.currentHealth < hero.maxHp) {
 				hero.hp += tempItem.currentHealth;
@@ -308,8 +366,17 @@ public class SettlementController {
 				hero.hp = hero.maxHp;
 			}
 		}
-		if (tempItem.healthLimit != 0) {
-			hero.maxHp += tempItem.healthLimit;
+		
+		if(tempItem.maxMana !=0)
+		{
+			hero.maxMana+=tempItem.maxMana;
+		}
+		if (tempItem.mana != 0) {
+			if (hero.mana + tempItem.mana < hero.maxMana) {
+				hero.mana += tempItem.mana;
+			} else {
+				hero.mana = hero.maxMana;
+			}
 		}
 		if (tempItem.attackMin != 0) {
 			hero.attackMin += tempItem.attackMin;
@@ -351,6 +418,9 @@ public class SettlementController {
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
+		if (tempItem2.healthLimit != 0) {
+			hero.maxHp += tempItem2.healthLimit;
+		}
 		if (tempItem2.currentHealth!=0) {
 			if(hero.hp + tempItem2.currentHealth < hero.maxHp) {
 				hero.hp += tempItem2.currentHealth;
@@ -358,8 +428,16 @@ public class SettlementController {
 				hero.hp = hero.maxHp;
 			}
 		}
-		if (tempItem2.healthLimit != 0) {
-			hero.maxHp += tempItem2.healthLimit;
+		if(tempItem2.maxMana !=0)
+		{
+			hero.maxMana+=tempItem2.maxMana;
+		}
+		if (tempItem2.mana != 0) {
+			if (hero.mana + tempItem2.mana < hero.maxMana) {
+				hero.mana += tempItem2.mana;
+			} else {
+				hero.mana = hero.maxMana;
+			}
 		}
 		if (tempItem2.attackMin != 0) {
 			hero.attackMin += tempItem2.attackMin;
@@ -401,6 +479,10 @@ public class SettlementController {
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
+		
+		if (tempItem3.healthLimit != 0) {
+			hero.maxHp += tempItem3.healthLimit;
+		}
 		if (tempItem3.currentHealth!=0) {
 			if(hero.hp + tempItem3.currentHealth < hero.maxHp) {
 				hero.hp += tempItem3.currentHealth;
@@ -408,8 +490,17 @@ public class SettlementController {
 				hero.hp = hero.maxHp;
 			}
 		}
-		if (tempItem3.healthLimit != 0) {
-			hero.maxHp += tempItem3.healthLimit;
+		
+		if(tempItem3.maxMana !=0)
+		{
+			hero.maxMana+=tempItem3.maxMana;
+		}
+		if (tempItem3.mana != 0) {
+			if (hero.mana + tempItem3.mana < hero.maxMana) {
+				hero.mana += tempItem3.mana;
+			} else {
+				hero.mana = hero.maxMana;
+			}
 		}
 		if (tempItem3.attackMin != 0) {
 			hero.attackMin += tempItem3.attackMin;
@@ -451,6 +542,10 @@ public class SettlementController {
 			model.addAttribute("notEnoughGold","Not enough Gold for");
 			return "shopped";
 		}
+		
+		if (tempItem4.healthLimit != 0) {
+			hero.maxHp += tempItem4.healthLimit;
+		}
 		if (tempItem4.currentHealth!=0) {
 			if(hero.hp + tempItem4.currentHealth < hero.maxHp) {
 				hero.hp += tempItem4.currentHealth;
@@ -458,8 +553,17 @@ public class SettlementController {
 				hero.hp = hero.maxHp;
 			}
 		}
-		if (tempItem4.healthLimit != 0) {
-			hero.maxHp += tempItem4.healthLimit;
+		
+		if(tempItem4.maxMana !=0)
+		{
+			hero.maxMana+=tempItem4.maxMana;
+		}
+		if (tempItem4.mana != 0) {
+			if (hero.mana + tempItem4.mana < hero.maxMana) {
+				hero.mana += tempItem4.mana;
+			} else {
+				hero.mana = hero.maxMana;
+			}
 		}
 		if (tempItem4.attackMin != 0) {
 			hero.attackMin += tempItem4.attackMin;
