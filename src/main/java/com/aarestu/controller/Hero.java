@@ -15,6 +15,8 @@ public class Hero {
 	int gold = 10;
 	int critChance = 5;
 	int enemyEncountersLeft=24;
+	int hpRegen=2;
+	int manaRegen=1;
 	boolean isValid = true;
 
 	public Hero() {
@@ -22,11 +24,11 @@ public class Hero {
 	}
 
 	public Hero(int hp, int maxHp,int mana,int maxMana, int attackMin, int attackMax, int armor, int magicResist, int gold, int critChance) {
-		this(hp, maxHp,mana,maxMana, attackMin, attackMax, armor, magicResist, gold, critChance, 0);
+		this(hp, maxHp,mana,maxMana, attackMin, attackMax, armor, magicResist, gold, critChance, 0,0,0);
 	}
 	
 	public Hero(int hp, int maxHp,int mana,int maxMana, int attackMin, int attackMax, int armor, int magicResist, int gold, int critChance,
-			int enemyEncountersLeft) {
+			int enemyEncountersLeft, int hpRegen, int manaRegen) {
 		this.hp = hp;
 		this.mana=mana;
 		this.maxMana=maxMana;
@@ -38,6 +40,8 @@ public class Hero {
 		this.critChance = critChance;
 		this.maxHp = maxHp;
 		this.enemyEncountersLeft = enemyEncountersLeft;
+		this.hpRegen=hpRegen;
+		this.manaRegen=manaRegen;
 	}
 
 	public static Hero fromCookie(String cookie) {
@@ -56,6 +60,8 @@ public class Hero {
 			hero.gold=Integer.parseInt(heroArr[9]);
 			hero.critChance=Integer.parseInt(heroArr[10]);
 			hero.enemyEncountersLeft=Integer.parseInt(heroArr[11]);
+			hero.hpRegen=Integer.parseInt(heroArr[12]);
+			hero.manaRegen=Integer.parseInt(heroArr[13]);
 			if (hero.hp > hero.maxHp) {
 				return null;
 			}
@@ -67,14 +73,14 @@ public class Hero {
 	}
 	
 	public Cookie createCookie() {
-		return new Cookie("hero", String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",heroClass, hp, maxHp,mana,maxMana, attackMin, attackMax, armor, magicResist, gold, critChance,enemyEncountersLeft));
+		return new Cookie("hero", String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",heroClass, hp, maxHp,mana,maxMana, attackMin, attackMax, armor, magicResist, gold, critChance,enemyEncountersLeft,hpRegen,manaRegen));
 	}
 	
 	public String createDisplayText() {
 		if(heroClass.equals("Mage")) {
 		return  "class = " +heroClass+
-				",   health = " + hp +"/" + maxHp + 
-				",   mana = "+mana+"/"+ maxMana+
+				",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+ 
+				",   mana = "+mana+"/"+ maxMana+" (+"+manaRegen+" regen)"+ 
 				",   attack = " + (attackMin+(magicResist/2)) + "-" + (attackMax+(magicResist/2))+
 				",   armor = " + armor +
 				",   magic resist = " + magicResist + 
@@ -83,8 +89,8 @@ public class Hero {
 				",   Enemy encounters left until Boss: " + enemyEncountersLeft;
 		}else if(heroClass.equals("Warrior")) {
 			return  "class = " +heroClass+
-					",   health = " + hp +"/" + maxHp + 
-					",   mana = "+mana+"/"+ maxMana+
+					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+					",   mana = "+mana+"/"+ maxMana+" (+"+manaRegen+" regen)"+ 
 					",   attack = " + (attackMin+(armor/2)) + "-" + (attackMax+(armor/2))+
 					",   armor = " + armor +
 					",   magic resist = " + magicResist + 
@@ -93,8 +99,8 @@ public class Hero {
 					",   Enemy encounters left until Boss: " + enemyEncountersLeft;
 		}else if(heroClass.equals("Ranger")) {
 		return  "class = " +heroClass+
-				",   health = " + hp +"/" + maxHp + 
-				",   mana = "+mana+"/"+maxMana+
+				",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+				",   mana = "+mana+"/"+maxMana+" (+"+manaRegen+" regen)"+ 
 				",   attack = " + attackMin+ "-" + attackMax+
 				",   armor = " + armor +
 				",   magic resist = " + magicResist + 
@@ -103,8 +109,8 @@ public class Hero {
 				",   Enemy encounters left until Boss: " + enemyEncountersLeft;
 		}else {
 			return  "class = " +heroClass+
-					",   health = " + hp +"/" + maxHp + 
-					",   mana = "+mana+"/"+maxMana+
+					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+					",   mana = "+mana+"/"+maxMana+" (+"+manaRegen+" regen)"+ 
 					",   attack = " + (attackMin+((maxHp-hp)/25))+ "-" + (attackMax+((maxHp-hp)/25))+
 					",   armor = " + armor +
 					",   magic resist = " + magicResist + 

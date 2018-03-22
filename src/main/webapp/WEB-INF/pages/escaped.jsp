@@ -25,11 +25,15 @@ height: 100%;
   background-size: cover;
 
 }
+.blue{
+color: blue;
+}
 </style>
 <head>
 </head>
 <body background= "resources/images/escaped.jpg" class=bg>
 	<h1>You Have Escaped</h1>
+	<h2 style="color:CornflowerBlue "><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<a href="http://localhost:8081/AdventureGame/hello" class="button">CONTINUE</a>
 </body>
 </html>

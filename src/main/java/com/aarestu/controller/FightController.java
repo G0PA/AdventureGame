@@ -149,6 +149,17 @@ public class FightController {
 				hero.attackMin-=hero.armor/2;
 				hero.attackMax-=hero.armor/2;
 			}
+			if(hero.hp+hero.hpRegen<=hero.maxHp) {
+			hero.hp+=hero.hpRegen;
+		}else {
+			hero.hp=hero.maxHp;
+		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+			hero.mana+=hero.manaRegen;
+		}else {
+			hero.mana=hero.maxMana;
+		}
+			model.addAttribute("hpRegen",hero.hpRegen);
+			model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie c = hero.createCookie();
 
 			c.setPath("/");
@@ -193,6 +204,7 @@ public class FightController {
 			images.add("defeat4");
 			images.add("defeat5");
 			images.add("defeat6");
+			images.add("defeat7");
 			
 			int theIndex=attack(0,images.size()-1);
 			model.addAttribute("defeatScreen",images.get(theIndex));

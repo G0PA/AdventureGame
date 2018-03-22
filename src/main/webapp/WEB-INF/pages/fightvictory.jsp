@@ -31,9 +31,13 @@ color: Chartreuse;
 .grayText{
 color: green;
 }
+.blue{
+color: blue;
+}
 </style>
 <body background= "resources/images/${resource}.jpg" class=bg>
 	<a href="http://localhost:8081/AdventureGame/hello" class="button">VICTORY</a>
+	<h2 style="color:MediumBlue"><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<h1><span class="grayText">Gold earned:</span> <span class="blueText">+${gold}</span></h1>
 </body>
 </html>
