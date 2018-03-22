@@ -12,9 +12,11 @@ public class Item {
 	int magicResist;
 	int critChance;
 	int costsGold;
+	int hpRegen;
+	int manaRegen;
 	
 	public Item(String name, int price) {
-		this(name, 0, 0, 0, 0, 0, 0, 0,0,0, price);
+		this(name, 0, 0, 0, 0, 0, 0, 0,0,0,0,0, price);
 	}
 	
 	Item setCurrentHealth(int currentHealth) {
@@ -61,9 +63,17 @@ public class Item {
 		this.critChance = critChance;
 		return this;
 	}
+	Item setHpRegen(int hpRegen) {
+		this.hpRegen = hpRegen;
+		return this;
+	}
+	Item setManaRegen(int manaRegen) {
+		this.manaRegen = manaRegen;
+		return this;
+	}
 
 	public Item(String name, int currentHealth, int healthLimit,int mana, int maxMana, int attackMin, int attackMax, int armor,
-			int magicResist, int critChance, int costsGold) {
+			int magicResist, int critChance,int hpRegen, int manaRegen, int costsGold) {
 		this.name = name;
 		this.currentHealth = currentHealth;
 		this.healthLimit = healthLimit;
@@ -75,5 +85,7 @@ public class Item {
 		this.magicResist = magicResist;
 		this.critChance = critChance;
 		this.costsGold = costsGold;
+		this.hpRegen=hpRegen;
+		this.manaRegen=manaRegen;
 	}
 }

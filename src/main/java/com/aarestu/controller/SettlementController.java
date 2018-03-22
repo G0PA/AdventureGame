@@ -46,6 +46,17 @@ public class SettlementController {
 		if (!bossState.equals("dead")) {
 			hero = Hero.fromCookie(heroCookie);
 			hero.enemyEncountersLeft += 1;
+			if(hero.hp+hero.hpRegen<=hero.maxHp) {
+				hero.hp+=hero.hpRegen;
+			}else {
+				hero.hp=hero.maxHp;
+			}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+				hero.mana+=hero.manaRegen;
+			}else {
+				hero.mana=hero.maxMana;
+			}
+				model.addAttribute("hpRegen",hero.hpRegen);
+				model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie theHero=hero.createCookie();
 			theHero.setPath("/");
 			theHero.setMaxAge(60*60*24*2);
@@ -80,7 +91,17 @@ public class SettlementController {
 			}else {
 				hero.mana=hero.maxMana;
 			}
-
+			if(hero.hp+hero.hpRegen<=hero.maxHp) {
+				hero.hp+=hero.hpRegen;
+			}else {
+				hero.hp=hero.maxHp;
+			}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+				hero.mana+=hero.manaRegen;
+			}else {
+				hero.mana=hero.maxMana;
+			}
+				model.addAttribute("hpRegen",hero.hpRegen);
+				model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie d = new Cookie("bossState", "dead");
 			Cookie cc = hero.createCookie();
 			cc.setPath("/");
@@ -95,7 +116,7 @@ public class SettlementController {
 	}
 
 	@RequestMapping(value="/leaveSettlement",method=RequestMethod.GET)
-	String bye(ModelMap model,HttpServletResponse response,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState)
+	String bye(ModelMap model,HttpServletResponse response,@CookieValue("hero")String heroCookie,@CookieValue("leftEnemies") String fooCookie,@CookieValue("resource") String resourceCookie,@CookieValue("bossState")String bossState)
 	{
 		
 
@@ -105,6 +126,22 @@ public class SettlementController {
 		d.setPath("/");
 		d.setMaxAge(60*60*24*2);
 		response.addCookie(d);
+		Hero hero=Hero.fromCookie(heroCookie);
+		if(hero.hp+hero.hpRegen<=hero.maxHp) {
+			hero.hp+=hero.hpRegen;
+		}else {
+			hero.hp=hero.maxHp;
+		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+			hero.mana+=hero.manaRegen;
+		}else {
+			hero.mana=hero.maxMana;
+		}
+			model.addAttribute("hpRegen",hero.hpRegen);
+			model.addAttribute("manaRegen",hero.manaRegen);
+			Cookie f=hero.createCookie();
+			f.setMaxAge(60*60*24*2);
+			f.setPath("/");
+			response.addCookie(f);
 		
 		return "leaveSettlement";
 	}
@@ -146,6 +183,9 @@ public class SettlementController {
 		Item mediumCape=new Item("Medium Cape",30).setMaxMana(20).setMana(20);
 		Item woodenStaff=new Item("Wooden Staff",32).setMana(5).setMaxMana(15).setMagicResist(2);
 		Item vitalityNecklace=new Item("Vitality Necklace",30).setCurrentHealth(15).setHealthLimit(30).setMaxMana(15).setMana(10);
+		Item rejuvinationBracelet=new Item("Rejuvination Bracelet",23).setHpRegen(4).setManaRegen(2);
+		Item smallJacket=new Item("Small Jacket",16).setCurrentHealth(15).setHpRegen(2);
+		Item brokenStaff=new Item("Broken Staff",15).setMana(10).setManaRegen(1);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -174,6 +214,9 @@ public class SettlementController {
 		items.add(mediumCape);
 		items.add(woodenStaff);
 		items.add(vitalityNecklace);
+		items.add(rejuvinationBracelet);
+		items.add(smallJacket);
+		items.add(brokenStaff);
 
 		if (!bossStateCookie.equals("shopping")) {
 			shop = new ArrayList<Item>();
@@ -218,6 +261,14 @@ public class SettlementController {
 			{
 				model.addAttribute("critChance","Critical Chance +"+String.valueOf(tempItem.critChance)+" ");
 			}
+			if(tempItem.hpRegen!=0) 
+			{
+				model.addAttribute("hpRegen","Hp Regen +"+String.valueOf(tempItem.hpRegen)+" ");
+			}
+			if(tempItem.manaRegen!=0)
+			{
+				model.addAttribute("manaRegen","Mana Regen +"+String.valueOf(tempItem.manaRegen)+" ");
+			}
 			model.addAttribute("costsGold","Gold -"+String.valueOf(tempItem.costsGold));
 		
 			tempItem2=shop.get(1);
@@ -259,6 +310,14 @@ public class SettlementController {
 			{
 				model.addAttribute("secondCritChance","Critical Chance +"+String.valueOf(tempItem2.critChance)+" ");
 			}
+			if(tempItem2.hpRegen!=0) 
+			{
+				model.addAttribute("secondHpRegen","Hp Regen +"+String.valueOf(tempItem2.hpRegen)+" ");
+			}
+			if(tempItem2.manaRegen!=0)
+			{
+				model.addAttribute("secondManaRegen","Mana Regen +"+String.valueOf(tempItem2.manaRegen)+" ");
+			}
 			model.addAttribute("secondCostsGold","Gold -"+String.valueOf(tempItem2.costsGold)+" ");
 			
 			tempItem3=shop.get(2);
@@ -299,6 +358,14 @@ public class SettlementController {
 			{
 				model.addAttribute("thirdCritChance","Critical Chance +"+String.valueOf(tempItem3.critChance)+" ");
 			}
+			if(tempItem3.hpRegen!=0) 
+			{
+				model.addAttribute("thirdHpRegen","Hp Regen +"+String.valueOf(tempItem3.hpRegen)+" ");
+			}
+			if(tempItem3.manaRegen!=0)
+			{
+				model.addAttribute("thirdManaRegen","Mana Regen +"+String.valueOf(tempItem3.manaRegen)+" ");
+			}
 			model.addAttribute("thirdCostsGold","Gold -"+String.valueOf(tempItem3.costsGold)+" ");
 			
 			tempItem4=shop.get(3);
@@ -338,6 +405,14 @@ public class SettlementController {
 			if(tempItem4.critChance!=0)
 			{
 				model.addAttribute("fourthCritChance","Critical Chance +"+String.valueOf(tempItem4.critChance)+" ");
+			}
+			if(tempItem4.hpRegen!=0) 
+			{
+				model.addAttribute("fourthHpRegen","Hp Regen +"+String.valueOf(tempItem4.hpRegen)+" ");
+			}
+			if(tempItem4.manaRegen!=0)
+			{
+				model.addAttribute("fourthManaRegen","Mana Regen +"+String.valueOf(tempItem4.manaRegen)+" ");
 			}
 			model.addAttribute("fourthCostsGold","Gold -"+String.valueOf(tempItem4.costsGold)+" ");
 			
@@ -384,6 +459,14 @@ public class SettlementController {
 			if(tempItem5.critChance!=0)
 			{
 				model.addAttribute("fifthCritChance","Critical Chance +"+String.valueOf(tempItem5.critChance)+" ");
+			}
+			if(tempItem5.hpRegen!=0) 
+			{
+				model.addAttribute("fifthHpRegen","Hp Regen +"+String.valueOf(tempItem5.hpRegen)+" ");
+			}
+			if(tempItem5.manaRegen!=0)
+			{
+				model.addAttribute("fifthManaRegen","Mana Regen +"+String.valueOf(tempItem5.manaRegen)+" ");
 			}
 			model.addAttribute("fifthCostsGold","Gold -"+String.valueOf(tempItem5.costsGold)+" ");
 			
@@ -447,6 +530,12 @@ public class SettlementController {
 		if (tempItem.critChance != 0) {
 			hero.critChance+=tempItem.critChance;
 		}
+		if(tempItem.hpRegen !=0) {
+			hero.hpRegen+=tempItem.hpRegen;
+		}
+		if(tempItem.manaRegen !=0) {
+			hero.manaRegen=tempItem.manaRegen;
+		}
 		
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
@@ -507,6 +596,12 @@ public class SettlementController {
 		}
 		if (tempItem2.critChance != 0) {
 			hero.critChance+=tempItem2.critChance;
+		}
+		if(tempItem2.hpRegen !=0) {
+			hero.hpRegen+=tempItem2.hpRegen;
+		}
+		if(tempItem2.manaRegen !=0) {
+			hero.manaRegen=tempItem2.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -571,6 +666,12 @@ public class SettlementController {
 		if (tempItem3.critChance != 0) {
 			hero.critChance+=tempItem3.critChance;
 		}
+		if(tempItem3.hpRegen !=0) {
+			hero.hpRegen+=tempItem3.hpRegen;
+		}
+		if(tempItem3.manaRegen !=0) {
+			hero.manaRegen=tempItem3.manaRegen;
+		}
 		
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
@@ -634,6 +735,12 @@ public class SettlementController {
 		if (tempItem4.critChance != 0) {
 			hero.critChance+=tempItem4.critChance;
 		}
+		if(tempItem4.hpRegen !=0) {
+			hero.hpRegen+=tempItem4.hpRegen;
+		}
+		if(tempItem4.manaRegen !=0) {
+			hero.manaRegen=tempItem4.manaRegen;
+		}
 		
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
@@ -694,6 +801,12 @@ public class SettlementController {
 		}
 		if (tempItem5.critChance != 0) {
 			hero.critChance+=tempItem5.critChance;
+		}
+		if(tempItem5.hpRegen !=0) {
+			hero.hpRegen+=tempItem5.hpRegen;
+		}
+		if(tempItem5.manaRegen !=0) {
+			hero.manaRegen=tempItem5.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();

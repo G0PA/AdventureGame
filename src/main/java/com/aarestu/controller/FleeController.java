@@ -43,6 +43,17 @@ public class FleeController {
 	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie)
 	{
 		hero=Hero.fromCookie(fooCookie);
+		if(hero.hp+hero.hpRegen<=hero.maxHp) {
+			hero.hp+=hero.hpRegen;
+		}else {
+			hero.hp=hero.maxHp;
+		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+			hero.mana+=hero.manaRegen;
+		}else {
+			hero.mana=hero.maxMana;
+		}
+			model.addAttribute("hpRegen",hero.hpRegen);
+			model.addAttribute("manaRegen",hero.manaRegen);
 		if(passedCookie.equals("failed"))
 		{
 			model.addAttribute("cheater","No Cheating : )");
@@ -58,19 +69,11 @@ public class FleeController {
 			
 			return "escaped";
 		}
+
 		
 		model.addAttribute("resource",resourceCookie);	
 		enemy=enemy.fromCookie(badCookie);
-//		theBadCookie=badCookie.replaceAll("[A-Za-z=]+","");
-//		String []enemyAttributes=theBadCookie.split(",");
-//		int attackType=Integer.parseInt(enemyAttributes[2].trim());
-//		int enemyHealth=Integer.parseInt(enemyAttributes[1].trim());
-//		String[] enemyAttacks=enemyAttributes[3].split("-");
-//		int enemyAttackMin=Integer.parseInt(enemyAttacks[0].trim());
-//		int enemyAttackMax=Integer.parseInt(enemyAttacks[1].trim());
-//		int enemyArmor=Integer.parseInt(enemyAttributes[4].trim());
-//		int dropsGold=Integer.parseInt(enemyAttributes[5].trim());
-//		int enemyCritChance=Integer.parseInt(enemyAttributes[6].trim());
+
 		int defense;
 		//1st attack
 		if(enemy.attackType==1)

@@ -28,11 +28,15 @@ height: 100%;
 .crimsonText{
 color:red;
 }
+.blue{
+color=blue;
+}
 </style>
 <head>
 </head>
 <body background= "resources/images/${resource}.jpg" class=bg>
 	<h1 style="color:green;">${sleep}</h1>
+	<h2 style="color:MediumBlue"><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<h1 style="color:crimson;">You Left the Settlement</h1>
 	<a href="http://localhost:8081/AdventureGame/hello" class="button">CONTINUE</a>
 </body>

@@ -24,9 +24,9 @@ public class EventController {
 			count++;
 			hero = Hero.fromCookie(heroCookie);
 			if (count == 1) {
-				Hero elfDruidsGood1 = new Hero(25, 0, 0,0, 0, 0, 0, 0, 0, 0, 0);
-				Hero elfDruidsBad1 = new Hero(-25, 0, 0,0, 0, 0, 0, 0, 0, 0, 0);
-				Hero elfDruidsGood2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 15, 0, 0);
+				Hero elfDruidsGood1 = new Hero(25, 0, 0,0, 0, 0, 0, 0, 0, 0, 0,0,0);
+				Hero elfDruidsBad1 = new Hero(-25, 0, 0,0, 0, 0, 0, 0, 0, 0, 0,0,0);
+				Hero elfDruidsGood2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 15, 0, 0,0,0);
 				Event elfDruids = new Event("elfDruids",
 						"You come across three elf druids who are healing a plant in the wilds",
 						"Ask the druids to heal you", 70, elfDruidsGood1,
@@ -35,10 +35,10 @@ public class EventController {
 						"Threathen to attack the druids if they don't give you gold", 30, elfDruidsGood2,
 						"The elfs feel threathened by you and give you 15 gold to leave them alone", elfDruidsBad1,
 						"the Elfs attack you DEALING 25 damage then run away");
-				Hero sacredMageGood1 = new Hero(0, 0, 0, 0,0, 0, 0, 2, 0, 0, 0);
-				Hero sacredMageBad1 = new Hero(0, 0, 0, 0, 0, 0, 0, -2, 0, 0);
-				Hero sacredMageGood2 = new Hero(0, 0, 10,15, 0, 0, 0, 0, 0, 0, 0);
-				Hero sacredMageBad2 = new Hero(-10,-10,0,0, 0, 0, 0, 0, 0, 0, 0);
+				Hero sacredMageGood1 = new Hero(0, 0, 0, 0,0, 0, 0, 2, 0, 0, 0,0,0);
+				Hero sacredMageBad1 = new Hero(0, 0, 0, 0, 0, 0, 0, -2, 0, 0,0,0,0);
+				Hero sacredMageGood2 = new Hero(0, 0, 10,15, 0, 0, 0, 0, 0, 0, 0,0,0);
+				Hero sacredMageBad2 = new Hero(-10,-10,0,0, 0, 0, 0, 0, 0, 0, 0,0,0);
 				Event sacredMage = new Event("sacredMage",
 						"You venture into a cave and find a sacred mage studying arcane magic",
 						"Ask the mage to teach you what she knows", 50, sacredMageGood1,
@@ -49,20 +49,20 @@ public class EventController {
 						"You drink the contents of the vial feeling a surge of vitality.Current Mana +10, Maximum mana +15",
 						sacredMageBad2,
 						"You drink the contents of the vial and begin to feel poisoned. Current and Maximum health are REDUCED by 10");
-				Hero oldSageGood1 = new Hero(15, 15, 0,0, 2, 2, 0, 0, 0, 2, -3);
-				Hero oldSageBad1 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0,0);
-				Hero oldSageGood2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 10, 0);
-				Hero oldSageBad2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0, -1);
+				Hero oldSageGood1 = new Hero(15, 15, 0,0, 2, 2, 0, 0, 0, 2, -3,0,0);
+				Hero oldSageBad1 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0,0,0,0);
+				Hero oldSageGood2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 10, 0,0,0);
+				Hero oldSageBad2 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0, -1,0,0);
 				Event oldSage = new Event("oldSage", "You stumble across an old Sage standing near a tree of skeletons",
 						"Ask the Sage to teach you every wisdom that he knows", 33, oldSageGood1,
 						"The old Sage teaches you everything he knows, but by the time he is finished an entire year has passed. Enemy encounters -3.Current and maximum health +15, Attack Minimum and Attack Maximum +2, Critical chance +2%",
 						oldSageBad1, "The old Sage declines your offer and leaves.", "Rob the old sage", 80,
 						oldSageGood2, "You rob the old Sage stealing 10 gold", oldSageBad2,
 						"The old sage casts a spell on you to immobilize you and then leaves. Enemy encounters -1");
-				Hero riverEncounterGood1 = new Hero(0, 0,0, 0, 2, 2, 0, 0, 0, 0, -2);
-				Hero riverEncounterBad1 = new Hero(-15, 0,0, 0, 0, 0, 0, 0, 0, 0, 0);
-				Hero riverEncounterGood2 = new Hero(0, 0,0, 0, 0, 0, 2, 0, 0, 0, 0);
-				Hero riverEncounterBad2 = new Hero(0, 0,0, 0, 0, 0, -2, 0, 0, 0, 0);
+				Hero riverEncounterGood1 = new Hero(0, 0,0, 0, 2, 2, 0, 0, 0, 0, -2,0,0);
+				Hero riverEncounterBad1 = new Hero(-15, 0,0, 0, 0, 0, 0, 0, 0, 0, 0,0,0);
+				Hero riverEncounterGood2 = new Hero(0, 0,0, 0, 0, 0, 2, 0, 0, 0, 0,0,0);
+				Hero riverEncounterBad2 = new Hero(0, 0,0, 0, 0, 0, -2, 0, 0, 0, 0,0,0);
 				Event riverEncounter = new Event("riverEncounter",
 						"You walk past a wounded Dark Knight with a dragon on his knee",
 						"Help the Dark Knight to recover", 28, riverEncounterGood1,
@@ -86,7 +86,7 @@ public class EventController {
 						"You help the assassin with the murder after which she STEALS 15 gold from you and runs away");
 				Hero hoodedIndividualGood1 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, 3);
 				Hero hoodedIndividualBad1 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, -3);
-				Hero hoodedIndividualGood2 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, 0, 1);
+				Hero hoodedIndividualGood2 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, 0, 1,0,0);
 				Event hoodedIndividual = new Event("hoodedIndividual",
 						"You see a hooded individual walking infront you", "Go and talk to him", 50,
 						hoodedIndividualGood1,
@@ -96,10 +96,10 @@ public class EventController {
 						"Ignore him", 100, hoodedIndividualGood2,
 						"You ignore the unknown person and continue on your way swiftly. Enemy encounters +1",
 						hoodedIndividualGood2, "asd");
-				Hero travelInTheMarshesGood1 = new Hero(0, 0, 0,0, 1, 1, 1, 1, 0, 2, -2);
-				Hero travelInTheMarshesBad1 = new Hero(-20, 0, 0,0, 0, 0, 0, 0, 0, 0, -2);
+				Hero travelInTheMarshesGood1 = new Hero(0, 0, 0,0, 1, 1, 1, 1, 0, 2, -2,0,0);
+				Hero travelInTheMarshesBad1 = new Hero(-20, 0, 0,0, 0, 0, 0, 0, 0, 0, -2,0,0);
 				Hero travelInTheMarshesGood2 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 15, 0);
-				Hero travelInTheMarshesBad2 = new Hero(-20, 0, 0,0, 0, 0, 0, 0, 0, 0, -2);
+				Hero travelInTheMarshesBad2 = new Hero(-20, 0, 0,0, 0, 0, 0, 0, 0, 0, -2,0,0);
 				Event travelInTheMarshes = new Event("travelInTheMarshes",
 						"As you venture into the marshes you find a group of people waling on the path with a loaded carriage",
 						"Help the travelers pass the Marshes", 50, travelInTheMarshesGood1,
@@ -109,10 +109,10 @@ public class EventController {
 						"Rob the travelers", 80, travelInTheMarshesGood2,
 						"You rob the passing traders INCREASING your Gold with 15", travelInTheMarshesBad2,
 						"You begin chasing the people deep into the Marshes, they eventually escape from you, but by that time you have LOST 2 Enemy Encounters and 20 Health");
-				Hero spiritBeastGood1 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, 0, 3);
-				Hero spiritBeastBad1 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0, -3);
-				Hero spiritBeastGood2 = new Hero(0, 0, 0,0, 0, 0, 0, 3, 0, 0, 0);
-				Hero spiritBeastBad2 = new Hero(-20, 0, 0,0, 0, 0, 0, -2, 0, 0, 0);
+				Hero spiritBeastGood1 = new Hero(0, 0, 0,0, 0, 0, 0, 0, 0, 0, 3,0,0);
+				Hero spiritBeastBad1 = new Hero(0, 0, 0, 0,0, 0, 0, 0, 0, 0, -3,0,0);
+				Hero spiritBeastGood2 = new Hero(0, 0, 0,0, 0, 0, 0, 3, 0, 0, 0,0,0);
+				Hero spiritBeastBad2 = new Hero(-20, 0, 0,0, 0, 0, 0, -2, 0, 0, 0,0,0);
 				Event spiritBeast=new Event("spiritBeast",
 						"You find a spiritual beast staring into an aurora sky",
 						"Pet the animal",50,

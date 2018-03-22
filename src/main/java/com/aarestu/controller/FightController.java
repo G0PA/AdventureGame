@@ -149,6 +149,17 @@ public class FightController {
 				hero.attackMin-=hero.armor/2;
 				hero.attackMax-=hero.armor/2;
 			}
+			if(hero.hp+hero.hpRegen<=hero.maxHp) {
+			hero.hp+=hero.hpRegen;
+		}else {
+			hero.hp=hero.maxHp;
+		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+			hero.mana+=hero.manaRegen;
+		}else {
+			hero.mana=hero.maxMana;
+		}
+			model.addAttribute("hpRegen",hero.hpRegen);
+			model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie c = hero.createCookie();
 
 			c.setPath("/");
