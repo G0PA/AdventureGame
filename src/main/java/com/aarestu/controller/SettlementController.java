@@ -140,10 +140,10 @@ public class SettlementController {
 		Item smallManaPotion=new Item("Small Mana Potion",8).setMana(12);
 		Item mediumManaPotion=new Item("Medium Mana Potion",15).setMana(25);
 		Item largeManaPotion=new Item("Large Mana Potion",28).setMana(50);
-		Item smallMixedPotion=new Item("Small Mixed Potion",16).setCurrentHealth(25).setMana(12);
-		Item mediumMixedPotion=new Item("Medium Mixed Potion",29).setCurrentHealth(50).setMana(25);
-		Item smallCape=new Item("Small Cape",18).setMaxMana(10).setMana(10);
-		Item mediumCape=new Item("Medium Cape",32).setMaxMana(20).setMana(20);
+		Item smallMixedPotion=new Item("Small Mixed Potion",15).setCurrentHealth(25).setMana(12);
+		Item mediumMixedPotion=new Item("Medium Mixed Potion",27).setCurrentHealth(50).setMana(25);
+		Item smallCape=new Item("Small Cape",17).setMaxMana(10).setMana(10);
+		Item mediumCape=new Item("Medium Cape",30).setMaxMana(20).setMana(20);
 		Item woodenStaff=new Item("Wooden Staff",32).setMana(5).setMaxMana(15).setMagicResist(2);
 		Item vitalityNecklace=new Item("Vitality Necklace",30).setCurrentHealth(15).setHealthLimit(30).setMaxMana(15).setMana(10);
 		model.addAttribute("message", hero.createDisplayText());

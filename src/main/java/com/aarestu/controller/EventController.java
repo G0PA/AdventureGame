@@ -36,7 +36,7 @@ public class EventController {
 						"The elfs feel threathened by you and give you 15 gold to leave them alone", elfDruidsBad1,
 						"the Elfs attack you DEALING 25 damage then run away");
 				Hero sacredMageGood1 = new Hero(0, 0, 0, 0,0, 0, 0, 2, 0, 0, 0);
-				Hero sacredMageBad1 = new Hero(0, 0, 0, 0, 0, 0, -2, 0, 0, 0);
+				Hero sacredMageBad1 = new Hero(0, 0, 0, 0, 0, 0, 0, -2, 0, 0);
 				Hero sacredMageGood2 = new Hero(0, 0, 10,15, 0, 0, 0, 0, 0, 0, 0);
 				Hero sacredMageBad2 = new Hero(-10,-10,0,0, 0, 0, 0, 0, 0, 0, 0);
 				Event sacredMage = new Event("sacredMage",
