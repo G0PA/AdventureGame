@@ -10,7 +10,6 @@ public class Enemy {
 	int dropsGold;
 	String resourcePath;
 	int critChance;
-
 	public Enemy() {
 
 	}
