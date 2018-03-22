@@ -43,16 +43,23 @@ public class Event {
 	{
 		currentHero.hp+=changedHero.hp;
 		currentHero.maxHp+=changedHero.maxHp;
+		currentHero.mana+=changedHero.mana;
+		currentHero.maxMana+=changedHero.maxMana;
 		currentHero.attackMin+=changedHero.attackMin;
 		currentHero.attackMax+=changedHero.attackMax;
 		currentHero.armor+=changedHero.armor;
 		currentHero.magicResist+=changedHero.magicResist;
 		currentHero.critChance+=changedHero.critChance;
 		currentHero.gold+=changedHero.gold;
+		currentHero.enemyEncountersLeft+=changedHero.enemyEncountersLeft;
 		if(currentHero.gold<0)
 		{
 			currentHero.gold=0;
 		}
+		if(currentHero.hp>currentHero.maxHp) {
+			currentHero.hp=currentHero.maxHp;
+		}
+
 		return currentHero;
 		
 		

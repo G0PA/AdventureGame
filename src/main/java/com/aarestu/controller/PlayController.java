@@ -63,7 +63,17 @@ public class PlayController {
 		if(hero2.heroClass.equals("Mage"))
 		{
 			model.addAttribute("spell","Fireball");
+		}else if(hero2.heroClass.equals("Warrior"))
+		{
+			model.addAttribute("spell","Endurance");
+		}else if(hero2.heroClass.equals("Ranger"))
+		{
+			model.addAttribute("spell","Ranger Sight");
+		}else if(hero2.heroClass.equals("Berserk"))
+		{
+			model.addAttribute("spell","Bloodlust");
 		}
+		
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");
 		passed.setMaxAge(60*60*24*2);
@@ -147,7 +157,7 @@ public class PlayController {
 			return "hello";
 		}
 		//Event
-		if(Utils.randomBool(10))
+		if(Utils.randomBool(7))
 		{
 			Cookie eligebleForEvent=new Cookie("eventState","eligebleForNewEvent");
 			eligebleForEvent.setPath("/");
@@ -181,7 +191,7 @@ public class PlayController {
 			enemies.add(new Enemy("assassin", "Assassin", 1, 52, 10, 14, 2, 8, 5));
 			enemies.add(new Enemy("scorpionMother", "Scorpion Mother", 1, 74, 15, 18, 3, 18, 8));
 			enemies.add(new Enemy("dispeller", "Dispeller", 2, 59, 13, 16, 6, 14, 9));
-			enemies.add(new Enemy("evolvedReptiles", "Evolved Reptiles", 1, 89, 14, 18, 3, 20, 11));
+			enemies.add(new Enemy("reptile", "Reptile", 1, 89, 14, 18, 3, 20, 11));
 			enemies.add(new Enemy("disciple", "Disciple", 2, 61, 12, 15, 2, 11, 8));
 			enemies.add(new Enemy("trollWarrior", "Troll Warrior", 1, 58, 11, 14, 3, 10, 7));
 			enemies.add(new Enemy("cutthroat", "Cutthroat", 1, 56, 10, 14, 2, 8, 5));
@@ -190,7 +200,8 @@ public class PlayController {
 			enemies.add(new Enemy("corruptedCentaur", "Corrupted Centaur", 1, 64, 13, 15, 2, 12, 6));
 			enemies.add(new Enemy("riteOfTheStorm", "Rite of the Storm", 2, 78, 14, 18, 4, 20, 9));
 			enemies.add(new Enemy("iceLizard", "Ice Lizard", 2, 75, 13, 17, 4, 17, 6));
-
+			enemies.add(new Enemy("seaSerpent", "Sea Serpent",1,70,12,16,3,16,8));
+			enemies.add(new Enemy("stoneGiant","Stone Giant",1,82,12,16,6,20,8));
 			Settlement snowyCastle=new Settlement("snowyCastle","Snowy Castle");
 			Settlement cliffTown=new Settlement("cliffTown","Cliff Town");
 			Settlement caveTown=new Settlement("caveTown","Cave Town");
@@ -198,6 +209,7 @@ public class PlayController {
 			Settlement riverSideCastle=new Settlement("riverSideCastle","Riverside Castle");
 			Settlement monkTown=new Settlement("monkTown","Monk Town");
 			Settlement mountainPassSanctuary=new Settlement("mountainPassSanctuary","Mountain pass Sanctuary");
+			Settlement theCapital=new Settlement("theCapital","The Capital");
 			settlements.add(snowyCastle);
 			settlements.add(cliffTown);
 			settlements.add(caveTown);
@@ -205,6 +217,7 @@ public class PlayController {
 			settlements.add(riverSideCastle);
 			settlements.add(monkTown);
 			settlements.add(mountainPassSanctuary);
+			settlements.add(theCapital);
 		}
 
 		

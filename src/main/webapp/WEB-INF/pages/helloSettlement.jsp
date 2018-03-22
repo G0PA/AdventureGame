@@ -56,6 +56,6 @@ color: Crimson;
 	<h1 style="color:Chartreuse;">SETTLEMENT</h1>
 	<h1 style="color:Chartreuse;"> You came across ${settlementName}</h1>
 	<a href="http://localhost:8081/AdventureGame/settlement" class="button">GO IN</a>
-	<a href="http://localhost:8081/AdventureGame/skipSettlement" class="button2">SKIP SETTLEMENT(+1 enemy encounter until next difficulty)</a>
+	<a href="http://localhost:8081/AdventureGame/skipSettlement" class="button2">SKIP SETTLEMENT(+1 enemy encounter until Boss)</a>
 </body>
 </html>

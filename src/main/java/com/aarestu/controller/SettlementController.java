@@ -22,10 +22,11 @@ public class SettlementController {
 	Item tempItem2;
 	Item tempItem3;
 	Item tempItem4;
+	Item tempItem5;
 	ArrayList<Item> items=new ArrayList<Item>();
 	ArrayList<Item> shop;
-	ArrayList<Item> getFourItems(int min, int max,ArrayList<Item> theItems) {
-		for(int i=1; i<=4; i++)
+	ArrayList<Item> getFiveItems(int min, int max,ArrayList<Item> theItems) {
+		for(int i=1; i<=5; i++)
 		{
 	    int range = (max - min) + 1;
 	    int theIndex=(int)(Math.random() * range) + min;
@@ -45,8 +46,12 @@ public class SettlementController {
 		if (!bossState.equals("dead")) {
 			hero = Hero.fromCookie(heroCookie);
 			hero.enemyEncountersLeft += 1;
-			model.addAttribute("enemiesLeft", hero.enemyEncountersLeft);
+			Cookie theHero=hero.createCookie();
+			theHero.setPath("/");
+			theHero.setMaxAge(60*60*24*2);
+			response.addCookie(theHero);
 			model.addAttribute("resource", resourceCookie);
+			model.addAttribute("enemiesLeft",hero.enemyEncountersLeft);
 
 			Cookie d = new Cookie("bossState", "dead");
 			d.setPath("/");
@@ -140,6 +145,7 @@ public class SettlementController {
 		Item smallCape=new Item("Small Cape",18).setMaxMana(10).setMana(10);
 		Item mediumCape=new Item("Medium Cape",32).setMaxMana(20).setMana(20);
 		Item woodenStaff=new Item("Wooden Staff",32).setMana(5).setMaxMana(15).setMagicResist(2);
+		Item vitalityNecklace=new Item("Vitality Necklace",30).setCurrentHealth(15).setHealthLimit(30).setMaxMana(15).setMana(10);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -167,10 +173,11 @@ public class SettlementController {
 		items.add(smallCape);
 		items.add(mediumCape);
 		items.add(woodenStaff);
+		items.add(vitalityNecklace);
 
 		if (!bossStateCookie.equals("shopping")) {
 			shop = new ArrayList<Item>();
-			getFourItems(0, items.size() - 1, shop);
+			getFiveItems(0, items.size() - 1, shop);
 		}
 		
 			 tempItem=shop.get(0);
@@ -333,6 +340,53 @@ public class SettlementController {
 				model.addAttribute("fourthCritChance","Critical Chance +"+String.valueOf(tempItem4.critChance)+" ");
 			}
 			model.addAttribute("fourthCostsGold","Gold -"+String.valueOf(tempItem4.costsGold)+" ");
+			
+
+
+			
+			
+			
+			
+			tempItem5=shop.get(4);
+			model.addAttribute("fifthName",tempItem5.name+": ");
+			if(tempItem5.currentHealth!=0)
+			{
+				model.addAttribute("fifthCurrentHealth","Current Health +"+String.valueOf(tempItem5.currentHealth)+" ");
+			}
+			if(tempItem5.healthLimit!=0)
+			{
+				model.addAttribute("fifthMaxHealth","Max Health +"+String.valueOf(tempItem5.healthLimit)+" ");
+			}
+			if(tempItem5.mana!=0)
+			{
+				model.addAttribute("fifthMana","Mana +"+String.valueOf(tempItem5.mana)+" ");
+			}
+			if(tempItem5.maxMana!=0)
+			{
+				model.addAttribute("fifthMaxMana","Max Mana +"+String.valueOf(tempItem5.maxMana)+" ");
+			}
+			if(tempItem5.attackMin!=0)
+			{
+				model.addAttribute("fifthAttackMin","Attack Minimum +"+String.valueOf(tempItem5.attackMin)+" ");
+			}
+			if(tempItem5.attackMax!=0)
+			{
+				model.addAttribute("fifthAttackMax","Attack Maximum +"+String.valueOf(tempItem5.attackMax)+" ");
+			}
+			if(tempItem5.armor!=0)
+			{
+				model.addAttribute("fifthArmor","Armor +"+String.valueOf(tempItem5.armor)+" ");
+			}
+			if(tempItem5.magicResist!=0)
+			{
+				model.addAttribute("fifthMagicResist","Magic Resist +"+String.valueOf(tempItem5.magicResist)+" ");
+			}
+			if(tempItem5.critChance!=0)
+			{
+				model.addAttribute("fifthCritChance","Critical Chance +"+String.valueOf(tempItem5.critChance)+" ");
+			}
+			model.addAttribute("fifthCostsGold","Gold -"+String.valueOf(tempItem5.costsGold)+" ");
+			
 		items.clear();
 		Cookie boss=new Cookie("bossState","shopping");
 		boss.setPath("/");
@@ -579,6 +633,67 @@ public class SettlementController {
 		}
 		if (tempItem4.critChance != 0) {
 			hero.critChance+=tempItem4.critChance;
+		}
+		
+		Cookie c = hero.createCookie();
+		model.addAttribute("resource", resourceCookie);
+		c.setPath("/");
+		c.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(c);
+		model.addAttribute("message", hero.createDisplayText());
+		return "shopped";
+	}
+	
+	@RequestMapping(value="/item5",method=RequestMethod.GET)
+	String theItem5(ModelMap model,HttpServletResponse response,@CookieValue("resource")String resourceCookie)
+	{
+		if(hero.gold-tempItem5.costsGold>=0) {
+			hero.gold-=tempItem5.costsGold;
+		} else {
+			Cookie c = hero.createCookie();
+			model.addAttribute("resource",resourceCookie);
+			c.setPath("/");
+			c.setMaxAge(60*60*24*2);
+			response.addCookie(c);
+			model.addAttribute("message",hero.createDisplayText());
+			model.addAttribute("notEnoughGold","Not enough Gold for");
+			return "shopped";
+		}
+		if (tempItem5.healthLimit != 0) {
+			hero.maxHp += tempItem5.healthLimit;
+		}
+		if (tempItem5.currentHealth!=0) {
+			if(hero.hp + tempItem5.currentHealth < hero.maxHp) {
+				hero.hp += tempItem5.currentHealth;
+			} else {
+				hero.hp = hero.maxHp;
+			}
+		}
+		if(tempItem5.maxMana !=0)
+		{
+			hero.maxMana+=tempItem5.maxMana;
+		}
+		if (tempItem5.mana != 0) {
+			if (hero.mana + tempItem5.mana < hero.maxMana) {
+				hero.mana += tempItem5.mana;
+			} else {
+				hero.mana = hero.maxMana;
+			}
+		}
+		if (tempItem5.attackMin != 0) {
+			hero.attackMin += tempItem5.attackMin;
+		}
+		if (tempItem5.attackMax != 0) {
+			hero.attackMax += tempItem5.attackMax;
+		}
+		if (tempItem5.armor != 0) {
+			hero.armor += tempItem5.armor;
+		}
+		if (tempItem5.magicResist != 0) {
+			hero.magicResist += tempItem5.magicResist;
+		}
+		if (tempItem5.critChance != 0) {
+			hero.critChance+=tempItem5.critChance;
 		}
 		
 		Cookie c = hero.createCookie();

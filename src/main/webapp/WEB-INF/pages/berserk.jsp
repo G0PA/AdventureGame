@@ -33,13 +33,13 @@ text-align:center;
 <head>
 <title>Welcome</title>
 </head>
-<body background= "http://localhost:8081/AdventureGame/resources/images/mageWallpaper.jpg"class=bg>
+<body background= "http://localhost:8081/AdventureGame/resources/images/berserkWallpaper.jpg"class=bg>
 <div class="asd">
-	<h1 style="color:yellow"><font size="10"><i>Mage</i></font></h1>
-	<h1><i>Passive: every 2 points of Magic Resist increases Attack Damage Min and Max with 1</i></h1>
-	<h1><i>Active: Cast a Fireball dealing damage equal to 30% of your Maximum Mana (Can do Critical Damage)</i></h1>
+	<h1 style="color:violet"><font size="10"><i>Berserk</i></font></h1>
+	<h1><i>Passive: Every 25 missing health Increase Damage Min and Max with 1</i></h1>
+	<h1><i>Active: Your next attack is a critical and it's Attack Damage Min and Max are Increased by 1.5% for each point of critical strike you have</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE MAGE</a>
+	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE BERSERK</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>
 	</div>
 	

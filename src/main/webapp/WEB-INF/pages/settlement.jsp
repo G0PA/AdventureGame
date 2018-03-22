@@ -50,16 +50,14 @@ color: crimson;
 color:Chartreuse;
 }
 
+
 .button3 {font-size: 24px;}
 .button3 {
-position:relative;
 padding: 30px 40px;
 border-radius: 2px;
-background-color: #1E90FF;
+background-color: green;
     color: black;
     border: 2px solid red;
-    margin-top:50px;
-    bottom: -125px
 
 }
 .button3{
@@ -91,7 +89,10 @@ background-color: red; /* Green */
 	<a href="http://localhost:8081/AdventureGame/item4" class="button">${fourthName}<span class="greenText">${fourthCurrentHealth}${fourthMaxHealth}${fourthMana}${fourthMaxMana}${fourthAttackMin}${fourthAttackMax}${fourthArmor}${fourthMagicResist}${fourthCritChance}</span><span class="redText">${fourthCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/sleep" class="button">SLEEP: <span class="greenText">+15 Health, +5 Mana</span> <span class="redText">-1 Enemy Encounter</span></a>
+	<a href="http://localhost:8081/AdventureGame/item5" class="button">${fifthName}<span class="greenText">${fifthCurrentHealth}${fifthMaxHealth}${fifthMana}${fifthMaxMana}${fifthAttackMin}${fifthAttackMax}${fifthArmor}${fifthMagicResist}${fifthCritChance}</span><span class="redText">${fifthCostsGold}</span></a>
+	</div>
+	<div>
+	<a href="http://localhost:8081/AdventureGame/sleep" class="button3">SLEEP: <span class="greenText">+15 Health, +5 Mana</span> <span class="redText">-1 Enemy Encounter</span></a>
 	</div>
 	<a href="http://localhost:8081/AdventureGame/leaveSettlement" class="button2">LEAVE SETTLEMENT</a>
 	

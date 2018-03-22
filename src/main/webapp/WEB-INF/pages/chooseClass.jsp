@@ -28,13 +28,53 @@ font-size:40px;
 text-align: center;
 font-size:40px;
 }
+.images3:hover{
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+ -webkit-box-shadow: 0px 0px 30px 0px rgba(0, 255, 0, 0.67);
+-moz-box-shadow:    0px 0px 30px 0px rgba(0, 255, 0, 0.67);
+box-shadow:         0px 0px 30px 0px rgba(0, 255, 0, 0.67);
+}
+.images4:hover{
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+ -webkit-box-shadow: 0px 0px 30px 0px rgba(232, 0, 0, 0.67);
+-moz-box-shadow:    0px 0px 30px 0px rgba(232, 0, 0, 0.67);
+box-shadow:         0px 0px 30px 0px rgba(232, 0, 0, 0.67);
+}
 .images:hover{
-background-color: red; /* Green */
-    color: red;
-    
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+ -webkit-box-shadow: 0px 0px 30px 0px rgba(255,255,0,0.67);
+-moz-box-shadow:    0px 0px 30px 0px rgba(255,255,0,0.67);
+box-shadow:         0px 0px 30px 0px rgba(255,255,0,0.67);
+}
+.images2:hover{
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+ -webkit-box-shadow: 0px 0px 30px 0px rgba(238,130,238,0.67);
+-moz-box-shadow:    0px 0px 30px 0px rgba(238,130,238,0.67);
+box-shadow:         0px 0px 30px 0px rgba(238,130,238,0.67);
 }
 .images{
 width: 24%;
+cursor:pointer;
+}
+.images2{
+width: 24%;
+cursor:pointer;
+}
+.images3{
+width: 24%;
+cursor:pointer;
+}
+.images4{
+width: 24%;
+cursor:pointer;
 }
 
 
@@ -44,13 +84,13 @@ function redirect(){
 	window.location = "http://localhost:8081/AdventureGame/mage";
 }
 function redirect2(){
-	window.location = "http://localhost:8081/AdventureGame/hello";
+	window.location = "http://localhost:8081/AdventureGame/berserk";
 }
 function redirect3(){
-	window.location = "http://localhost:8081/AdventureGame/hello";
+	window.location = "http://localhost:8081/AdventureGame/ranger";
 }
 function redirect4(){
-	window.location = "http://localhost:8081/AdventureGame/hello";
+	window.location = "http://localhost:8081/AdventureGame/warrior";
 }
 </script>
 <head>
@@ -64,11 +104,11 @@ function redirect4(){
 
 
 
-<input class="images" type="image" onClick="redirect2()" src="https://i.pinimg.com/736x/f6/03/e0/f603e0de490ed5454c8f58e98c254f1e.jpg" alt="Submit" width="470" height="1000">
+<input class="images2" type="image" onClick="redirect2()" src="https://i.pinimg.com/736x/f6/03/e0/f603e0de490ed5454c8f58e98c254f1e.jpg" alt="Submit" width="470" height="1000">
 
 
-<input class="images" type="image" onClick="redirect3()" src="https://pbs.twimg.com/media/BgrdApmCMAEOAzM.jpg:large" alt="Submit" width="470" height="1000">
+<input class="images3" type="image" onClick="redirect3()" src="https://pbs.twimg.com/media/BgrdApmCMAEOAzM.jpg:large" alt="Submit" width="470" height="1000">
 
-<input class="images" type="image" onClick="redirect4()" src="https://68.media.tumblr.com/2ea7a52b82323f0239756ec71d6edf3d/tumblr_oponspCcCW1vf5c5jo1_1280.jpg" alt="Submit" width="460" height="1000">
+<input class="images4" type="image" onClick="redirect4()" src="https://68.media.tumblr.com/2ea7a52b82323f0239756ec71d6edf3d/tumblr_oponspCcCW1vf5c5jo1_1280.jpg" alt="Submit" width="460" height="1000">
 </body>
 </html>

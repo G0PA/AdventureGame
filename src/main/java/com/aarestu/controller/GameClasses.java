@@ -23,4 +23,46 @@ public class GameClasses {
 		
 		return "mage";
 	}
+	@RequestMapping(value="/warrior",method=RequestMethod.GET)
+	public String returnWarrior(@CookieValue("hero")String heroCookie,HttpServletResponse response)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		hero.heroClass="Warrior";
+		Cookie c=hero.createCookie();
+		c.setPath("/");
+		c.setMaxAge(60*60*24*2);
+		response.addCookie(c);
+		
+		
+		return "warrior";
+	}
+	
+	@RequestMapping(value="/ranger",method=RequestMethod.GET)
+	public String returnRanger(@CookieValue("hero")String heroCookie,HttpServletResponse response)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		hero.heroClass="Ranger";
+		Cookie c=hero.createCookie();
+		c.setPath("/");
+		c.setMaxAge(60*60*24*2);
+		response.addCookie(c);
+		
+		
+		return "ranger";
+	}
+	
+	@RequestMapping(value="/berserk",method=RequestMethod.GET)
+	public String returnBerserk(@CookieValue("hero")String heroCookie,HttpServletResponse response)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		hero.heroClass="Berserk";
+		Cookie c=hero.createCookie();
+		c.setPath("/");
+		c.setMaxAge(60*60*24*2);
+		response.addCookie(c);
+		
+		
+		return "berserk";
+	}
+	
 }

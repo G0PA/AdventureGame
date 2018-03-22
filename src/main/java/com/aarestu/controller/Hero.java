@@ -8,13 +8,13 @@ public class Hero {
 	int maxHp = 100;
 	int mana=50;
 	int maxMana=50;
-	int attackMin=12;
+	int attackMin=13;
 	int attackMax=16;
 	int armor=4;
 	int magicResist=4;
 	int gold = 10;
 	int critChance = 5;
-	int enemyEncountersLeft=25;
+	int enemyEncountersLeft=24;
 	boolean isValid = true;
 
 	public Hero() {
@@ -28,6 +28,8 @@ public class Hero {
 	public Hero(int hp, int maxHp,int mana,int maxMana, int attackMin, int attackMax, int armor, int magicResist, int gold, int critChance,
 			int enemyEncountersLeft) {
 		this.hp = hp;
+		this.mana=mana;
+		this.maxMana=maxMana;
 		this.attackMin = attackMin;
 		this.attackMax = attackMax;
 		this.armor = armor;
@@ -79,15 +81,36 @@ public class Hero {
 				",   gold = " + gold +
 				",   critical chance = " + critChance + "%" +
 				",   Enemy encounters left until Boss: " + enemyEncountersLeft;
-		}
+		}else if(heroClass.equals("Warrior")) {
+			return  "class = " +heroClass+
+					",   health = " + hp +"/" + maxHp + 
+					",   mana = "+mana+"/"+ maxMana+
+					",   attack = " + (attackMin+(armor/2)) + "-" + (attackMax+(armor/2))+
+					",   armor = " + armor +
+					",   magic resist = " + magicResist + 
+					",   gold = " + gold +
+					",   critical chance = " + critChance + "%" +
+					",   Enemy encounters left until Boss: " + enemyEncountersLeft;
+		}else if(heroClass.equals("Ranger")) {
 		return  "class = " +heroClass+
 				",   health = " + hp +"/" + maxHp + 
-				",   mana = "+mana+"/"+"maxmana"+
+				",   mana = "+mana+"/"+maxMana+
 				",   attack = " + attackMin+ "-" + attackMax+
 				",   armor = " + armor +
 				",   magic resist = " + magicResist + 
 				",   gold = " + gold +
 				",   critical chance = " + critChance + "%" +
 				",   Enemy encounters left until Boss: " + enemyEncountersLeft;
+		}else {
+			return  "class = " +heroClass+
+					",   health = " + hp +"/" + maxHp + 
+					",   mana = "+mana+"/"+maxMana+
+					",   attack = " + (attackMin+((maxHp-hp)/25))+ "-" + (attackMax+((maxHp-hp)/25))+
+					",   armor = " + armor +
+					",   magic resist = " + magicResist + 
+					",   gold = " + gold +
+					",   critical chance = " + critChance + "%" +
+					",   Enemy encounters left until Boss: " + enemyEncountersLeft;
+		}
 	}
 }
