@@ -29,6 +29,9 @@ height: 100%;
 .asd{
 text-align:center;
 }
+.yellowText{
+color:yellow;
+}
 </style>
 <head>
 <title>Welcome</title>
@@ -37,9 +40,9 @@ text-align:center;
 <div class="asd">
 	<h1 style="color:yellow"><font size="10"><i>Mage</i></font></h1>
 	<h1><i>Passive: every 2 points of Magic Resist increases Attack Damage Min and Max with 1</i></h1>
-	<h1><i>Active: Cast a Fireball dealing damage equal to 30% of your Maximum Mana (Can do Critical Damage)</i></h1>
+	<h1><i>Active: Cast a <span class="yellowText">Fireball</span> dealing damage equal to 30% of your Maximum Mana (Has same Critical chance as your normal attacks and ignores armor)</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE MAGE</a>
+	<a href="http://localhost:8081/AdventureGame/greenWoods" class="button">CHOOSE MAGE</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>
 	</div>
 	

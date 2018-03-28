@@ -57,9 +57,28 @@ public class PlayController {
 		return "chooseClass";//"play";
 	}
 	@RequestMapping("/hello")
-	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,HttpServletResponse response)
+	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,HttpServletResponse response)
 	{
+
 		hero2=Hero.fromCookie(fooCookie);
+		if(hero2.enemyEncountersLeft==26) {
+			Cookie firstBoss=new Cookie("firstBoss","notReached");
+			firstBoss.setPath("/");
+			firstBoss.setMaxAge(60*60*24*2);
+			response.addCookie(firstBoss);
+		}
+		if(firstBossCookie.equals("fighting") && hero2.enemyEncountersLeft!=26) {
+			
+			hero2.zone="Red Woods";
+			hero2.hp=hero2.maxHp;
+			hero2.mana=hero2.maxMana;
+			hero2.enemyEncountersLeft=20;
+			Cookie zone=hero2.createCookie();
+			zone.setMaxAge(60*60*24*2);
+			zone.setPath("/");
+			response.addCookie(zone);
+			return "secondZone";
+		}
 		if(hero2.heroClass.equals("Mage"))
 		{
 			model.addAttribute("spell","Fireball");
@@ -124,6 +143,10 @@ public class PlayController {
 			bosses.add(whiteScaleDragon);
 			theBoss=bosses.get(Utils.attack(0,bosses.size()-1));
 			int type=theBoss.attackType;
+			Cookie firstBoss=new Cookie("firstBoss","fighting");
+			firstBoss.setPath("/");
+			firstBoss.setMaxAge(60*60*24);
+			response.addCookie(firstBoss);
 			String attackType="";
 			if (type == 1) {
 				attackType = "PHYSICAL";
@@ -157,7 +180,7 @@ public class PlayController {
 			return "hello";
 		}
 		//Event
-		if(Utils.randomBool(7))
+		if(Utils.randomBool(5))
 		{
 			Cookie eligebleForEvent=new Cookie("eventState","eligebleForNewEvent");
 			eligebleForEvent.setPath("/");

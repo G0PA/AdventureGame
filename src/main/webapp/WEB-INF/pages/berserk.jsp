@@ -29,6 +29,9 @@ height: 100%;
 .asd{
 text-align:center;
 }
+.violetText{
+color:violet;
+}
 </style>
 <head>
 <title>Welcome</title>
@@ -37,9 +40,9 @@ text-align:center;
 <div class="asd">
 	<h1 style="color:violet"><font size="10"><i>Berserk</i></font></h1>
 	<h1><i>Passive: Every 25 missing health Increase Damage Min and Max with 1</i></h1>
-	<h1><i>Active: Your next attack is a critical and it's Attack Damage Min and Max are Increased by 1.5% for each point of critical strike you have</i></h1>
+	<h1><i>Active: Cast <span class="violetText">Bloodlust</span> making your next attack a critical and Increasing it's Attack Damage Min and Max by 1.5% for each point of critical strike you have</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE BERSERK</a>
+	<a href="http://localhost:8081/AdventureGame/greenWoods" class="button">CHOOSE BERSERK</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>
 	</div>
 	

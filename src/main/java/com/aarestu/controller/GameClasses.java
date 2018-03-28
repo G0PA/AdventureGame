@@ -56,6 +56,7 @@ public class GameClasses {
 	{
 		Hero hero=Hero.fromCookie(heroCookie);
 		hero.heroClass="Berserk";
+		
 		Cookie c=hero.createCookie();
 		c.setPath("/");
 		c.setMaxAge(60*60*24*2);
@@ -63,6 +64,10 @@ public class GameClasses {
 		
 		
 		return "berserk";
+	}
+	@RequestMapping(value="/greenWoods",method=RequestMethod.GET)
+	public String returnGreenWoods() {
+		return "greenWoods";
 	}
 	
 }

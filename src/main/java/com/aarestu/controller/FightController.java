@@ -129,11 +129,12 @@ public class FightController {
 		logger.debug("BLoodlust bonus damage min and max are: "+bloodlustBonusDamageMin+"-"+bloodlustBonusDamageMax);
 		logger.debug("Damage Min is: "+hero.attackMin);
 		logger.debug("Damage max is:" +hero.attackMax);
-		
-		if ((attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin,hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax)*multiply - enemyArmor)<0) {
-			enemyHealth=enemyHealth-1;
+		int theHeroDamage;
+		theHeroDamage=(int)(attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin,hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax)*multiply) - enemyArmor;
+		if(theHeroDamage<=0) {	
+		enemyHealth=enemyHealth-1;
 		} else {
-			enemyHealth =(int) (enemyHealth - (attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin, hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax) * multiply - enemyArmor));
+			enemyHealth-=theHeroDamage;
 		}
 		rangerSightBonusDamageMin=0;
 		rangerSightBonusDamageMax=0;
@@ -158,6 +159,9 @@ public class FightController {
 		}else {
 			hero.mana=hero.maxMana;
 		}
+//		if(enemy.name.equals("Island Shark") || enemy.name.equals("Whitescale Dragon")) {
+//			hero.zone="Red Woods";
+//		}
 			model.addAttribute("hpRegen",hero.hpRegen);
 			model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie c = hero.createCookie();
@@ -174,6 +178,22 @@ public class FightController {
 			bloodlustBonusDamageMin=0;
 			bloodlustBonusDamageMax=0;
 			berserkCritical=0;
+			rangerSightBonusDamageMin=0;
+			rangerSightBonusDamageMax=0;
+//			if(enemy.name.equals("Island Shark") || enemy.name.equals("Whitescale Dragon")) {
+//				Cookie firstBoss=new Cookie("firstBoss","notReached");
+//				firstBoss.setPath("/");
+//				firstBoss.setMaxAge(60*60*24*2);
+//				response.addCookie(firstBoss);
+//			}
+			int damageDealt = tempEnemyHealth-enemyHealth;
+			model.addAttribute("damageDealt", String.valueOf(damageDealt));
+			model.addAttribute("message2", hero.createDisplayText());
+			if(hero.zone.equals("Green Woods")) {
+				model.addAttribute("zone","hello");
+			}else if(hero.zone.equals("Red Woods")) {
+				model.addAttribute("zone","redWoods");
+			}
 			return "fightvictory";
 		}
 		int tempHealth=hero.hp;
@@ -185,10 +205,13 @@ public class FightController {
 		} else {
 			model.addAttribute("enemyCritically","");
 		}
-		if ((attack(enemyAttackMin,enemyAttackMax) - hero.armor) < 0) {
+		int theEnemyDamage;
+		theEnemyDamage=(int)(attack(enemyAttackMin,enemyAttackMax)*multiply) - defense; 
+		if(theEnemyDamage<=0) {
 			hero.hp = hero.hp - 1;
-		} else {
-			hero.hp =(int) (hero.hp - (attack(enemyAttackMin,enemyAttackMax)*multiply - defense));
+		}
+		 else {
+			hero.hp-=theEnemyDamage;
 		}
 		if (hero.hp <= 0) {
 			Cookie c = hero.createCookie();
@@ -216,6 +239,15 @@ public class FightController {
 			berserkPassiveDamageIncrease=0;
 			bloodlustBonusDamageMin=0;
 			bloodlustBonusDamageMax=0;
+			rangerSightBonusDamageMin=0;
+			rangerSightBonusDamageMax=0;
+			int damageDealt = tempEnemyHealth-enemyHealth;
+			int enemyDamage=tempHealth-hero.hp;
+			model.addAttribute("message2", hero.createDisplayText());
+			model.addAttribute("damageDealt", String.valueOf(damageDealt));
+			model.addAttribute("enemy", String.valueOf(enemyHealth));
+			model.addAttribute("enemyName",resource);
+			model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
 			return "defeat";
 
 		}
@@ -233,6 +265,8 @@ public class FightController {
 		bloodlustBonusDamageMin=0;
 		bloodlustBonusDamageMax=0;
 		berserkCritical=0;
+		rangerSightBonusDamageMin=0;
+		rangerSightBonusDamageMax=0;
 		Cookie c = hero.createCookie();
 		enemy.health=enemyHealth;
 		theBadCookie=enemy.toCookie();
@@ -326,8 +360,8 @@ public class FightController {
 			//enemy.health -= (hero.maxHp - hero.hp) * 0.10;
 			//currentEnemyHealth = currentEnemyHealth - enemy.health;
 			//hero.hp += currentEnemyHealth;
-			rangerSightBonusDamageMin=(int)(hero.attackMin*0.60);
-			rangerSightBonusDamageMax=(int)(hero.attackMax*0.60);
+			rangerSightBonusDamageMin=(int)(hero.attackMin*0.80);
+			rangerSightBonusDamageMax=(int)(hero.attackMax*0.80);
 			model.addAttribute("spellDamage", "You cast Ranger Sight increasing your Damage to "+String.valueOf(hero.attackMin+rangerSightBonusDamageMin)+"-"
 					+ String.valueOf(hero.attackMax+rangerSightBonusDamageMax));
 			Cookie leHeroCookie = hero.createCookie();

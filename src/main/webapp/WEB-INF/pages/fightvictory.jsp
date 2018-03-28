@@ -36,7 +36,11 @@ color: blue;
 }
 </style>
 <body background= "resources/images/${resource}.jpg" class=bg>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">VICTORY</a>
+<h1 style="background-color:Chartreuse;">${message2}</h1>
+<h2 style="color:yellow"><i>${spellDamage}</i></h2>
+	<h4 style="color:yellow"><i>${yourPetAttacks}${petCritically}${dealing}${petDamage} </i></h4>
+	<h3><i><span class="blueText">You</span> <span class="blueText">${critically}</span><span class="grayText">damage the enemy dealing</span><span class="blueText"> ${damageDealt}</span> <span class="grayText">damage </span></i></h3>
+	<a href="http://localhost:8081/AdventureGame/${zone}" class="button">VICTORY</a>
 	<h2 style="color:MediumBlue"><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<h1><span class="grayText">Gold earned:</span> <span class="blueText">+${gold}</span></h1>
 </body>

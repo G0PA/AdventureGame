@@ -35,6 +35,7 @@ color:Maroon;
 <body background= "resources/images/${resource}.jpg" class=bg>
 	<h1>You failed to escape</h1>
 	<h1>${cheater}</h1>
+	<h1>${boss}</h1>
 	<h2 style="color:red;">While trying to flee ${resource} damaged you <span class="maroonText">${enemyCritically}</span>dealing <span class="maroonText">${enemyDamage}</span> damage</h2>
 	<h2 style="color:red;">While trying to flee ${resource} damaged you <span class="maroonText">${enemyCritically2}</span>dealing <span class="maroonText">${enemyDamage2}</span> damage</h2>
 	<a href="http://localhost:8081/AdventureGame/fight" class="button">CONTINUE</a>

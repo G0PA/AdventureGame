@@ -69,6 +69,11 @@ public class SettlementController {
 			d.setMaxAge(60 * 60 * 24 * 2);
 			response.addCookie(d);
 		}
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+		}else {
+			model.addAttribute("zone","redWoods");
+		}
 		return "skippedSettlement";
 	}
 
@@ -80,26 +85,54 @@ public class SettlementController {
 			hero.enemyEncountersLeft -= 1;
 			model.addAttribute("enemiesLeft", hero.enemyEncountersLeft);
 			model.addAttribute("resource", resourceCookie);
-			if (hero.hp + 15 <= hero.maxHp) {
-				hero.hp += 15;
-			} else {
-				hero.hp = hero.maxHp;
-			}
-			if (hero.mana+5<=hero.maxMana)
-			{
-				hero.mana+=5;
+			if (hero.zone.equals("Green Woods")) {
+				if (hero.hp + 15 <= hero.maxHp) {
+					hero.hp += 15;
+				} else {
+					hero.hp = hero.maxHp;
+				}
+				if (hero.mana + 5 <= hero.maxMana) {
+					hero.mana += 5;
+				} else {
+					hero.mana = hero.maxMana;
+				}
+				if (hero.hp + hero.hpRegen <= hero.maxHp) {
+					hero.hp += hero.hpRegen;
+				} else {
+					hero.hp = hero.maxHp;
+				}
+				if (hero.mana + hero.manaRegen <= hero.maxMana) {
+					hero.mana += hero.manaRegen;
+				} else {
+					hero.mana = hero.maxMana;
+				}
+				model.addAttribute("sleep", "You decide to sleep Restoring 15 Health and 5 Mana");
+				model.addAttribute("zone","hello");
 			}else {
-				hero.mana=hero.maxMana;
+				if (hero.hp + 30 <= hero.maxHp) {
+					hero.hp += 30;
+				} else {
+					hero.hp = hero.maxHp;
+				}
+				if (hero.mana + 10 <= hero.maxMana) {
+					hero.mana += 10;
+				} else {
+					hero.mana = hero.maxMana;
+				}
+				if (hero.hp + hero.hpRegen <= hero.maxHp) {
+					hero.hp += hero.hpRegen;
+				} else {
+					hero.hp = hero.maxHp;
+				}
+				if (hero.mana + hero.manaRegen <= hero.maxMana) {
+					hero.mana += hero.manaRegen;
+				} else {
+					hero.mana = hero.maxMana;
+				}
+				model.addAttribute("sleep", "You decide to sleep Restoring 30 Health and 10 Mana");
+				model.addAttribute("zone","redWoods");
 			}
-			if(hero.hp+hero.hpRegen<=hero.maxHp) {
-				hero.hp+=hero.hpRegen;
-			}else {
-				hero.hp=hero.maxHp;
-			}if(hero.mana+hero.manaRegen<=hero.maxMana) {
-				hero.mana+=hero.manaRegen;
-			}else {
-				hero.mana=hero.maxMana;
-			}
+
 				model.addAttribute("hpRegen",hero.hpRegen);
 				model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie d = new Cookie("bossState", "dead");
@@ -109,7 +142,6 @@ public class SettlementController {
 			response.addCookie(cc);
 			d.setPath("/");
 			d.setMaxAge(60 * 60 * 24 * 2);
-			model.addAttribute("sleep", "You decide to sleep Restoring 15 Health and 5 Mana");
 			response.addCookie(d);
 		}
 		return "leaveSettlement";
@@ -142,6 +174,11 @@ public class SettlementController {
 			f.setMaxAge(60*60*24*2);
 			f.setPath("/");
 			response.addCookie(f);
+			if(hero.zone.equals("Green Woods")) {
+				model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
 		
 		return "leaveSettlement";
 	}
@@ -156,6 +193,9 @@ public class SettlementController {
 		hero=Hero.fromCookie(heroCookie);
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
+		model.addAttribute("message", hero.createDisplayText());
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("sleepInfo","+15 Health +5 Mana");
 		Item smallPotion = new Item("Small Health Potion", 9).setCurrentHealth(25);
 		Item magicBoots = new Item("Magic Boots", 17).setMagicResist(2);
 		Item woodenShield = new Item("Wooden Shield", 17).setArmor(2);
@@ -217,6 +257,39 @@ public class SettlementController {
 		items.add(rejuvinationBracelet);
 		items.add(smallJacket);
 		items.add(brokenStaff);
+		}else {
+			model.addAttribute("sleepInfo","+30 Health +10 Mana");
+			Item largePotion=new Item("Large Health Potion", 29).setCurrentHealth(100);
+			Item largeManaPotion=new Item("Large Mana Potion",28).setMana(50);
+			Item fireSword=new Item("Fire Sword",61).setAttackMin(5).setAttackMax(5);
+			Item enhancedDagger=new Item("Enhanced Dagger",47).setAttackMin(4).setAttackMax(2);
+			Item enhancedBow=new Item("Enhanced Bow",47).setAttackMax(6);
+			Item steelSharpener=new Item("Steel Sharpener",55).setCritChance(5);
+			Item specialHealthPotion=new Item("Special Health Potion",50).setCurrentHealth(150);
+			Item specialManaPotion=new Item("Special Mana Potion",50).setMana(80);
+			Item plateArmor=new Item("Plate Armor",49).setArmor(3).setMagicResist(3);
+			Item tunic=new Item("Tunic",59).setCurrentHealth(30).setHealthLimit(50).setMaxMana(25).setMana(15);
+			Item largeMixedPotion=new Item("Large Mixed Potion",58).setCurrentHealth(100).setMaxMana(50);
+			Item largeEnergyBoost=new Item("Large Energy Boost",54).setCurrentHealth(25).setAttackMin(2).setAttackMax(2).setArmor(2).setMagicResist(2).setCritChance(2);
+			Item mageHat=new Item("Mage Hat",58).setMaxMana(30).setMana(20).setMagicResist(2).setCritChance(2);
+			Item amuletOfRestoration=new Item("Amulet of Restoration",59).setHpRegen(6).setManaRegen(3).setCurrentHealth(30).setMana(15);
+			Item upgradedFireSword=new Item("Upgraded Fire Sword",100).setAttackMin(6).setAttackMax(6).setCritChance(4);
+			items.add(largePotion);
+			items.add(largeManaPotion);
+			items.add(fireSword);
+			items.add(enhancedDagger);
+			items.add(enhancedBow);
+			items.add(specialHealthPotion);
+			items.add(specialManaPotion);
+			items.add(steelSharpener);
+			items.add(plateArmor);
+			items.add(tunic);
+			items.add(largeMixedPotion);
+			items.add(largeEnergyBoost);
+			items.add(mageHat);
+			items.add(amuletOfRestoration);
+			items.add(upgradedFireSword);
+		}
 
 		if (!bossStateCookie.equals("shopping")) {
 			shop = new ArrayList<Item>();
@@ -224,197 +297,197 @@ public class SettlementController {
 		}
 		
 			 tempItem=shop.get(0);
-			model.addAttribute("name",tempItem.name+": ");
+			model.addAttribute("name",tempItem.name+":  ");
 			if(tempItem.currentHealth!=0)
 			{
-				model.addAttribute("currentHealth","Current Health +"+String.valueOf(tempItem.currentHealth)+" ");
+				model.addAttribute("currentHealth","Current Health +"+String.valueOf(tempItem.currentHealth)+"  ");
 			}
 			if(tempItem.healthLimit!=0)
 			{
-				model.addAttribute("maxHealth","Max Health +"+String.valueOf(tempItem.healthLimit)+" ");
+				model.addAttribute("maxHealth","Max Health +"+String.valueOf(tempItem.healthLimit)+"  ");
 			}
 			if(tempItem.mana!=0)
 			{
-				model.addAttribute("mana","Mana +"+String.valueOf(tempItem.mana)+" ");
+				model.addAttribute("mana","Mana +"+String.valueOf(tempItem.mana)+"  ");
 			}
 			if(tempItem.maxMana!=0)
 			{
-				model.addAttribute("maxMana","Max Mana +"+String.valueOf(tempItem.maxMana)+" ");
+				model.addAttribute("maxMana","Max Mana +"+String.valueOf(tempItem.maxMana)+"  ");
 			}
 			if(tempItem.attackMin!=0)
 			{
-				model.addAttribute("attackMin","Attack Minimum +"+String.valueOf(tempItem.attackMin)+" ");
+				model.addAttribute("attackMin","Attack Minimum +"+String.valueOf(tempItem.attackMin)+"  ");
 			}
 			if(tempItem.attackMax!=0)
 			{
-				model.addAttribute("attackMax","Attack Maximum +"+String.valueOf(tempItem.attackMax)+" ");
+				model.addAttribute("attackMax","Attack Maximum +"+String.valueOf(tempItem.attackMax)+"  ");
 			}
 			if(tempItem.armor!=0)
 			{
-				model.addAttribute("armor","Armor +"+String.valueOf(tempItem.armor)+" ");
+				model.addAttribute("armor","Armor +"+String.valueOf(tempItem.armor)+"  ");
 			}
 			if(tempItem.magicResist!=0)
 			{
-				model.addAttribute("magicResist","Magic Resist +"+String.valueOf(tempItem.magicResist)+" ");
+				model.addAttribute("magicResist","Magic Resist +"+String.valueOf(tempItem.magicResist)+"  ");
 			}
 			if(tempItem.critChance!=0)
 			{
-				model.addAttribute("critChance","Critical Chance +"+String.valueOf(tempItem.critChance)+" ");
+				model.addAttribute("critChance","Critical Chance +"+String.valueOf(tempItem.critChance)+"%  ");
 			}
 			if(tempItem.hpRegen!=0) 
 			{
-				model.addAttribute("hpRegen","Hp Regen +"+String.valueOf(tempItem.hpRegen)+" ");
+				model.addAttribute("hpRegen","Hp Regen +"+String.valueOf(tempItem.hpRegen)+"  ");
 			}
 			if(tempItem.manaRegen!=0)
 			{
-				model.addAttribute("manaRegen","Mana Regen +"+String.valueOf(tempItem.manaRegen)+" ");
+				model.addAttribute("manaRegen","Mana Regen +"+String.valueOf(tempItem.manaRegen)+"  ");
 			}
 			model.addAttribute("costsGold","Gold -"+String.valueOf(tempItem.costsGold));
 		
 			tempItem2=shop.get(1);
-			model.addAttribute("secondName",tempItem2.name+": ");
+			model.addAttribute("secondName",tempItem2.name+":  ");
 			if(tempItem2.currentHealth!=0)
 			{
-				model.addAttribute("secondCurrentHealth","Current Health +"+String.valueOf(tempItem2.currentHealth)+" ");
+				model.addAttribute("secondCurrentHealth","Current Health +"+String.valueOf(tempItem2.currentHealth)+"  ");
 			}
 			if(tempItem2.healthLimit!=0)
 			{
-				model.addAttribute("secondMaxHealth","Max Health +"+String.valueOf(tempItem2.healthLimit)+" ");
+				model.addAttribute("secondMaxHealth","Max Health +"+String.valueOf(tempItem2.healthLimit)+"  ");
 			}
 			
 			if(tempItem2.mana!=0)
 			{
-				model.addAttribute("secondMana","Mana +"+String.valueOf(tempItem2.mana)+" ");
+				model.addAttribute("secondMana","Mana +"+String.valueOf(tempItem2.mana)+"  ");
 			}
 			if(tempItem2.maxMana!=0)
 			{
-				model.addAttribute("secondMaxMana","Max Mana +"+String.valueOf(tempItem2.maxMana)+" ");
+				model.addAttribute("secondMaxMana","Max Mana +"+String.valueOf(tempItem2.maxMana)+"  ");
 			}
 			if(tempItem2.attackMin!=0)
 			{
-				model.addAttribute("secondAttackMin","Attack Minimum +"+String.valueOf(tempItem2.attackMin)+" ");
+				model.addAttribute("secondAttackMin","Attack Minimum +"+String.valueOf(tempItem2.attackMin)+"  ");
 			}
 			if(tempItem2.attackMax!=0)
 			{
-				model.addAttribute("secondAttackMax","Attack Maximum +"+String.valueOf(tempItem2.attackMax)+" ");
+				model.addAttribute("secondAttackMax","Attack Maximum +"+String.valueOf(tempItem2.attackMax)+"  ");
 			}
 			if(tempItem2.armor!=0)
 			{
-				model.addAttribute("secondArmor","Armor +"+String.valueOf(tempItem2.armor)+" ");
+				model.addAttribute("secondArmor","Armor +"+String.valueOf(tempItem2.armor)+"  ");
 			}
 			if(tempItem2.magicResist!=0)
 			{
-				model.addAttribute("secondMagicResist","Magic Resist +"+String.valueOf(tempItem2.magicResist)+" ");
+				model.addAttribute("secondMagicResist","Magic Resist +"+String.valueOf(tempItem2.magicResist)+"  ");
 			}
 			if(tempItem2.critChance!=0)
 			{
-				model.addAttribute("secondCritChance","Critical Chance +"+String.valueOf(tempItem2.critChance)+" ");
+				model.addAttribute("secondCritChance","Critical Chance +"+String.valueOf(tempItem2.critChance)+"%  ");
 			}
 			if(tempItem2.hpRegen!=0) 
 			{
-				model.addAttribute("secondHpRegen","Hp Regen +"+String.valueOf(tempItem2.hpRegen)+" ");
+				model.addAttribute("secondHpRegen","Hp Regen +"+String.valueOf(tempItem2.hpRegen)+"  ");
 			}
 			if(tempItem2.manaRegen!=0)
 			{
-				model.addAttribute("secondManaRegen","Mana Regen +"+String.valueOf(tempItem2.manaRegen)+" ");
+				model.addAttribute("secondManaRegen","Mana Regen +"+String.valueOf(tempItem2.manaRegen)+"  ");
 			}
-			model.addAttribute("secondCostsGold","Gold -"+String.valueOf(tempItem2.costsGold)+" ");
+			model.addAttribute("secondCostsGold","Gold -"+String.valueOf(tempItem2.costsGold)+"  ");
 			
 			tempItem3=shop.get(2);
-			model.addAttribute("thirdName",tempItem3.name+": ");
+			model.addAttribute("thirdName",tempItem3.name+":  ");
 			if(tempItem3.currentHealth!=0)
 			{
-				model.addAttribute("thirdCurrentHealth","Current Health +"+String.valueOf(tempItem3.currentHealth)+" ");
+				model.addAttribute("thirdCurrentHealth","Current Health +"+String.valueOf(tempItem3.currentHealth)+"  ");
 			}
 			if(tempItem3.healthLimit!=0)
 			{
-				model.addAttribute("thirdMaxHealth","Max Health +"+String.valueOf(tempItem3.healthLimit)+" ");
+				model.addAttribute("thirdMaxHealth","Max Health +"+String.valueOf(tempItem3.healthLimit)+"  ");
 			}
 			if(tempItem3.mana!=0)
 			{
-				model.addAttribute("thirdMana","Mana +"+String.valueOf(tempItem3.mana)+" ");
+				model.addAttribute("thirdMana","Mana +"+String.valueOf(tempItem3.mana)+"  ");
 			}
 			if(tempItem3.maxMana!=0)
 			{
-				model.addAttribute("thirdMaxMana","Max Mana +"+String.valueOf(tempItem3.maxMana)+" ");
+				model.addAttribute("thirdMaxMana","Max Mana +"+String.valueOf(tempItem3.maxMana)+"  ");
 			}
 			if(tempItem3.attackMin!=0)
 			{
-				model.addAttribute("thirdAttackMin","Attack Minimum +"+String.valueOf(tempItem3.attackMin)+" ");
+				model.addAttribute("thirdAttackMin","Attack Minimum +"+String.valueOf(tempItem3.attackMin)+"  ");
 			}
 			if(tempItem3.attackMax!=0)
 			{
-				model.addAttribute("thirdAttackMax","Attack Maximum +"+String.valueOf(tempItem3.attackMax)+" ");
+				model.addAttribute("thirdAttackMax","Attack Maximum +"+String.valueOf(tempItem3.attackMax)+"  ");
 			}
 			if(tempItem3.armor!=0)
 			{
-				model.addAttribute("thirdArmor","Armor +"+String.valueOf(tempItem3.armor)+" ");
+				model.addAttribute("thirdArmor","Armor +"+String.valueOf(tempItem3.armor)+"  ");
 			}
 			if(tempItem3.magicResist!=0)
 			{
-				model.addAttribute("thirdMagicResist","Magic Resist +"+String.valueOf(tempItem3.magicResist)+" ");
+				model.addAttribute("thirdMagicResist","Magic Resist +"+String.valueOf(tempItem3.magicResist)+"  ");
 			}
 			if(tempItem3.critChance!=0)
 			{
-				model.addAttribute("thirdCritChance","Critical Chance +"+String.valueOf(tempItem3.critChance)+" ");
+				model.addAttribute("thirdCritChance","Critical Chance +"+String.valueOf(tempItem3.critChance)+"%  ");
 			}
 			if(tempItem3.hpRegen!=0) 
 			{
-				model.addAttribute("thirdHpRegen","Hp Regen +"+String.valueOf(tempItem3.hpRegen)+" ");
+				model.addAttribute("thirdHpRegen","Hp Regen +"+String.valueOf(tempItem3.hpRegen)+"  ");
 			}
 			if(tempItem3.manaRegen!=0)
 			{
-				model.addAttribute("thirdManaRegen","Mana Regen +"+String.valueOf(tempItem3.manaRegen)+" ");
+				model.addAttribute("thirdManaRegen","Mana Regen +"+String.valueOf(tempItem3.manaRegen)+"  ");
 			}
-			model.addAttribute("thirdCostsGold","Gold -"+String.valueOf(tempItem3.costsGold)+" ");
+			model.addAttribute("thirdCostsGold","Gold -"+String.valueOf(tempItem3.costsGold)+"  ");
 			
 			tempItem4=shop.get(3);
-			model.addAttribute("fourthName",tempItem4.name+": ");
+			model.addAttribute("fourthName",tempItem4.name+":  ");
 			if(tempItem4.currentHealth!=0)
 			{
-				model.addAttribute("fourthCurrentHealth","Current Health +"+String.valueOf(tempItem4.currentHealth)+" ");
+				model.addAttribute("fourthCurrentHealth","Current Health +"+String.valueOf(tempItem4.currentHealth)+"  ");
 			}
 			if(tempItem4.healthLimit!=0)
 			{
-				model.addAttribute("fourthMaxHealth","Max Health +"+String.valueOf(tempItem4.healthLimit)+" ");
+				model.addAttribute("fourthMaxHealth","Max Health +"+String.valueOf(tempItem4.healthLimit)+"  ");
 			}
 			if(tempItem4.mana!=0)
 			{
-				model.addAttribute("fourthMana","Mana +"+String.valueOf(tempItem4.mana)+" ");
+				model.addAttribute("fourthMana","Mana +"+String.valueOf(tempItem4.mana)+"  ");
 			}
 			if(tempItem4.maxMana!=0)
 			{
-				model.addAttribute("fourthMaxMana","Max Mana +"+String.valueOf(tempItem4.maxMana)+" ");
+				model.addAttribute("fourthMaxMana","Max Mana +"+String.valueOf(tempItem4.maxMana)+"  ");
 			}
 			if(tempItem4.attackMin!=0)
 			{
-				model.addAttribute("fourthAttackMin","Attack Minimum +"+String.valueOf(tempItem4.attackMin)+" ");
+				model.addAttribute("fourthAttackMin","Attack Minimum +"+String.valueOf(tempItem4.attackMin)+"  ");
 			}
 			if(tempItem4.attackMax!=0)
 			{
-				model.addAttribute("fourthAttackMax","Attack Maximum +"+String.valueOf(tempItem4.attackMax)+" ");
+				model.addAttribute("fourthAttackMax","Attack Maximum +"+String.valueOf(tempItem4.attackMax)+"  ");
 			}
 			if(tempItem4.armor!=0)
 			{
-				model.addAttribute("fourthArmor","Armor +"+String.valueOf(tempItem4.armor)+" ");
+				model.addAttribute("fourthArmor","Armor +"+String.valueOf(tempItem4.armor)+"  ");
 			}
 			if(tempItem4.magicResist!=0)
 			{
-				model.addAttribute("fourthMagicResist","Magic Resist +"+String.valueOf(tempItem4.magicResist)+" ");
+				model.addAttribute("fourthMagicResist","Magic Resist +"+String.valueOf(tempItem4.magicResist)+"  ");
 			}
 			if(tempItem4.critChance!=0)
 			{
-				model.addAttribute("fourthCritChance","Critical Chance +"+String.valueOf(tempItem4.critChance)+" ");
+				model.addAttribute("fourthCritChance","Critical Chance +"+String.valueOf(tempItem4.critChance)+"%  ");
 			}
 			if(tempItem4.hpRegen!=0) 
 			{
-				model.addAttribute("fourthHpRegen","Hp Regen +"+String.valueOf(tempItem4.hpRegen)+" ");
+				model.addAttribute("fourthHpRegen","Hp Regen +"+String.valueOf(tempItem4.hpRegen)+"  ");
 			}
 			if(tempItem4.manaRegen!=0)
 			{
-				model.addAttribute("fourthManaRegen","Mana Regen +"+String.valueOf(tempItem4.manaRegen)+" ");
+				model.addAttribute("fourthManaRegen","Mana Regen +"+String.valueOf(tempItem4.manaRegen)+"  ");
 			}
-			model.addAttribute("fourthCostsGold","Gold -"+String.valueOf(tempItem4.costsGold)+" ");
+			model.addAttribute("fourthCostsGold","Gold -"+String.valueOf(tempItem4.costsGold)+"  ");
 			
 
 
@@ -423,52 +496,52 @@ public class SettlementController {
 			
 			
 			tempItem5=shop.get(4);
-			model.addAttribute("fifthName",tempItem5.name+": ");
+			model.addAttribute("fifthName",tempItem5.name+":  ");
 			if(tempItem5.currentHealth!=0)
 			{
-				model.addAttribute("fifthCurrentHealth","Current Health +"+String.valueOf(tempItem5.currentHealth)+" ");
+				model.addAttribute("fifthCurrentHealth","Current Health +"+String.valueOf(tempItem5.currentHealth)+"  ");
 			}
 			if(tempItem5.healthLimit!=0)
 			{
-				model.addAttribute("fifthMaxHealth","Max Health +"+String.valueOf(tempItem5.healthLimit)+" ");
+				model.addAttribute("fifthMaxHealth","Max Health +"+String.valueOf(tempItem5.healthLimit)+"  ");
 			}
 			if(tempItem5.mana!=0)
 			{
-				model.addAttribute("fifthMana","Mana +"+String.valueOf(tempItem5.mana)+" ");
+				model.addAttribute("fifthMana","Mana +"+String.valueOf(tempItem5.mana)+"  ");
 			}
 			if(tempItem5.maxMana!=0)
 			{
-				model.addAttribute("fifthMaxMana","Max Mana +"+String.valueOf(tempItem5.maxMana)+" ");
+				model.addAttribute("fifthMaxMana","Max Mana +"+String.valueOf(tempItem5.maxMana)+"  ");
 			}
 			if(tempItem5.attackMin!=0)
 			{
-				model.addAttribute("fifthAttackMin","Attack Minimum +"+String.valueOf(tempItem5.attackMin)+" ");
+				model.addAttribute("fifthAttackMin","Attack Minimum +"+String.valueOf(tempItem5.attackMin)+"  ");
 			}
 			if(tempItem5.attackMax!=0)
 			{
-				model.addAttribute("fifthAttackMax","Attack Maximum +"+String.valueOf(tempItem5.attackMax)+" ");
+				model.addAttribute("fifthAttackMax","Attack Maximum +"+String.valueOf(tempItem5.attackMax)+"  ");
 			}
 			if(tempItem5.armor!=0)
 			{
-				model.addAttribute("fifthArmor","Armor +"+String.valueOf(tempItem5.armor)+" ");
+				model.addAttribute("fifthArmor","Armor +"+String.valueOf(tempItem5.armor)+"  ");
 			}
 			if(tempItem5.magicResist!=0)
 			{
-				model.addAttribute("fifthMagicResist","Magic Resist +"+String.valueOf(tempItem5.magicResist)+" ");
+				model.addAttribute("fifthMagicResist","Magic Resist +"+String.valueOf(tempItem5.magicResist)+"  ");
 			}
 			if(tempItem5.critChance!=0)
 			{
-				model.addAttribute("fifthCritChance","Critical Chance +"+String.valueOf(tempItem5.critChance)+" ");
+				model.addAttribute("fifthCritChance","Critical Chance +"+String.valueOf(tempItem5.critChance)+"%  ");
 			}
 			if(tempItem5.hpRegen!=0) 
 			{
-				model.addAttribute("fifthHpRegen","Hp Regen +"+String.valueOf(tempItem5.hpRegen)+" ");
+				model.addAttribute("fifthHpRegen","Hp Regen +"+String.valueOf(tempItem5.hpRegen)+"  ");
 			}
 			if(tempItem5.manaRegen!=0)
 			{
-				model.addAttribute("fifthManaRegen","Mana Regen +"+String.valueOf(tempItem5.manaRegen)+" ");
+				model.addAttribute("fifthManaRegen","Mana Regen +"+String.valueOf(tempItem5.manaRegen)+"  ");
 			}
-			model.addAttribute("fifthCostsGold","Gold -"+String.valueOf(tempItem5.costsGold)+" ");
+			model.addAttribute("fifthCostsGold","Gold -"+String.valueOf(tempItem5.costsGold)+"  ");
 			
 		items.clear();
 		Cookie boss=new Cookie("bossState","shopping");
@@ -516,7 +589,11 @@ public class SettlementController {
 			}
 		}
 		if (tempItem.attackMin != 0) {
+			if(hero.attackMin+tempItem.attackMin<=hero.attackMax) {
 			hero.attackMin += tempItem.attackMin;
+			}else {
+				hero.attackMin=hero.attackMax;
+			}
 		}
 		if (tempItem.attackMax != 0) {
 			hero.attackMax += tempItem.attackMax;
@@ -534,7 +611,7 @@ public class SettlementController {
 			hero.hpRegen+=tempItem.hpRegen;
 		}
 		if(tempItem.manaRegen !=0) {
-			hero.manaRegen=tempItem.manaRegen;
+			hero.manaRegen+=tempItem.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -583,7 +660,12 @@ public class SettlementController {
 			}
 		}
 		if (tempItem2.attackMin != 0) {
-			hero.attackMin += tempItem2.attackMin;
+			if(hero.attackMin+tempItem2.attackMin<=hero.attackMax) {
+				hero.attackMin += tempItem2.attackMin;
+				}else {
+					hero.attackMin=hero.attackMax;
+				}
+			
 		}
 		if (tempItem2.attackMax != 0) {
 			hero.attackMax += tempItem2.attackMax;
@@ -601,7 +683,7 @@ public class SettlementController {
 			hero.hpRegen+=tempItem2.hpRegen;
 		}
 		if(tempItem2.manaRegen !=0) {
-			hero.manaRegen=tempItem2.manaRegen;
+			hero.manaRegen+=tempItem2.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -652,7 +734,12 @@ public class SettlementController {
 			}
 		}
 		if (tempItem3.attackMin != 0) {
-			hero.attackMin += tempItem3.attackMin;
+			if(hero.attackMin+tempItem3.attackMin<=hero.attackMax) {
+				hero.attackMin += tempItem3.attackMin;
+				}else {
+					hero.attackMin=hero.attackMax;
+				}
+			
 		}
 		if (tempItem3.attackMax != 0) {
 			hero.attackMax += tempItem3.attackMax;
@@ -670,7 +757,7 @@ public class SettlementController {
 			hero.hpRegen+=tempItem3.hpRegen;
 		}
 		if(tempItem3.manaRegen !=0) {
-			hero.manaRegen=tempItem3.manaRegen;
+			hero.manaRegen+=tempItem3.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -721,7 +808,12 @@ public class SettlementController {
 			}
 		}
 		if (tempItem4.attackMin != 0) {
-			hero.attackMin += tempItem4.attackMin;
+			if(hero.attackMin+tempItem4.attackMin<=hero.attackMax) {
+				hero.attackMin += tempItem4.attackMin;
+				}else {
+					hero.attackMin=hero.attackMax;
+				}
+			
 		}
 		if (tempItem4.attackMax != 0) {
 			hero.attackMax += tempItem4.attackMax;
@@ -739,7 +831,7 @@ public class SettlementController {
 			hero.hpRegen+=tempItem4.hpRegen;
 		}
 		if(tempItem4.manaRegen !=0) {
-			hero.manaRegen=tempItem4.manaRegen;
+			hero.manaRegen+=tempItem4.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -788,7 +880,11 @@ public class SettlementController {
 			}
 		}
 		if (tempItem5.attackMin != 0) {
-			hero.attackMin += tempItem5.attackMin;
+			if(hero.attackMin+tempItem5.attackMin<=hero.attackMax) {
+				hero.attackMin += tempItem5.attackMin;
+				}else {
+					hero.attackMin=hero.attackMax;
+				}
 		}
 		if (tempItem5.attackMax != 0) {
 			hero.attackMax += tempItem5.attackMax;
@@ -806,7 +902,7 @@ public class SettlementController {
 			hero.hpRegen+=tempItem5.hpRegen;
 		}
 		if(tempItem5.manaRegen !=0) {
-			hero.manaRegen=tempItem5.manaRegen;
+			hero.manaRegen+=tempItem5.manaRegen;
 		}
 		
 		Cookie c = hero.createCookie();

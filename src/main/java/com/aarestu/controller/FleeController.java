@@ -40,20 +40,20 @@ public class FleeController {
 	Hero hero;
 	Enemy enemy;
 	@RequestMapping(method = RequestMethod.GET)
-	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie)
+	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie)
 	{
 		hero=Hero.fromCookie(fooCookie);
-		if(hero.hp+hero.hpRegen<=hero.maxHp) {
-			hero.hp+=hero.hpRegen;
-		}else {
-			hero.hp=hero.maxHp;
-		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
-			hero.mana+=hero.manaRegen;
-		}else {
-			hero.mana=hero.maxMana;
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else if(hero.zone.equals("Red Woods")) {
+			model.addAttribute("zone","redWoods");
+			}
+		if(firstBossCookie.equals("fighting")) {
+			model.addAttribute("boss","The enemy is too Strong to outrun or escape");
+			model.addAttribute("resource",resourceCookie);	
+			return "failedToFlee";
 		}
-			model.addAttribute("hpRegen",hero.hpRegen);
-			model.addAttribute("manaRegen",hero.manaRegen);
+		
 		if(passedCookie.equals("failed"))
 		{
 			model.addAttribute("cheater","No Cheating : )");
@@ -62,11 +62,30 @@ public class FleeController {
 		int escape=flee(1,2);
 		if(escape==1)
 		{
+			if(hero.hp+hero.hpRegen<=hero.maxHp) {
+				hero.hp+=hero.hpRegen;
+			}else {
+				hero.hp=hero.maxHp;
+			}if(hero.mana+hero.manaRegen<=hero.maxMana) {
+				hero.mana+=hero.manaRegen;
+			}else {
+				hero.mana=hero.maxMana;
+			}
+				model.addAttribute("hpRegen",hero.hpRegen);
+				model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie c=new Cookie("bossState","dead");
 			c.setPath("/");
 			c.setMaxAge(60*60*24*2);
 			response.addCookie(c);
-			
+			Cookie heroCookie=hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60*60*24*2);
+			response.addCookie(heroCookie);
+			if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else if(hero.zone.equals("Red Woods")) {
+			model.addAttribute("zone","redWoods");
+			}
 			return "escaped";
 		}
 
@@ -75,6 +94,7 @@ public class FleeController {
 		enemy=enemy.fromCookie(badCookie);
 
 		int defense;
+		int enemyDamage1=hero.hp;
 		//1st attack
 		if(enemy.attackType==1)
 		{
@@ -98,8 +118,10 @@ public class FleeController {
 		{
 			//do nothing
 		}else {
+			
 		hero.hp = hero.hp - (attack(enemy.damageMin,enemy.damageMax)*multiply - defense);
 		}
+		enemyDamage1-=hero.hp;
 		if (hero.hp <= 0) {
 
 			Cookie c = hero.createCookie();
@@ -117,6 +139,10 @@ public class FleeController {
 			
 			int theIndex=attack(0,images.size()-1);
 			model.addAttribute("defeatScreen",images.get(theIndex));
+			model.addAttribute("message2", hero.createDisplayText());
+			model.addAttribute("enemyName",enemy.name);
+			model.addAttribute("enemy",enemy.health);
+			model.addAttribute("enemyDamage",String.valueOf(enemyDamage1));
 			return "defeat";
 
 		}
@@ -158,6 +184,11 @@ public class FleeController {
 			images.add("defeat6");
 			int theIndex=attack(0,images.size()-1);
 			model.addAttribute("defeatScreen",images.get(theIndex));
+			model.addAttribute("defeatScreen",images.get(theIndex));
+			model.addAttribute("message2", hero.createDisplayText());
+			model.addAttribute("enemyName",enemy.name);
+			model.addAttribute("enemy",enemy.health);
+			model.addAttribute("enemyDamage2",enemy.name+" damages you dealing "+String.valueOf(enemyDamage1)+" damage");
 			return "defeat";
 
 		}
@@ -174,6 +205,11 @@ public class FleeController {
 		passed.setMaxAge(60*60*24*2);
 		passed.setPath("/");
 		response.addCookie(passed);
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else if(hero.zone.equals("Red Woods")) {
+			model.addAttribute("zone","redWoods");
+			}
 		return "failedToFlee";
 		
 	}

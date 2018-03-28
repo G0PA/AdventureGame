@@ -29,6 +29,9 @@ height: 100%;
 .asd{
 text-align:center;
 }
+.greenText{
+color:Chartreuse;
+}
 </style>
 <head>
 <title>Welcome</title>
@@ -37,9 +40,9 @@ text-align:center;
 <div class="asd">
 	<h1 style="color:Chartreuse"><font size="10"><i>RANGER</i></font></h1>
 	<h1><i>Passive: Your pet fights with you, having 15% of your Attack Min and Max and same Critical Chance</i></h1>
-	<h1><i>Active: Cast Ranger Sight increasing your Attack Damage Min and Max with 60% for one attack</i></h1>
+	<h1><i>Active: Cast <span class="greenText">Ranger Sight</span> increasing your Attack Damage Min and Max with 80% for one attack</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">CHOOSE RANGER</a>
+	<a href="http://localhost:8081/AdventureGame/greenWoods" class="button">CHOOSE RANGER</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>
 	</div>
 	

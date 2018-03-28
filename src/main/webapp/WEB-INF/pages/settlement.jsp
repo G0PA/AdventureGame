@@ -95,7 +95,7 @@ color:blue;
 	<a href="http://localhost:8081/AdventureGame/item5" class="button">${fifthName}<span class="greenText">${fifthCurrentHealth}${fifthMaxHealth}${fifthMana}${fifthMaxMana}</span><span class="blue">${fifthHpRegen}${fifthManaRegen}</span><span class="greenText">${fifthAttackMin}${fifthAttackMax}${fifthArmor}${fifthMagicResist}${fifthCritChance}</span><span class="redText">${fifthCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/sleep" class="button3">SLEEP: <span class="greenText">+15 Health, +5 Mana</span> <span class="redText">-1 Enemy Encounter</span></a>
+	<a href="http://localhost:8081/AdventureGame/sleep" class="button3">SLEEP: <span class="greenText">${sleepInfo}</span> <span class="redText">-1 Enemy Encounter</span></a>
 	</div>
 	<a href="http://localhost:8081/AdventureGame/leaveSettlement" class="button2">LEAVE SETTLEMENT</a>
 	
