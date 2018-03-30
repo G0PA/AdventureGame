@@ -17,6 +17,7 @@ public class Hero {
 	int enemyEncountersLeft=26;
 	int hpRegen=2;
 	int manaRegen=1;
+	int souls=0;
 	String zone="Green Woods";
 	boolean isValid = true;
 
@@ -68,6 +69,9 @@ public class Hero {
 			if (hero.hp > hero.maxHp) {
 				return null;
 			}
+			if(hero.heroClass.equals("Necromancer")){
+				hero.souls=Integer.parseInt(heroArr[15]);
+			}
 			
 			return hero;
 		} catch (Exception e) {
@@ -76,7 +80,17 @@ public class Hero {
 	}
 	
 	public Cookie createCookie() {
-		return new Cookie("hero", String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s",heroClass, hp, maxHp,mana,maxMana, attackMin, attackMax, armor, magicResist, gold, critChance,enemyEncountersLeft,hpRegen,manaRegen,zone));
+		if (heroClass.equals("Necromancer")) {
+			return new Cookie("hero",
+					String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s,%d", heroClass, hp, maxHp, mana,
+							maxMana, attackMin, attackMax, armor, magicResist, gold, critChance, enemyEncountersLeft,
+							hpRegen, manaRegen, zone,souls));
+		} else {
+			return new Cookie("hero",
+					String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s", heroClass, hp, maxHp, mana, maxMana,
+							attackMin, attackMax, armor, magicResist, gold, critChance, enemyEncountersLeft, hpRegen,
+							manaRegen, zone));
+		}
 	}
 	
 	public String createDisplayText() {
@@ -113,7 +127,31 @@ public class Hero {
 				",   critical chance = " + critChance + "%" +
 				",   Enemy encounters left until Boss: " + enemyEncountersLeft+
 				",   Current Zone: "+zone;
-		}else {
+		}else if(heroClass.equals("Giant")) {
+			return  "class = " +heroClass+
+					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+					",   attack = " + attackMin+ "-" + attackMax+
+					",   armor = " + armor +
+					",   magic resist = " + magicResist + 
+					",   gold = " + gold +
+					",   critical chance = " + critChance + "%" +
+					",   Enemy encounters left until Boss: " + enemyEncountersLeft+
+					",   Current Zone: "+zone;
+			}else if(heroClass.equals("Necromancer")) {
+				return  "class = " +heroClass+
+						",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+						",   mana = "+mana+"/"+maxMana+" (+"+manaRegen+" regen)"+ 
+						",   attack = " + (attackMin+souls/2)+"-"+(attackMax+souls/2)+
+						",   armor = " + armor +
+						",   magic resist = " + magicResist + 
+						",   gold = " + gold +
+						",   critical chance = " + critChance + "%" +
+						",   Enemy encounters left until Boss: " + enemyEncountersLeft+
+						",   Souls: "+souls+
+						",   Current Zone: "+zone;
+				}
+		
+		else {
 			return  "class = " +heroClass+
 					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
 					",   mana = "+mana+"/"+maxMana+" (+"+manaRegen+" regen)"+ 

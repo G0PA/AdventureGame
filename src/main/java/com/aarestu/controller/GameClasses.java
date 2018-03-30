@@ -65,6 +65,36 @@ public class GameClasses {
 		
 		return "berserk";
 	}
+	@RequestMapping(value="/giant",method=RequestMethod.GET)
+	public String returnGiant(@CookieValue("hero")String heroCookie,HttpServletResponse response)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		hero.heroClass="Giant";
+		hero.mana=0;
+		hero.manaRegen=0;
+		hero.maxMana=0;
+		
+		Cookie c=hero.createCookie();
+		c.setPath("/");
+		c.setMaxAge(60*60*24*2);
+		response.addCookie(c);
+		return "giant";
+	}
+	
+	@RequestMapping(value="/necromancer",method=RequestMethod.GET)
+	public String returnNecromancer(@CookieValue("hero")String heroCookie,HttpServletResponse response)
+	{
+		Hero hero=Hero.fromCookie(heroCookie);
+		hero.heroClass="Necromancer";
+		
+		Cookie c=hero.createCookie();
+		c.setPath("/");
+		c.setMaxAge(60*60*24*2);
+		response.addCookie(c);
+		
+		
+		return "necromancer";
+	}
 	@RequestMapping(value="/greenWoods",method=RequestMethod.GET)
 	public String returnGreenWoods() {
 		return "greenWoods";

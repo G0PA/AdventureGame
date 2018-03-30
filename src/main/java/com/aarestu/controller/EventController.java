@@ -152,7 +152,7 @@ public class EventController {
 			model.addAttribute("resource", theEvent.resource);
 			model.addAttribute("message", hero.createDisplayText());
 			model.addAttribute("event", theEvent.eventName);
-			Cookie passedEvents = new Cookie("passedEvents", passedEventsCookie+String.valueOf(theIndex) + ",");
+			Cookie passedEvents = new Cookie("passedEvents",  passedEventsCookie+","+String.valueOf(theIndex) );
 			passedEvents.setPath("/");
 			passedEvents.setMaxAge(60 * 60 * 24 * 2);
 			response.addCookie(passedEvents);
@@ -166,7 +166,7 @@ public class EventController {
 			return "event";
 		}
 		else {
-			return "event";
+			return "hello";
 		}
 	}
 	@RequestMapping(value = "/outcome1",method = RequestMethod.GET)

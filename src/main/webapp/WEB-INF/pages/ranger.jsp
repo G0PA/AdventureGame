@@ -39,8 +39,8 @@ color:Chartreuse;
 <body background= "http://localhost:8081/AdventureGame/resources/images/ranger.jpg"class=bg>
 <div class="asd">
 	<h1 style="color:Chartreuse"><font size="10"><i>RANGER</i></font></h1>
-	<h1><i>Passive: Your pet fights with you, having 15% of your Attack Min and Max and same Critical Chance</i></h1>
-	<h1><i>Active: Cast <span class="greenText">Ranger Sight</span> increasing your Attack Damage Min and Max with 80% for one attack</i></h1>
+	<h1 style="color:white"><i>Passive: Your pet fights with you, having 15% of your Attack Min and Max and same Critical Chance</i></h1>
+	<h1 style="color:white"><i>Active: Cast <span class="greenText">Ranger Sight</span> increasing your Attack Damage Min and Max with 80% for one attack</i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<a href="http://localhost:8081/AdventureGame/greenWoods" class="button">CHOOSE RANGER</a>
 	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>

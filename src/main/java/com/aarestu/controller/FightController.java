@@ -26,11 +26,23 @@ public class FightController {
 	int bloodlustBonusDamageMax=0;
 	int berserkPassiveDamageIncrease=0;
 	int berserkCritical=0;
+	int necromancerPassiveDamageMin=0;
+	int necromancerPassiveDamageMax=0;
 	final static Logger logger=Logger.getLogger(FightController.class);
 	@RequestMapping(value="/fight",method = RequestMethod.GET)
-	public String fight(ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,
+	public String fight(ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="bossState") String bossStateCookie,
 			HttpServletResponse response) {
-	
+		if(bossStateCookie.equals("dead")) {
+			model.addAttribute("cheating","No cheating : )");
+			model.addAttribute("resource", resourceCookie);
+			Hero hero=Hero.fromCookie(fooCookie);
+			if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
+			return "fightvictory";
+		}
 		resource=resourceCookie;
 		logger.debug("the bad Cookie is: "+badCookie);
 		hero = Hero.fromCookie(fooCookie);
@@ -111,6 +123,15 @@ public class FightController {
 				berserkPassiveDamageIncrease = (hero.maxHp - hero.hp) / 25;
 			
 		}
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+		}
+		if(hero.heroClass.equals("Necromancer")) {
+			model.addAttribute("spell","Siphon Life");
+			necromancerPassiveDamageMin=hero.souls/2;
+			necromancerPassiveDamageMax=hero.souls/2;
+			
+		}
 		if(attackType==1) {
 			defense=hero.armor;
 		} else {
@@ -130,7 +151,7 @@ public class FightController {
 		logger.debug("Damage Min is: "+hero.attackMin);
 		logger.debug("Damage max is:" +hero.attackMax);
 		int theHeroDamage;
-		theHeroDamage=(int)(attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin,hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax)*multiply) - enemyArmor;
+		theHeroDamage=(int)(attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin+necromancerPassiveDamageMin,hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax+necromancerPassiveDamageMax)*multiply) - enemyArmor;
 		if(theHeroDamage<=0) {	
 		enemyHealth=enemyHealth-1;
 		} else {
@@ -159,9 +180,12 @@ public class FightController {
 		}else {
 			hero.mana=hero.maxMana;
 		}
-//		if(enemy.name.equals("Island Shark") || enemy.name.equals("Whitescale Dragon")) {
-//			hero.zone="Red Woods";
-//		}
+			if(hero.heroClass.equals("Necromancer")) {
+				if(critical(66)) {
+					model.addAttribute("soul","You steal the enemy's Soul");
+				hero.souls++;
+				}
+			}
 			model.addAttribute("hpRegen",hero.hpRegen);
 			model.addAttribute("manaRegen",hero.manaRegen);
 			Cookie c = hero.createCookie();
@@ -180,12 +204,8 @@ public class FightController {
 			berserkCritical=0;
 			rangerSightBonusDamageMin=0;
 			rangerSightBonusDamageMax=0;
-//			if(enemy.name.equals("Island Shark") || enemy.name.equals("Whitescale Dragon")) {
-//				Cookie firstBoss=new Cookie("firstBoss","notReached");
-//				firstBoss.setPath("/");
-//				firstBoss.setMaxAge(60*60*24*2);
-//				response.addCookie(firstBoss);
-//			}
+			necromancerPassiveDamageMin=0;
+			necromancerPassiveDamageMax=0;
 			int damageDealt = tempEnemyHealth-enemyHealth;
 			model.addAttribute("damageDealt", String.valueOf(damageDealt));
 			model.addAttribute("message2", hero.createDisplayText());
@@ -201,7 +221,7 @@ public class FightController {
 		multiply=1;
 		if(crit==true) {
 			model.addAttribute("enemyCritically","CRITICALLY ");
-			multiply=2;
+			multiply=1.8;
 		} else {
 			model.addAttribute("enemyCritically","");
 		}
@@ -267,6 +287,8 @@ public class FightController {
 		berserkCritical=0;
 		rangerSightBonusDamageMin=0;
 		rangerSightBonusDamageMax=0;
+		necromancerPassiveDamageMin=0;
+		necromancerPassiveDamageMax=0;
 		Cookie c = hero.createCookie();
 		enemy.health=enemyHealth;
 		theBadCookie=enemy.toCookie();
@@ -396,6 +418,66 @@ public class FightController {
 			berserkCritical=100;
 			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
 					enemy.dropsGold, enemy.critChance,rangerSightBonusDamageMin,rangerSightBonusDamageMax, response, model, hero);
+			if (fightOutcome.equals("nobodyDied")) {
+				return "fight";
+			}
+			return fightOutcome;
+		}
+		if(hero.heroClass.equals("Giant")){
+			enemy = Enemy.fromCookie(enemyCookie);
+			int healthLost=(int)(hero.hp*0.25);
+			int earthShockCritChance=healthLost+hero.critChance;
+			int earthShockDamage=(int)(hero.maxHp*0.10);
+			hero.hp-=healthLost;
+			String critically="";
+			if (critical(earthShockCritChance)) {
+				earthShockDamage=(int)(earthShockDamage*1.8);
+				enemy.health -=earthShockDamage;
+				critically = " CRITICALLY";
+
+			} else {
+				enemy.health -= earthShockDamage;
+			}
+			model.addAttribute("spellDamage", "You cast Earth Shock damaging yourself for "+String.valueOf(healthLost)+" and"+critically+" damaging the enemy for "+String.valueOf(earthShockDamage)+" damage");
+			Cookie leHeroCookie = hero.createCookie();
+			leHeroCookie.setPath("/");
+			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(leHeroCookie);
+			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
+					enemy.dropsGold, enemy.critChance,rangerSightBonusDamageMin,rangerSightBonusDamageMax, response, model, hero);
+			if (fightOutcome.equals("nobodyDied")) {
+				return "fight";
+			}
+			return fightOutcome;
+		}
+		if (hero.heroClass.equals("Necromancer")) {
+			if (hero.mana - 20 < 0) {
+				model.addAttribute("message", hero.createDisplayText());
+				return "noMana";
+
+			}
+			hero.mana -= 20;
+			String critically = "";
+			enemy = Enemy.fromCookie(enemyCookie);
+			int currentEnemyHealth = enemy.health;
+			if (critical(hero.critChance)) {
+				enemy.health -= (hero.maxMana * 0.15+hero.souls) * 1.8;
+				critically = " CRITICALLY";
+
+			} else {
+				enemy.health -= hero.maxMana * 0.15 + hero.souls;
+			}
+			int siphonLifeHealing=(int)(hero.maxMana*0.10+hero.souls);
+			currentEnemyHealth = currentEnemyHealth - enemy.health;
+			hero.hp+=siphonLifeHealing;
+			model.addAttribute("spellDamage", "You cast Siphon Life" + critically + " Damaging the enemy for "
+					+ String.valueOf(currentEnemyHealth) + " Damage and healing yourself for "+String.valueOf(siphonLifeHealing));
+			Cookie leHeroCookie = hero.createCookie();
+			leHeroCookie.setPath("/");
+			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(leHeroCookie);
+			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
+					enemy.dropsGold, enemy.critChance,0,0, response, model, hero);
 			if (fightOutcome.equals("nobodyDied")) {
 				return "fight";
 			}

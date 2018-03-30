@@ -26,52 +26,7 @@ public class RedWoodsController {
 	@RequestMapping(value="/redWoods",method=RequestMethod.GET)
 	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,HttpServletResponse response)
 	{
-
 		hero=Hero.fromCookie(fooCookie);
-		if(hero.enemyEncountersLeft>0) {
-			Cookie firstBoss=new Cookie("firstBoss","notReached");
-			firstBoss.setPath("/");
-			firstBoss.setMaxAge(60*60*24*2);
-			response.addCookie(firstBoss);
-		}
-
-		if (count  ==0) {
-			count++;
-			enemies.add(new Enemy("moltenGiant","Molten Giant",1,145,24,30,10,40,13));
-			enemies.add(new Enemy("gryphonRider","Gryphon Rider",1,138,22,28,8,35,18));
-			enemies.add(new Enemy("undeadElite","Undead Elite",1,125,20,26,7,29,15));
-			enemies.add(new Enemy("archDemon","Arch Demon",2,210,29,37,11,61,10));
-			enemies.add(new Enemy("twoHeadedGiants","Two Headed Giants",1,190,25,32,10,46,11 ));
-			enemies.add(new Enemy("DemigodWolf","Demigod Wolf",2,192,26,33,8,49,15));
-			enemies.add(new Enemy("lightEntity","Light Entity",2,280,20,26,0,44,25));
-			enemies.add(new Enemy("northernRanger","Northern Ranger",1,130,21,27,8,30,12));
-			enemies.add(new Enemy("summoner","Summoner",2,157,28,36,8,48,14));
-			enemies.add(new Enemy("tormentor","Tormentor",1,140,26,31,8,41,16));
-			enemies.add(new Enemy("undeadHorror","Undead Horror",1,136,22,27,8,33,15));
-			enemies.add(new Enemy("angryGiant","Angry Giant",1,200,25,30,10,56,10));
-			enemies.add(new Enemy("giganticWorm","Gigantic Worm",2,210,26,32,10,60,15));
-			enemies.add(new Enemy("metalGiant","Metal Giant",1,220,24,30,13,59,11));
-			enemies.add(new Enemy("skeletalHorror","Skeletal Horror",1,175,25,29,9,47,13));
-			enemies.add(new Enemy("evolvedOrochi","Evolved Orochi",1,192,28,36,10,60,18));
-			enemies.add(new Enemy("colossalElemental","Colossal Elemental",2,205,27,33,8,54,12));
-			enemies.add(new Enemy("waterHorror","Water Horror",2,185,26,30,9,50,14));
-			enemies.add(new Enemy("graveyardHorror","Graveyard Horror",1,195,28,33,11,56,13));
-			enemies.add(new Enemy("fireDrake","Fire Drake",2,190,26,32,10,54,16));
-			
-			Settlement mountainCastle=new Settlement("mountainCastle","Mountain Castle");
-			settlements.add(mountainCastle);
-			settlements.add(new Settlement("PitTown","Pit Town"));
-			settlements.add(new Settlement("cloudCity","Cloud City"));
-			settlements.add(new Settlement("lakeCastle","Lake Castle"));
-			settlements.add(new Settlement("mountainFortification","Mountain Fortification"));
-			settlements.add(new Settlement("harborTown","Harbor Town"));
-			settlements.add(new Settlement("towerCity","Tower City"));
-			Cookie passedMapss=new Cookie("passedMaps","-9");
-			passedMapss.setPath("/");
-			passedMapss.setMaxAge(60*60*24*2);
-			response.addCookie(passedMapss);
-		}
-		
 		if(hero.heroClass.equals("Mage"))
 		{
 			model.addAttribute("spell","Fireball");
@@ -85,6 +40,102 @@ public class RedWoodsController {
 		{
 			model.addAttribute("spell","Bloodlust");
 		}
+		else if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+		}else if(hero.heroClass.equals("Necromancer")) {
+			model.addAttribute("spell","Siphon Life");
+		}
+		if(hero.enemyEncountersLeft<=0) {
+//			Cookie firstBoss=new Cookie("firstBoss","secondBossReached");
+//			firstBoss.setPath("/");
+//			firstBoss.setMaxAge(60*60*24*2);
+			Enemy megalodon=new Enemy("megalodon","Megalodon",1,375,41,50,13,100,18);
+			Enemy oceanHorror=new Enemy("oceanHorror","Ocean Horror",2,360,43,52,12,100,17);
+			bosses.add(megalodon);
+			bosses.add(oceanHorror);
+			theBoss=bosses.get(Utils.attack(0,bosses.size()-1));
+//			int type=theBoss.attackType;
+			Cookie firstBoss=new Cookie("firstBoss","fighting");
+			firstBoss.setPath("/");
+			firstBoss.setMaxAge(60*60*24);
+			response.addCookie(firstBoss);
+//			String attackType="";
+//			if (type == 1) {
+//				attackType = "PHYSICAL";
+//			} else {
+//				attackType = "MAGIC";
+//			}
+			strToResource=theBoss.resourcePath;
+			String theEnemy=theBoss.displayText();
+			String theEnemy2=theBoss.toCookie();
+			model.addAttribute("message",hero.createDisplayText());
+			model.addAttribute("enemyInfo",theEnemy);
+			model.addAttribute("resource",strToResource);
+			Cookie c2=hero.createCookie();
+			Cookie c3=new Cookie("resource",strToResource);
+			Cookie c4=new Cookie("enemy",theEnemy2);
+			Cookie bossState=new Cookie("bossState","alive");
+			bossState.setPath("/");
+			bossState.setMaxAge(60*60*24*2);
+			c4.setPath("/");
+			c4.setMaxAge(60*60*24*2);
+			c3.setPath("/");
+			c3.setMaxAge(60*60*24*2);
+			c2.setPath("/");
+			c2.setMaxAge(60*60*24*2);
+			response.addCookie(c2);
+			response.addCookie(c3);
+			response.addCookie(c4);
+			response.addCookie(bossState);
+			model.addAttribute("bossFight","BOSS FIGHT ");
+			return "hello";
+		}
+		if(hero.enemyEncountersLeft==20) {
+			Cookie firstBoss=new Cookie("firstBoss","notReached");
+			firstBoss.setPath("/");
+			firstBoss.setMaxAge(60*60*24*2);
+			response.addCookie(firstBoss);
+		}
+
+		if (count == 0) {
+			count++;
+			enemies.add(new Enemy("moltenGiant","Molten Giant",1,145,24,30,10,45,13));
+			enemies.add(new Enemy("gryphonRider","Gryphon Rider",1,138,22,28,8,40,18));
+			enemies.add(new Enemy("undeadElite","Undead Elite",1,125,20,26,7,34,15));
+			enemies.add(new Enemy("archDemon","Arch Demon",2,210,29,37,11,68,10));
+			enemies.add(new Enemy("twoHeadedGiants","Two Headed Giants",1,190,25,32,10,51,11 ));
+			enemies.add(new Enemy("DemigodWolf","Demigod Wolf",2,192,26,33,8,54,15));
+			enemies.add(new Enemy("lightEntity","Light Entity",2,270,20,26,0,49,20));
+			enemies.add(new Enemy("northernRanger","Northern Ranger",1,130,21,27,8,39,12));
+			enemies.add(new Enemy("summoner","Summoner",2,157,28,36,8,53,14));
+			enemies.add(new Enemy("tormentor","Tormentor",1,140,26,31,8,46,16));
+			enemies.add(new Enemy("undeadHorror","Undead Horror",1,136,22,27,8,38,15));
+			enemies.add(new Enemy("angryGiant","Angry Giant",1,200,25,30,10,61,10));
+			enemies.add(new Enemy("giganticWorm","Gigantic Worm",2,210,26,32,10,65,15));
+			enemies.add(new Enemy("metalGiant","Metal Giant",1,220,24,30,13,64,11));
+			enemies.add(new Enemy("SkeletalHorror","Skeletal Horror",1,175,25,29,9,52,13));
+			enemies.add(new Enemy("evolvedOrochi","Evolved Orochi",1,192,28,36,10,68,18));
+			enemies.add(new Enemy("colossalElemental","Colossal Elemental",2,205,27,33,8,59,12));
+			enemies.add(new Enemy("waterHorror","Water Horror",2,185,26,30,9,55,14));
+			enemies.add(new Enemy("graveyardHorror","Graveyard Horror",1,195,28,33,11,61,13));
+			enemies.add(new Enemy("fireDrake","Fire Drake",2,190,26,32,10,59,16));
+			enemies.add(new Enemy("wrathMage","Wraith Mage",2,130,21,27,7,35,12));
+			
+			Settlement mountainCastle=new Settlement("mountainCastle","Mountain Castle");
+			settlements.add(mountainCastle);
+			settlements.add(new Settlement("PitTown","Pit Town"));
+			settlements.add(new Settlement("cloudCity","Cloud City"));
+			settlements.add(new Settlement("lakeCastle","Lake Castle"));
+			settlements.add(new Settlement("mountainFortification","Mountain Fortification"));
+			settlements.add(new Settlement("harborTown","Harbor Town"));
+			settlements.add(new Settlement("towerCity","Tower City"));
+			settlements.add(new Settlement("metropolitan","Metropolitan"));
+			Cookie passedMapss=new Cookie("passedMaps","-9");
+			passedMapss.setPath("/");
+			passedMapss.setMaxAge(60*60*24*2);
+			response.addCookie(passedMapss);
+		}
+		
 		
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");

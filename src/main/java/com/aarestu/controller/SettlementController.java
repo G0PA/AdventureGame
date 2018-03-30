@@ -91,15 +91,22 @@ public class SettlementController {
 				} else {
 					hero.hp = hero.maxHp;
 				}
-				if (hero.mana + 5 <= hero.maxMana) {
-					hero.mana += 5;
-				} else {
-					hero.mana = hero.maxMana;
-				}
 				if (hero.hp + hero.hpRegen <= hero.maxHp) {
 					hero.hp += hero.hpRegen;
 				} else {
 					hero.hp = hero.maxHp;
+				}
+				if (hero.heroClass.equals("Giant")) {
+					if (hero.hp + 5 * 2 <= hero.maxHp) {
+						hero.hp += 5 * 2;
+					} else {
+						hero.hp = hero.maxHp;
+					}
+				}
+				if (hero.mana + 5 <= hero.maxMana) {
+					hero.mana += 5;
+				} else {
+					hero.mana = hero.maxMana;
 				}
 				if (hero.mana + hero.manaRegen <= hero.maxMana) {
 					hero.mana += hero.manaRegen;
@@ -132,6 +139,7 @@ public class SettlementController {
 				model.addAttribute("sleep", "You decide to sleep Restoring 30 Health and 10 Mana");
 				model.addAttribute("zone","redWoods");
 			}
+			
 
 				model.addAttribute("hpRegen",hero.hpRegen);
 				model.addAttribute("manaRegen",hero.manaRegen);
@@ -267,13 +275,18 @@ public class SettlementController {
 			Item steelSharpener=new Item("Steel Sharpener",55).setCritChance(5);
 			Item specialHealthPotion=new Item("Special Health Potion",50).setCurrentHealth(150);
 			Item specialManaPotion=new Item("Special Mana Potion",50).setMana(80);
-			Item plateArmor=new Item("Plate Armor",49).setArmor(3).setMagicResist(3);
+			Item plateArmor=new Item("Plate Armor",57).setArmor(4).setMagicResist(4);
 			Item tunic=new Item("Tunic",59).setCurrentHealth(30).setHealthLimit(50).setMaxMana(25).setMana(15);
 			Item largeMixedPotion=new Item("Large Mixed Potion",58).setCurrentHealth(100).setMaxMana(50);
 			Item largeEnergyBoost=new Item("Large Energy Boost",54).setCurrentHealth(25).setAttackMin(2).setAttackMax(2).setArmor(2).setMagicResist(2).setCritChance(2);
 			Item mageHat=new Item("Mage Hat",58).setMaxMana(30).setMana(20).setMagicResist(2).setCritChance(2);
 			Item amuletOfRestoration=new Item("Amulet of Restoration",59).setHpRegen(6).setManaRegen(3).setCurrentHealth(30).setMana(15);
 			Item upgradedFireSword=new Item("Upgraded Fire Sword",100).setAttackMin(6).setAttackMax(6).setCritChance(4);
+			Item specialMixedPotion=new Item("Special Mixed Potion",88).setMana(80).setCurrentHealth(150);
+			Item magicShield=new Item("Magic Shield",48).setMagicResist(4).setMaxMana(20);
+			Item steelShield=new Item("Steel Shield",48).setArmor(4).setHealthLimit(40);
+			Item mediumJacket=new Item("Medium Jacket",52).setCurrentHealth(45).setHpRegen(6).setHealthLimit(20);
+			Item staffOfMagic=new Item("Staff of Magic",49).setMana(30).setManaRegen(3).setMaxMana(10);
 			items.add(largePotion);
 			items.add(largeManaPotion);
 			items.add(fireSword);
@@ -289,6 +302,11 @@ public class SettlementController {
 			items.add(mageHat);
 			items.add(amuletOfRestoration);
 			items.add(upgradedFireSword);
+			items.add(specialMixedPotion);
+			items.add(magicShield);
+			items.add(steelShield);
+			items.add(mediumJacket);
+			items.add(staffOfMagic);
 		}
 
 		if (!bossStateCookie.equals("shopping")) {
@@ -582,7 +600,14 @@ public class SettlementController {
 			hero.maxMana+=tempItem.maxMana;
 		}
 		if (tempItem.mana != 0) {
-			if (hero.mana + tempItem.mana < hero.maxMana) {
+			if(hero.heroClass.equals("Giant")) {
+				if(hero.hp+tempItem.mana*2<=hero.maxHp) {
+				hero.hp+=tempItem.mana*2;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			}
+			else if (hero.mana + tempItem.mana < hero.maxMana) {
 				hero.mana += tempItem.mana;
 			} else {
 				hero.mana = hero.maxMana;
@@ -613,7 +638,15 @@ public class SettlementController {
 		if(tempItem.manaRegen !=0) {
 			hero.manaRegen+=tempItem.manaRegen;
 		}
-		
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+			hero.hp+=hero.mana*2;
+			hero.maxHp+=hero.maxMana*2;
+			hero.hpRegen+=hero.manaRegen*2;
+			hero.mana=0;
+			hero.manaRegen=0;
+			hero.maxMana=0;
+		}
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
@@ -653,7 +686,14 @@ public class SettlementController {
 			hero.maxMana+=tempItem2.maxMana;
 		}
 		if (tempItem2.mana != 0) {
-			if (hero.mana + tempItem2.mana < hero.maxMana) {
+			if(hero.heroClass.equals("Giant")) {
+				if(hero.hp+tempItem2.mana*2<=hero.maxHp) {
+				hero.hp+=tempItem2.mana*2;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			}
+			else if (hero.mana + tempItem2.mana < hero.maxMana) {
 				hero.mana += tempItem2.mana;
 			} else {
 				hero.mana = hero.maxMana;
@@ -686,6 +726,15 @@ public class SettlementController {
 			hero.manaRegen+=tempItem2.manaRegen;
 		}
 		
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+			hero.hp+=hero.mana*2;
+			hero.maxHp+=hero.maxMana*2;
+			hero.hpRegen+=hero.manaRegen*2;
+			hero.mana=0;
+			hero.manaRegen=0;
+			hero.maxMana=0;
+		}
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
@@ -727,7 +776,14 @@ public class SettlementController {
 			hero.maxMana+=tempItem3.maxMana;
 		}
 		if (tempItem3.mana != 0) {
-			if (hero.mana + tempItem3.mana < hero.maxMana) {
+			if(hero.heroClass.equals("Giant")) {
+				if(hero.hp+tempItem3.mana*2<=hero.maxHp) {
+				hero.hp+=tempItem3.mana*2;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			}
+			else if (hero.mana + tempItem3.mana < hero.maxMana) {
 				hero.mana += tempItem3.mana;
 			} else {
 				hero.mana = hero.maxMana;
@@ -760,6 +816,15 @@ public class SettlementController {
 			hero.manaRegen+=tempItem3.manaRegen;
 		}
 		
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+			hero.hp+=hero.mana*2;
+			hero.maxHp+=hero.maxMana*2;
+			hero.hpRegen+=hero.manaRegen*2;
+			hero.mana=0;
+			hero.manaRegen=0;
+			hero.maxMana=0;
+		}
 		Cookie c = hero.createCookie();
 		model.addAttribute("resource", resourceCookie);
 		c.setPath("/");
@@ -801,7 +866,14 @@ public class SettlementController {
 			hero.maxMana+=tempItem4.maxMana;
 		}
 		if (tempItem4.mana != 0) {
-			if (hero.mana + tempItem4.mana < hero.maxMana) {
+			if(hero.heroClass.equals("Giant")) {
+				if(hero.hp+tempItem4.mana*2<=hero.maxHp) {
+				hero.hp+=tempItem4.mana*2;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			}
+			else if (hero.mana + tempItem4.mana < hero.maxMana) {
 				hero.mana += tempItem4.mana;
 			} else {
 				hero.mana = hero.maxMana;
@@ -832,6 +904,15 @@ public class SettlementController {
 		}
 		if(tempItem4.manaRegen !=0) {
 			hero.manaRegen+=tempItem4.manaRegen;
+		}
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+			hero.hp+=hero.mana*2;
+			hero.maxHp+=hero.maxMana*2;
+			hero.hpRegen+=hero.manaRegen*2;
+			hero.mana=0;
+			hero.manaRegen=0;
+			hero.maxMana=0;
 		}
 		
 		Cookie c = hero.createCookie();
@@ -873,7 +954,14 @@ public class SettlementController {
 			hero.maxMana+=tempItem5.maxMana;
 		}
 		if (tempItem5.mana != 0) {
-			if (hero.mana + tempItem5.mana < hero.maxMana) {
+			if(hero.heroClass.equals("Giant")) {
+				if(hero.hp+tempItem5.mana*2<=hero.maxHp) {
+				hero.hp+=tempItem5.mana*2;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			}
+			else if (hero.mana + tempItem5.mana < hero.maxMana) {
 				hero.mana += tempItem5.mana;
 			} else {
 				hero.mana = hero.maxMana;
@@ -903,6 +991,15 @@ public class SettlementController {
 		}
 		if(tempItem5.manaRegen !=0) {
 			hero.manaRegen+=tempItem5.manaRegen;
+		}
+		if(hero.heroClass.equals("Giant")) {
+			model.addAttribute("spell","Earth Shock");
+			hero.hp+=hero.mana*2;
+			hero.maxHp+=hero.maxMana*2;
+			hero.hpRegen+=hero.manaRegen*2;
+			hero.mana=0;
+			hero.manaRegen=0;
+			hero.maxMana=0;
 		}
 		
 		Cookie c = hero.createCookie();

@@ -91,7 +91,18 @@ public class PlayController {
 		}else if(hero2.heroClass.equals("Berserk"))
 		{
 			model.addAttribute("spell","Bloodlust");
+		} else if (hero2.heroClass.equals("Giant")) {
+			model.addAttribute("spell", "Earth Shock");
+			hero2.hp += hero2.mana * 2;
+			hero2.maxHp += hero2.maxMana * 2;
+			hero2.hpRegen += hero2.manaRegen * 2;
+			hero2.mana = 0;
+			hero2.manaRegen = 0;
+			hero2.maxMana = 0;
+		}else if(hero2.heroClass.equals("Necromancer")) {
+			model.addAttribute("spell","Siphon Life");
 		}
+		
 		
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");
@@ -245,7 +256,7 @@ public class PlayController {
 
 		
 		int theZone=0;
-		int bosses=enemies.size()+2;
+		//int bosses=enemies.size()+2;
 		String[] encounteredBosses=passedMaps.split(",");
 		int randomCount=0;
 		while (true) {
