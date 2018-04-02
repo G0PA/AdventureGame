@@ -11,4 +11,7 @@ public class Utils {
 	static boolean randomBool(double percentChance) {
 		return Math.random() * 100 < percentChance;
 	}
+	static boolean critical(int critChance) {
+		return Math.random() * 100 < critChance;
+	}
 }

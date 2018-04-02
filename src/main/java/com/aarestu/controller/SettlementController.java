@@ -97,14 +97,14 @@ public class SettlementController {
 					hero.hp = hero.maxHp;
 				}
 				if (hero.heroClass.equals("Giant")) {
-					if (hero.hp + 5 * 2 <= hero.maxHp) {
-						hero.hp += 5 * 2;
+					if (hero.hp + 15 <= hero.maxHp) {
+						hero.hp += 15;
 					} else {
 						hero.hp = hero.maxHp;
 					}
 				}
-				if (hero.mana + 5 <= hero.maxMana) {
-					hero.mana += 5;
+				if (hero.mana + 15 <= hero.maxMana) {
+					hero.mana += 15;
 				} else {
 					hero.mana = hero.maxMana;
 				}
@@ -113,7 +113,7 @@ public class SettlementController {
 				} else {
 					hero.mana = hero.maxMana;
 				}
-				model.addAttribute("sleep", "You decide to sleep Restoring 15 Health and 5 Mana");
+				model.addAttribute("sleep", "You decide to sleep Restoring 15 Health and 15 Mana");
 				model.addAttribute("zone","hello");
 			}else {
 				if (hero.hp + 30 <= hero.maxHp) {
@@ -121,8 +121,8 @@ public class SettlementController {
 				} else {
 					hero.hp = hero.maxHp;
 				}
-				if (hero.mana + 10 <= hero.maxMana) {
-					hero.mana += 10;
+				if (hero.mana + 30 <= hero.maxMana) {
+					hero.mana += 30;
 				} else {
 					hero.mana = hero.maxMana;
 				}
@@ -136,7 +136,7 @@ public class SettlementController {
 				} else {
 					hero.mana = hero.maxMana;
 				}
-				model.addAttribute("sleep", "You decide to sleep Restoring 30 Health and 10 Mana");
+				model.addAttribute("sleep", "You decide to sleep Restoring 30 Health and 30 Mana");
 				model.addAttribute("zone","redWoods");
 			}
 			
@@ -203,7 +203,7 @@ public class SettlementController {
 		model.addAttribute("resource",resourceCookie);
 		model.addAttribute("message", hero.createDisplayText());
 		if(hero.zone.equals("Green Woods")) {
-			model.addAttribute("sleepInfo","+15 Health +5 Mana");
+			model.addAttribute("sleepInfo","+15 Health +15 Mana");
 		Item smallPotion = new Item("Small Health Potion", 9).setCurrentHealth(25);
 		Item magicBoots = new Item("Magic Boots", 17).setMagicResist(2);
 		Item woodenShield = new Item("Wooden Shield", 17).setArmor(2);
@@ -222,18 +222,18 @@ public class SettlementController {
 		Item largePotion=new Item("Large Health Potion", 29).setCurrentHealth(100);
 		Item linenShirt=new Item("Linen Shirt",16).setArmor(1).setMagicResist(1);
 		Item mediumVest=new Item("Medium Vest",24).setCurrentHealth(30).setHealthLimit(30);
-		Item smallManaPotion=new Item("Small Mana Potion",8).setMana(12);
-		Item mediumManaPotion=new Item("Medium Mana Potion",15).setMana(25);
-		Item largeManaPotion=new Item("Large Mana Potion",28).setMana(50);
-		Item smallMixedPotion=new Item("Small Mixed Potion",15).setCurrentHealth(25).setMana(12);
-		Item mediumMixedPotion=new Item("Medium Mixed Potion",27).setCurrentHealth(50).setMana(25);
-		Item smallCape=new Item("Small Cape",17).setMaxMana(10).setMana(10);
-		Item mediumCape=new Item("Medium Cape",30).setMaxMana(20).setMana(20);
-		Item woodenStaff=new Item("Wooden Staff",32).setMana(5).setMaxMana(15).setMagicResist(2);
-		Item vitalityNecklace=new Item("Vitality Necklace",30).setCurrentHealth(15).setHealthLimit(30).setMaxMana(15).setMana(10);
-		Item rejuvinationBracelet=new Item("Rejuvination Bracelet",23).setHpRegen(4).setManaRegen(2);
+		Item smallManaPotion=new Item("Small Mana Potion",9).setMana(25);
+		Item mediumManaPotion=new Item("Medium Mana Potion",16).setMana(50);
+		Item largeManaPotion=new Item("Large Mana Potion",29).setMana(100);
+		Item smallMixedPotion=new Item("Small Mixed Potion",16).setCurrentHealth(25).setMana(25);
+		Item mediumMixedPotion=new Item("Medium Mixed Potion",28).setCurrentHealth(50).setMana(50);
+		Item smallCape=new Item("Small Cape",18).setMaxMana(20).setMana(20);
+		Item mediumCape=new Item("Medium Cape",30).setMaxMana(40).setMana(40);
+		Item woodenStaff=new Item("Wooden Staff",32).setMana(10).setMaxMana(30).setMagicResist(2);
+		Item vitalityNecklace=new Item("Vitality Necklace",30).setCurrentHealth(15).setHealthLimit(30).setMaxMana(30).setMana(15);
+		Item rejuvinationBracelet=new Item("Rejuvination Bracelet",23).setHpRegen(4).setManaRegen(4);
 		Item smallJacket=new Item("Small Jacket",16).setCurrentHealth(15).setHpRegen(2);
-		Item brokenStaff=new Item("Broken Staff",15).setMana(10).setManaRegen(1);
+		Item brokenStaff=new Item("Broken Staff",16).setMana(15).setManaRegen(2);
 		model.addAttribute("message", hero.createDisplayText());
 		items.add(smallPotion);
 		items.add(magicBoots);
@@ -266,27 +266,27 @@ public class SettlementController {
 		items.add(smallJacket);
 		items.add(brokenStaff);
 		}else {
-			model.addAttribute("sleepInfo","+30 Health +10 Mana");
+			model.addAttribute("sleepInfo","+30 Health +30 Mana");
 			Item largePotion=new Item("Large Health Potion", 29).setCurrentHealth(100);
-			Item largeManaPotion=new Item("Large Mana Potion",28).setMana(50);
+			Item largeManaPotion=new Item("Large Mana Potion",29).setMana(100);
 			Item fireSword=new Item("Fire Sword",61).setAttackMin(5).setAttackMax(5);
 			Item enhancedDagger=new Item("Enhanced Dagger",47).setAttackMin(4).setAttackMax(2);
 			Item enhancedBow=new Item("Enhanced Bow",47).setAttackMax(6);
 			Item steelSharpener=new Item("Steel Sharpener",55).setCritChance(5);
 			Item specialHealthPotion=new Item("Special Health Potion",50).setCurrentHealth(150);
-			Item specialManaPotion=new Item("Special Mana Potion",50).setMana(80);
+			Item specialManaPotion=new Item("Special Mana Potion",50).setMana(150);
 			Item plateArmor=new Item("Plate Armor",57).setArmor(4).setMagicResist(4);
-			Item tunic=new Item("Tunic",59).setCurrentHealth(30).setHealthLimit(50).setMaxMana(25).setMana(15);
+			Item tunic=new Item("Tunic",59).setCurrentHealth(30).setHealthLimit(50).setMaxMana(50).setMana(30);
 			Item largeMixedPotion=new Item("Large Mixed Potion",58).setCurrentHealth(100).setMaxMana(50);
 			Item largeEnergyBoost=new Item("Large Energy Boost",54).setCurrentHealth(25).setAttackMin(2).setAttackMax(2).setArmor(2).setMagicResist(2).setCritChance(2);
-			Item mageHat=new Item("Mage Hat",58).setMaxMana(30).setMana(20).setMagicResist(2).setCritChance(2);
-			Item amuletOfRestoration=new Item("Amulet of Restoration",59).setHpRegen(6).setManaRegen(3).setCurrentHealth(30).setMana(15);
+			Item mageHat=new Item("Mage Hat",68).setMaxMana(60).setMana(40).setMagicResist(2).setCritChance(2);
+			Item amuletOfRestoration=new Item("Amulet of Restoration",59).setHpRegen(6).setManaRegen(6).setCurrentHealth(30).setMana(30);
 			Item upgradedFireSword=new Item("Upgraded Fire Sword",100).setAttackMin(6).setAttackMax(6).setCritChance(4);
-			Item specialMixedPotion=new Item("Special Mixed Potion",88).setMana(80).setCurrentHealth(150);
-			Item magicShield=new Item("Magic Shield",48).setMagicResist(4).setMaxMana(20);
+			Item specialMixedPotion=new Item("Special Mixed Potion",88).setMana(150).setCurrentHealth(150);
+			Item magicShield=new Item("Magic Shield",48).setMagicResist(4).setMaxMana(40);
 			Item steelShield=new Item("Steel Shield",48).setArmor(4).setHealthLimit(40);
 			Item mediumJacket=new Item("Medium Jacket",52).setCurrentHealth(45).setHpRegen(6).setHealthLimit(20);
-			Item staffOfMagic=new Item("Staff of Magic",49).setMana(30).setManaRegen(3).setMaxMana(10);
+			Item staffOfMagic=new Item("Staff of Magic",49).setMana(50).setManaRegen(3).setMaxMana(20);
 			items.add(largePotion);
 			items.add(largeManaPotion);
 			items.add(fireSword);

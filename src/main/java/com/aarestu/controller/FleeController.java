@@ -40,7 +40,13 @@ public class FleeController {
 	Hero hero;
 	Enemy enemy;
 	@RequestMapping(method = RequestMethod.GET)
-	public String redirect(HttpServletResponse response,ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="passed",defaultValue="passed") String passedCookie,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie)
+	public String redirect(HttpServletResponse response, ModelMap model, @CookieValue("hero") String fooCookie,
+			@CookieValue(value = "enemy", defaultValue = "-1001") String badCookie,
+			@CookieValue(value = "resource", defaultValue = "-1001") String resourceCookie,
+			@CookieValue(value = "passed", defaultValue = "passed") String passedCookie,
+			@CookieValue(value = "firstBoss", defaultValue = "notReached") String firstBossCookie,
+			@CookieValue("spellCast")String spellCastCookie,
+			@CookieValue("skills")String skillsCookie)
 	{
 		hero=Hero.fromCookie(fooCookie);
 		if(hero.zone.equals("Green Woods")) {
@@ -205,6 +211,24 @@ public class FleeController {
 		passed.setMaxAge(60*60*24*2);
 		passed.setPath("/");
 		response.addCookie(passed);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		String[] skills=skillsCookie.split(",");
+		String theSkill=skills[0];
+		ArrayList<String[]>newSkills=hero.generateHeroSkillText(hero, response);
+		Cookie newSkillsCookie=new Cookie("skills",newSkills.get(0)[0]+","+newSkills.get(1)[0]);
+		newSkillsCookie.setPath("/");
+		newSkillsCookie.setMaxAge(60*60*24*2);
+		response.addCookie(newSkillsCookie);
+		model.addAttribute("skill1",newSkills.get(0)[0]);
+		model.addAttribute("skill2",newSkills.get(1)[0]);
+		model.addAttribute("tooltip1",newSkills.get(0)[1]);
+		model.addAttribute("tooltip2",newSkills.get(1)[1]);
 		if(hero.zone.equals("Green Woods")) {
 			model.addAttribute("zone","hello");
 			}else if(hero.zone.equals("Red Woods")) {

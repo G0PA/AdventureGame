@@ -22,10 +22,16 @@ public class RedWoodsController {
 	ArrayList<Enemy> bosses= new ArrayList<Enemy>();
 	int settlementTimer=100;
 	Hero hero;
-	
-	@RequestMapping(value="/redWoods",method=RequestMethod.GET)
-	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,HttpServletResponse response)
-	{
+
+	@RequestMapping(value = "/redWoods", method = RequestMethod.GET)
+	public String index(ModelMap model, @CookieValue(value = "hero", defaultValue = "defaultHero") String fooCookie,
+			@CookieValue(value = "settlement", defaultValue = "0") String settlementCookie,
+			@CookieValue(value = "bossState", defaultValue = "dead") String bossStateCookie,
+			@CookieValue(value = "leftEnemies", defaultValue = "15") String leftEnemiesString,
+			@CookieValue(value = "passedMaps", defaultValue = "-9") String passedMaps,
+			@CookieValue(value = "firstBoss", defaultValue = "notReached") String firstBossCookie,
+			@CookieValue("spellCast")String spellCastCookie,
+			HttpServletResponse response) {
 		hero=Hero.fromCookie(fooCookie);
 		if(hero.heroClass.equals("Mage"))
 		{
@@ -46,25 +52,17 @@ public class RedWoodsController {
 			model.addAttribute("spell","Siphon Life");
 		}
 		if(hero.enemyEncountersLeft<=0) {
-//			Cookie firstBoss=new Cookie("firstBoss","secondBossReached");
-//			firstBoss.setPath("/");
-//			firstBoss.setMaxAge(60*60*24*2);
+
 			Enemy megalodon=new Enemy("megalodon","Megalodon",1,375,41,50,13,100,18);
 			Enemy oceanHorror=new Enemy("oceanHorror","Ocean Horror",2,360,43,52,12,100,17);
 			bosses.add(megalodon);
 			bosses.add(oceanHorror);
 			theBoss=bosses.get(Utils.attack(0,bosses.size()-1));
-//			int type=theBoss.attackType;
 			Cookie firstBoss=new Cookie("firstBoss","fighting");
 			firstBoss.setPath("/");
 			firstBoss.setMaxAge(60*60*24);
 			response.addCookie(firstBoss);
-//			String attackType="";
-//			if (type == 1) {
-//				attackType = "PHYSICAL";
-//			} else {
-//				attackType = "MAGIC";
-//			}
+
 			strToResource=theBoss.resourcePath;
 			String theEnemy=theBoss.displayText();
 			String theEnemy2=theBoss.toCookie();
@@ -88,6 +86,11 @@ public class RedWoodsController {
 			response.addCookie(c4);
 			response.addCookie(bossState);
 			model.addAttribute("bossFight","BOSS FIGHT ");
+			ArrayList<String[]> skills=hero.generateHeroSkillText(hero, response);
+			model.addAttribute("skill1",skills.get(0)[0]);
+			model.addAttribute("skill2",skills.get(1)[0]);
+			model.addAttribute("tooltip1",skills.get(0)[1]);
+			model.addAttribute("tooltip2",skills.get(1)[1]);
 			return "hello";
 		}
 		if(hero.enemyEncountersLeft==20) {
@@ -215,8 +218,16 @@ public class RedWoodsController {
 		//strToResource=theBoss.resourcePath;
 		
 		String theEnemy=theBoss.displayText();
-
+		
 		String theEnemy2=theBoss.toCookie();
+		
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
 		model.addAttribute("enemyInfo",theEnemy);
 		model.addAttribute("resource",theBoss.resourcePath);
 		Cookie c2=hero.createCookie();

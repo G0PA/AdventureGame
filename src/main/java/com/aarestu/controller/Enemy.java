@@ -1,5 +1,12 @@
 package com.aarestu.controller;
 
+import java.util.ArrayList;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.ui.ModelMap;
+
 public class Enemy {
 	String name;
 	int attackType;
@@ -31,9 +38,9 @@ public class Enemy {
 		return String.format("%s,%s,%d,%d,%d,%d,%d,%d,%d", this.resourcePath, name, attackType, health, damageMin,
 				damageMax, armor, dropsGold, critChance);
 	}
-
 	static Enemy fromCookie(String theCookie) {
 		Enemy enemy = new Enemy();
+		
 		try {
 			String[] c = theCookie.split(",");
 			enemy.resourcePath = c[0];
@@ -66,6 +73,41 @@ public class Enemy {
 				", armor = " + armor + 
 				", Gold reward = " + dropsGold + 
 				", critical chance = " + critChance+"%";
+	}
+	int defense;
+	public Hero enemyAttack(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response) {
+		int tempHealth=hero.hp;
+		if(enemy.attackType==1) {
+			defense=hero.armor;
+		}else {
+			defense=hero.magicResist;
+		}
+		boolean crit=Utils.critical(enemy.critChance);
+		double multiply=1;
+		if(crit==true) {
+			model.addAttribute("enemyCritically","CRITICALLY ");
+			multiply=1.8;
+		} else {
+			model.addAttribute("enemyCritically","");
+		}
+		int theEnemyDamage;
+		theEnemyDamage=(int)(Utils.attack(enemy.damageMin,enemy.damageMax)*multiply) - defense; 
+		if(theEnemyDamage<=0) {
+			hero.hp = hero.hp - 1;
+		}
+		 else {
+			hero.hp-=theEnemyDamage;
+		}
+		int enemyDamage=tempHealth-hero.hp;
+		model.addAttribute("enemy", String.valueOf(enemy.health));
+		model.addAttribute("enemyName",enemy.name);
+		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
+		model.addAttribute("message2",hero.createDisplayText());
+		Cookie heroCookie=hero.createCookie();
+		heroCookie.setPath("/");
+		heroCookie.setMaxAge(60*60*24*2);
+		response.addCookie(heroCookie);
+		return hero;
 	}
 
 }

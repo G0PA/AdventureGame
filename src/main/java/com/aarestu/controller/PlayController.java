@@ -54,13 +54,17 @@ public class PlayController {
 		passedEvents.setMaxAge(60*60*24*2);
 		passedEvents.setPath("/");
 		response.addCookie(passedEvents);
-		return "chooseClass";//"play";
+		return "chooseClass";
 	}
 	@RequestMapping("/hello")
-	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,HttpServletResponse response)
+	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,@CookieValue(value="spellCast",defaultValue ="none")String spellCastCookie,HttpServletResponse response)
 	{
 
 		hero2=Hero.fromCookie(fooCookie);
+		Cookie poison=new Cookie("poison","0");
+		poison.setPath("/");
+		poison.setMaxAge(60*60*24*2);
+		response.addCookie(poison);
 		if(hero2.enemyEncountersLeft==26) {
 			Cookie firstBoss=new Cookie("firstBoss","notReached");
 			firstBoss.setPath("/");
@@ -79,19 +83,21 @@ public class PlayController {
 			response.addCookie(zone);
 			return "secondZone";
 		}
-		if(hero2.heroClass.equals("Mage"))
-		{
-			model.addAttribute("spell","Fireball");
-		}else if(hero2.heroClass.equals("Warrior"))
-		{
-			model.addAttribute("spell","Endurance");
-		}else if(hero2.heroClass.equals("Ranger"))
-		{
-			model.addAttribute("spell","Ranger Sight");
-		}else if(hero2.heroClass.equals("Berserk"))
-		{
-			model.addAttribute("spell","Bloodlust");
-		} else if (hero2.heroClass.equals("Giant")) {
+//		if(hero2.heroClass.equals("Mage"))
+//		{
+//			model.addAttribute("spell","Fireball");
+//		}else if(hero2.heroClass.equals("Warrior"))
+//		{
+//			model.addAttribute("spell","Endurance");
+//		}else if(hero2.heroClass.equals("Ranger"))
+//		{
+//			model.addAttribute("spell","Ranger Sight");
+//		}else if(hero2.heroClass.equals("Berserk"))
+//		{
+//			model.addAttribute("spell","Bloodlust");
+//		} 
+//	else 
+		if (hero2.heroClass.equals("Giant")) {
 			model.addAttribute("spell", "Earth Shock");
 			hero2.hp += hero2.mana * 2;
 			hero2.maxHp += hero2.maxMana * 2;
@@ -99,9 +105,10 @@ public class PlayController {
 			hero2.mana = 0;
 			hero2.manaRegen = 0;
 			hero2.maxMana = 0;
-		}else if(hero2.heroClass.equals("Necromancer")) {
-			model.addAttribute("spell","Siphon Life");
 		}
+//		}else if(hero2.heroClass.equals("Necromancer")) {
+//			model.addAttribute("spell","Siphon Life");
+//		}
 		
 		
 		Cookie passed=new Cookie("passed","passed");
@@ -153,17 +160,17 @@ public class PlayController {
 			bosses.add(islandShark);
 			bosses.add(whiteScaleDragon);
 			theBoss=bosses.get(Utils.attack(0,bosses.size()-1));
-			int type=theBoss.attackType;
+//			int type=theBoss.attackType;
 			Cookie firstBoss=new Cookie("firstBoss","fighting");
 			firstBoss.setPath("/");
 			firstBoss.setMaxAge(60*60*24);
 			response.addCookie(firstBoss);
-			String attackType="";
-			if (type == 1) {
-				attackType = "PHYSICAL";
-			} else {
-				attackType = "MAGIC";
-			}
+//			String attackType="";
+//			if (type == 1) {
+//				attackType = "PHYSICAL";
+//			} else {
+//				attackType = "MAGIC";
+//			}
 			strToResource=theBoss.resourcePath;
 			logger.debug("the resource path is: "+strToResource);
 			String theEnemy=theBoss.displayText();
@@ -188,6 +195,18 @@ public class PlayController {
 			response.addCookie(c4);
 			response.addCookie(bossState);
 			model.addAttribute("bossFight","BOSS FIGHT ");
+			String[] theSpell=hero2.generateHeroSpellText(hero2,spellCastCookie,response);
+			model.addAttribute("spell",theSpell[0]);
+			model.addAttribute("tooltip",theSpell[1]);
+			Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+			spellCast.setPath("/");
+			spellCast.setMaxAge(60*60*24*2);
+			response.addCookie(spellCast);
+			ArrayList<String[]> skills=hero.generateHeroSkillText(hero, response);
+			model.addAttribute("skill1",skills.get(0)[0]);
+			model.addAttribute("skill2",skills.get(1)[0]);
+			model.addAttribute("tooltip1",skills.get(0)[1]);
+			model.addAttribute("tooltip2",skills.get(1)[1]);
 			return "hello";
 		}
 		//Event
@@ -273,17 +292,29 @@ public class PlayController {
 			randomCount = 0;
 		}
 		theBoss=enemies.get(theZone);
-		int type=theBoss.attackType;
-		String attackType="";
-		if (type == 1) {
-			attackType = "PHYSICAL";
-		} else {
-			attackType = "MAGIC";
-		}
+//		int type=theBoss.attackType;
+//		String attackType="";
+//		if (type == 1) {
+//			attackType = "PHYSICAL";
+//		} else {
+//			attackType = "MAGIC";
+//		}
+		
+		String[] theSpell=hero2.generateHeroSpellText(hero2,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		ArrayList<String[]> skills=hero2.generateHeroSkillText(hero, response);
+		model.addAttribute("skill1",skills.get(0)[0]);
+		model.addAttribute("skill2",skills.get(1)[0]);
+		model.addAttribute("tooltip1",skills.get(0)[1]);
+		model.addAttribute("tooltip2",skills.get(1)[1]);
+		
 		strToResource=theBoss.resourcePath;
-		logger.debug("the resource path is: "+strToResource);
 		String theEnemy=theBoss.displayText();
-		logger.debug("hero2 attack = "+hero2.attackMin);
 		String theEnemy2=theBoss.toCookie();
 		model.addAttribute("enemyInfo",theEnemy);
 		model.addAttribute("resource",strToResource);

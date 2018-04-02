@@ -140,7 +140,11 @@ public class EventController {
 			outer: while (true) {
 				theIndex = Utils.attack(0, events.size() - 1);
 				for (int i = 0; i < passedEventsArr.length; i++) {
-					if (!passedEventsArr[i].equals(String.valueOf(theIndex))) {
+					if (passedEventsArr[i].equals(String.valueOf(theIndex))) {
+						continue outer;
+						
+					}
+					if(i==passedEventsArr.length-1) {
 						break outer;
 					}
 				}
@@ -194,7 +198,8 @@ public class EventController {
 		c.setMaxAge(60*60*24*2);
 		response.addCookie(c);
 		if(hero.hp<=0) {
-			return "defeat";
+			model.addAttribute("defeatScreen",theEvent.resource);
+			return "defeatFromEvent";
 		}
 		
 
@@ -225,7 +230,8 @@ public class EventController {
 		c.setMaxAge(60*60*24*2);
 		response.addCookie(c);
 		if(hero.hp<=0) {
-			return "defeat";
+			model.addAttribute("defeatScreen",theEvent.resource);
+			return "defeatFromEvent";
 		}
 
 		return "theOutcome";

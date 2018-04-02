@@ -1,297 +1,1084 @@
 package com.aarestu.controller;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import java.util.Random;
+
 @Controller
 public class FightController {
-	String theBadCookie="";
-	String resource="";
+	String theBadCookie = "";
+	String enemyName = "";
 	Hero hero;
 	Enemy enemy;
-	int rangerSightBonusDamageMin=0;
-	int rangerSightBonusDamageMax=0;
-	int bloodlustBonusDamageMin=0;
-	int bloodlustBonusDamageMax=0;
-	int berserkPassiveDamageIncrease=0;
-	int berserkCritical=0;
-	int necromancerPassiveDamageMin=0;
-	int necromancerPassiveDamageMax=0;
-	final static Logger logger=Logger.getLogger(FightController.class);
-	@RequestMapping(value="/fight",method = RequestMethod.GET)
-	public String fight(ModelMap model, @CookieValue("hero") String fooCookie, @CookieValue(value="enemy",defaultValue="-1001") String badCookie,@CookieValue(value="resource",defaultValue="-1001") String resourceCookie,@CookieValue(value="bossState") String bossStateCookie,
-			HttpServletResponse response) {
-		if(bossStateCookie.equals("dead")) {
-			model.addAttribute("cheating","No cheating : )");
+	final static Logger logger = Logger.getLogger(FightController.class);
+
+	@RequestMapping(value = "/fight1", method = RequestMethod.GET)
+	public String fight(ModelMap model, @CookieValue("hero") String fooCookie,
+			@CookieValue(value = "enemy", defaultValue = "-1001") String badCookie,
+			@CookieValue(value = "resource", defaultValue = "-1001") String resourceCookie,
+			@CookieValue(value = "bossState") String bossStateCookie, @CookieValue("spellCast") String spellCastCookie,
+			@CookieValue("skills") String skillsCookie, HttpServletResponse response,
+			@CookieValue(value="poison", defaultValue="0")String poisonCookie){
+		if (bossStateCookie.equals("dead")) {
+			model.addAttribute("cheating", "No cheating : )");
 			model.addAttribute("resource", resourceCookie);
-			Hero hero=Hero.fromCookie(fooCookie);
-			if(hero.zone.equals("Green Woods")) {
-			model.addAttribute("zone","hello");
-			}else {
-				model.addAttribute("zone","redWoods");
+			Hero hero = Hero.fromCookie(fooCookie);
+			if (hero.zone.equals("Green Woods")) {
+				model.addAttribute("zone", "hello");
+			} else {
+				model.addAttribute("zone", "redWoods");
 			}
 			return "fightvictory";
 		}
-		resource=resourceCookie;
-		logger.debug("the bad Cookie is: "+badCookie);
 		hero = Hero.fromCookie(fooCookie);
 		if (hero == null) {
 			return "defeat";
 		}
-		model.addAttribute("resource",resourceCookie);
-		logger.debug("enemy123:  "+badCookie);
+		model.addAttribute("resource", resourceCookie);
 		enemy = Enemy.fromCookie(badCookie);
-
-		String fightOutcome=fight(enemy.health,enemy.attackType,enemy.damageMin,enemy.damageMax,enemy.armor,enemy.dropsGold,enemy.critChance,0,0,response,model,hero);
-		if(fightOutcome.equals("nobodyDied"))
-		{
-			return "fight";
+		if(!poisonCookie.equals("0")) {
+			enemy.health-=Integer.parseInt(poisonCookie);
+			model.addAttribute("poison","The poison damages the enemy dealing "+poisonCookie+" damage");
 		}
-		return fightOutcome;
-	}
+		String[] theSpell = hero.generateHeroSpellText(hero, spellCastCookie, response);
+		model.addAttribute("spell", theSpell[0]);
+		model.addAttribute("tooltip", theSpell[1]);
+		Cookie spellCast = new Cookie("spellCast", theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(spellCast);
+		String[] skills = skillsCookie.split(",");
+		String theSkill = skills[0];
+		ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+		Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+		newSkillsCookie.setPath("/");
+		newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(newSkillsCookie);
+		model.addAttribute("skill1", newSkills.get(0)[0]);
+		model.addAttribute("skill2", newSkills.get(1)[0]);
+		model.addAttribute("tooltip1", newSkills.get(0)[1]);
+		model.addAttribute("tooltip2", newSkills.get(1)[1]);
+		if (theSkill.equals("Attack")) {
 
-	
-	int attack(int min, int max) {
-	   int range = (max - min) + 1;     
-	   return (int)(Math.random() * range) + min;
-	}
-	boolean critical(int critChance) {
-		return Math.random() * 100 < critChance;
-	}
-
-	
-	String fight(int enemyHealth,int attackType, int enemyAttackMin, int enemyAttackMax, 
-			int enemyArmor, int dropsGold, int enemyCritChance,int rangerSightBonusDamageMin,int rangerSightBonusDamageMax, HttpServletResponse response, ModelMap model,Hero hero) {
-		int defense;
-		resource=enemy.name;
-		if(hero.heroClass.equals("Mage"))
-		{
-			hero.attackMin+=hero.magicResist/2;
-			hero.attackMax+=hero.magicResist/2;
-			model.addAttribute("spell","Fireball");
-		}else if(hero.heroClass.equals("Warrior"))
-		{
-			hero.attackMin+=hero.armor/2;
-			hero.attackMax+=hero.armor/2;
-			model.addAttribute("spell","Endurance");
-		}
-		if(hero.heroClass.equals("Ranger"))
-		{
-			model.addAttribute("yourPetAttacks","Your pet attacks");
-			model.addAttribute("dealing"," dealing ");
-			model.addAttribute("spell","Ranger Sight");
-			int petDamageMin;
-			int petDamageMax;
-			if(rangerSightBonusDamageMax!=0 && rangerSightBonusDamageMin!=0)
-			{
-				 petDamageMax=(int)((hero.attackMax+rangerSightBonusDamageMax)*0.15);
-				 petDamageMin=(int)((hero.attackMin+rangerSightBonusDamageMin)*0.15);
-			}else {
-				 petDamageMin=(int)(hero.attackMin*0.15);
-				 petDamageMax=(int)(hero.attackMax*0.15);
-			}
-			
-			int tempEnemyH=enemyHealth;
-			boolean petCrit=critical(hero.critChance);
-			if (petCrit) {
-				model.addAttribute("petCritically"," CRITICALLY");
-				enemyHealth-=attack(petDamageMin,petDamageMax)*1.8;
-				tempEnemyH-=enemyHealth;
-				model.addAttribute("petDamage",String.valueOf(tempEnemyH)+" Damage");
-			}else {
+			return fight(enemy, response, model, hero);
+		} else if (theSkill.equals("Shield Throw")) {
+			int defenses = 0;
+			int tempHeroArmor = hero.armor;
+			int tempHeroMagicResist = hero.magicResist;
+			defenses = (hero.armor + hero.magicResist)*2;
+			hero.armor = 0;
+			hero.magicResist = 0;
+			int tempHeroCritChance = hero.critChance;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.critChance = hero.critChance + defenses;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.armor = tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				hero.critChance=tempHeroCritChance;
 				
-				enemyHealth-=attack(petDamageMin,petDamageMax);
-				tempEnemyH-=enemyHealth;
-				model.addAttribute("petDamage",String.valueOf(tempEnemyH)+" Damage");
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
 			}
-			
-		}
-		if (hero.heroClass.equals("Berserk")) {
-			model.addAttribute("spell", "Bloodlust");
-			
-				berserkPassiveDamageIncrease = (hero.maxHp - hero.hp) / 25;
-			
-		}
-		if(hero.heroClass.equals("Giant")) {
-			model.addAttribute("spell","Earth Shock");
-		}
-		if(hero.heroClass.equals("Necromancer")) {
-			model.addAttribute("spell","Siphon Life");
-			necromancerPassiveDamageMin=hero.souls/2;
-			necromancerPassiveDamageMax=hero.souls/2;
-			
-		}
-		if(attackType==1) {
-			defense=hero.armor;
-		} else {
-			defense=hero.magicResist;
-		}
-		int tempEnemyHealth=enemyHealth;
-		boolean crit=critical(hero.critChance+berserkCritical);
-		double multiply=1;
-		if(crit==true) {
-			model.addAttribute("critically","CRITICALLY ");
-			multiply=1.8;
-		} else {
-			model.addAttribute("critically","");
-		}
-		logger.debug("berserk bonus damage is :"+berserkPassiveDamageIncrease);
-		logger.debug("BLoodlust bonus damage min and max are: "+bloodlustBonusDamageMin+"-"+bloodlustBonusDamageMax);
-		logger.debug("Damage Min is: "+hero.attackMin);
-		logger.debug("Damage max is:" +hero.attackMax);
-		int theHeroDamage;
-		theHeroDamage=(int)(attack(hero.attackMin+rangerSightBonusDamageMin+berserkPassiveDamageIncrease+bloodlustBonusDamageMin+necromancerPassiveDamageMin,hero.attackMax+rangerSightBonusDamageMax+berserkPassiveDamageIncrease+bloodlustBonusDamageMax+necromancerPassiveDamageMax)*multiply) - enemyArmor;
-		if(theHeroDamage<=0) {	
-		enemyHealth=enemyHealth-1;
-		} else {
-			enemyHealth-=theHeroDamage;
-		}
-		rangerSightBonusDamageMin=0;
-		rangerSightBonusDamageMax=0;
-		if (enemyHealth <= 0) {
-			hero.gold += dropsGold;
-			if(hero.heroClass.equals("Mage"))
-			{
-				hero.attackMin-=hero.magicResist/2;
-				hero.attackMax-=hero.magicResist/2;
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.critChance = tempHeroCritChance;
+			hero.armor = tempHeroArmor;
+			hero.magicResist = tempHeroMagicResist;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
 			}
-			else if(hero.heroClass.equals("Warrior"))
-			{
-				hero.attackMin-=hero.armor/2;
-				hero.attackMax-=hero.armor/2;
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			} 
+		} else if(theSkill.equals("Armor Deflection")) {
+			
+			int tempHeroArmor = hero.armor;
+			int tempHeroMagicResist=hero.magicResist;
+			hero.armor =(int)(hero.armor+(hero.magicResist*0.5));
+			hero.magicResist=(int)(hero.magicResist*0.5);
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(hero.armor*2);
+			hero.attackMax=(hero.armor*2);
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			enemy=hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.armor = tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
 			}
-			if(hero.hp+hero.hpRegen<=hero.maxHp) {
-			hero.hp+=hero.hpRegen;
-		}else {
-			hero.hp=hero.maxHp;
-		}if(hero.mana+hero.manaRegen<=hero.maxMana) {
-			hero.mana+=hero.manaRegen;
-		}else {
-			hero.mana=hero.maxMana;
-		}
-			if(hero.heroClass.equals("Necromancer")) {
-				if(critical(66)) {
-					model.addAttribute("soul","You steal the enemy's Soul");
-				hero.souls++;
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.armor = tempHeroArmor;
+			hero.magicResist=tempHeroMagicResist;
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Magic Deflection")) {
+			int tempHeroMagicResist = hero.magicResist;
+			int tempHeroArmor=hero.armor;
+			hero.magicResist =(int)(hero.magicResist+(hero.armor*0.5));
+			hero.armor=(int)(hero.armor*0.5);
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(hero.magicResist*2);
+			hero.attackMax=(hero.magicResist*2);
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.magicResist = tempHeroMagicResist;
+				hero.armor=tempHeroArmor;
+				
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.magicResist = tempHeroMagicResist;
+			hero.armor=tempHeroArmor;
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Lucky hit")) {
+			int tempHeroCritChance = hero.critChance;
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(int)(hero.attackMin*0.90);
+			hero.attackMax=(int)(hero.attackMax*0.90);
+			hero.critChance+=10;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.critChance=tempHeroCritChance;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			hero.critChance=tempHeroCritChance;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Dying Blow")) {
+			int tempHeroCritChance = hero.critChance;
+			
+			hero.critChance+=25;
+			int tempEnemyHealth = enemy.health;
+			hero.hp=(int)(hero.hp*0.5);
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.critChance=tempHeroCritChance;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.critChance=tempHeroCritChance;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Life Steal")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			hero.attackMin=(int)(hero.attackMin*0.80);
+			hero.attackMax=(int)(hero.attackMax*0.80);
+			hero.heroAttack(hero, enemy, model, response);
+			String damageDealt=String.valueOf(model.get("damageDealt"));
+			int lifeSteal=(int)(Integer.parseInt(damageDealt)*0.20);
+			if(hero.hp+lifeSteal<=hero.maxHp) {
+				hero.hp+=lifeSteal;
+				}else {
+					hero.hp=hero.maxHp;
 				}
+			int tempHealth = hero.hp;
+			model.addAttribute("lifesteal"," and healing yourself for "+String.valueOf(lifeSteal));
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
 			}
-			model.addAttribute("hpRegen",hero.hpRegen);
-			model.addAttribute("manaRegen",hero.manaRegen);
-			Cookie c = hero.createCookie();
 
-			c.setPath("/");
-			c.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(c);
-			model.addAttribute("gold",String.valueOf(dropsGold));
-			Cookie bossState=new Cookie("bossState","dead");
-			bossState.setPath("/");
-			bossState.setMaxAge(60*60*24*2);
-			response.addCookie(bossState);
-			berserkPassiveDamageIncrease=0;
-			bloodlustBonusDamageMin=0;
-			bloodlustBonusDamageMax=0;
-			berserkCritical=0;
-			rangerSightBonusDamageMin=0;
-			rangerSightBonusDamageMax=0;
-			necromancerPassiveDamageMin=0;
-			necromancerPassiveDamageMax=0;
-			int damageDealt = tempEnemyHealth-enemyHealth;
-			model.addAttribute("damageDealt", String.valueOf(damageDealt));
-			model.addAttribute("message2", hero.createDisplayText());
-			if(hero.zone.equals("Green Woods")) {
-				model.addAttribute("zone","hello");
-			}else if(hero.zone.equals("Red Woods")) {
-				model.addAttribute("zone","redWoods");
+			 else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Mana Steal")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			hero.attackMin=(int)(hero.attackMin*0.80);
+			hero.attackMax=(int)(hero.attackMax*0.80);
+			hero.heroAttack(hero, enemy, model, response);
+			String damageDealt=String.valueOf(model.get("damageDealt"));
+			int lifeSteal=(int)(Integer.parseInt(damageDealt)*0.20);
+			if(hero.mana+lifeSteal<=hero.maxMana) {
+				hero.mana+=lifeSteal;
+				}else {
+					hero.mana=hero.maxMana;
+				}
+			int tempHealth = hero.hp;
+			model.addAttribute("manasteal"," and restoring "+String.valueOf(lifeSteal)+" mana");
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Empowered Attack")) {
+			
+			
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempHeroArmor=hero.armor;
+			int tempHeroMagicResist=hero.magicResist;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.attackMin=(int)(hero.attackMin*1.2);
+			hero.attackMax=(int)(hero.attackMax*1.2);
+			hero.armor=(int)(hero.armor*0.5);
+			hero.magicResist=(int)(hero.magicResist*0.5);
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.armor=tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			hero.armor=tempHeroArmor;
+			hero.magicResist=tempHeroMagicResist;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Double Trouble")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.attackMin=(int)(hero.attackMin*0.7);
+			hero.attackMax=(int)(hero.attackMax*0.7);
+			int count=0;
+			if(Utils.critical(75)) {
+				count++;
+				hero.heroAttack(hero, enemy, model, response);
+			}
+			if(enemy.health<=0) {
+				model.addAttribute("missedHits"," From both attacks you manage to hit the enemy "+String.valueOf(count)+" times");
+				model.addAttribute("damageDealt",String.valueOf((tempEnemyHealth-enemy.health)));
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+			}
+			if(Utils.critical(75)) {
+				count++;
+				hero.heroAttack(hero, enemy, model, response);
+			}
+			model.addAttribute("missedHits"," From both attacks you manage to hit the enemy "+String.valueOf(count)+" times");
+			model.addAttribute("damageDealt",String.valueOf((tempEnemyHealth-enemy.health)));
+			
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}
+		return "fight";
+	}
+
+	@RequestMapping(value = "/fight2", method = RequestMethod.GET)
+	public String fight2(ModelMap model, @CookieValue("hero") String fooCookie,
+			@CookieValue(value = "enemy", defaultValue = "-1001") String badCookie,
+			@CookieValue(value = "resource", defaultValue = "-1001") String resourceCookie,
+			@CookieValue(value = "bossState") String bossStateCookie, @CookieValue("spellCast") String spellCastCookie,
+			@CookieValue("skills") String skillsCookie, HttpServletResponse response,
+			@CookieValue(value="poison", defaultValue="0")String poisonCookie){
+		if (bossStateCookie.equals("dead")) {
+			model.addAttribute("cheating", "No cheating : )");
+			model.addAttribute("resource", resourceCookie);
+			Hero hero = Hero.fromCookie(fooCookie);
+			if (hero.zone.equals("Green Woods")) {
+				model.addAttribute("zone", "hello");
+			} else {
+				model.addAttribute("zone", "redWoods");
 			}
 			return "fightvictory";
 		}
-		int tempHealth=hero.hp;
-		crit=critical(enemyCritChance);
-		multiply=1;
-		if(crit==true) {
-			model.addAttribute("enemyCritically","CRITICALLY ");
-			multiply=1.8;
+		hero = Hero.fromCookie(fooCookie);
+		if (hero == null) {
+			return "defeat";
+		}
+		model.addAttribute("resource", resourceCookie);
+		enemy = Enemy.fromCookie(badCookie);
+		if(!poisonCookie.equals("0")) {
+			enemy.health-=Integer.parseInt(poisonCookie);
+			model.addAttribute("poison","The poison damages the enemy dealing "+poisonCookie+" damage");
+		}
+		String[] theSpell = hero.generateHeroSpellText(hero, spellCastCookie, response);
+		model.addAttribute("spell", theSpell[0]);
+		model.addAttribute("tooltip", theSpell[1]);
+		Cookie spellCast = new Cookie("spellCast", theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(spellCast);
+		String[] skills = skillsCookie.split(",");
+		String theSkill = skills[1];
+		ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+		Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+		newSkillsCookie.setPath("/");
+		newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(newSkillsCookie);
+		model.addAttribute("skill1", newSkills.get(0)[0]);
+		model.addAttribute("skill2", newSkills.get(1)[0]);
+		model.addAttribute("tooltip1", newSkills.get(0)[1]);
+		model.addAttribute("tooltip2", newSkills.get(1)[1]);
+		if (theSkill.equals("Attack")) {
+
+			return fight(enemy, response, model, hero);
+		} else if (theSkill.equals("Shield Throw")) {
+			int defenses = 0;
+			int tempHeroArmor = hero.armor;
+			int tempHeroMagicResist = hero.magicResist;
+			defenses = (hero.armor + hero.magicResist)*2;
+			hero.armor = 0;
+			hero.magicResist = 0;
+			int tempHeroCritChance = hero.critChance;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.critChance = hero.critChance + defenses;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.armor = tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				hero.critChance=tempHeroCritChance;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+			}
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.critChance = tempHeroCritChance;
+			hero.armor = tempHeroArmor;
+			hero.magicResist = tempHeroMagicResist;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			} 
+		} else if(theSkill.equals("Armor Deflection")) {
+			int tempHeroArmor = hero.armor;
+			int tempHeroMagicResist=hero.magicResist;
+			hero.armor =(int)(hero.armor+(hero.magicResist*0.5));
+			hero.magicResist=(int)(hero.magicResist*0.5);
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(hero.armor*2);
+			hero.attackMax=(hero.armor*2);
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			enemy=hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.armor = tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+			}
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.armor = tempHeroArmor;
+			hero.magicResist=tempHeroMagicResist;
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Magic Deflection")) {
+			int tempHeroMagicResist = hero.magicResist;
+			int tempHeroArmor=hero.armor;
+			hero.magicResist =(int)(hero.magicResist+(hero.armor*0.5));
+			hero.armor=(int)(hero.armor*0.5);
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(hero.magicResist*2);
+			hero.attackMax=(hero.magicResist*2);
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.magicResist = tempHeroMagicResist;
+				hero.armor=tempHeroArmor;
+				
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.magicResist = tempHeroMagicResist;
+			hero.armor=tempHeroArmor;
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Lucky hit")) {
+			int tempHeroCritChance = hero.critChance;
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			hero.attackMin=(int)(hero.attackMin*0.90);
+			hero.attackMax=(int)(hero.attackMax*0.90);
+			hero.critChance+=10;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.critChance=tempHeroCritChance;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			hero.critChance=tempHeroCritChance;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Dying Blow")) {
+			int tempHeroCritChance = hero.critChance;
+			
+			hero.critChance+=25;
+			int tempEnemyHealth = enemy.health;
+			hero.hp=(int)(hero.hp*0.5);
+			int tempHealth = hero.hp;
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.critChance=tempHeroCritChance;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.critChance=tempHeroCritChance;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Life Steal")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			hero.attackMin=(int)(hero.attackMin*0.80);
+			hero.attackMax=(int)(hero.attackMax*0.80);
+			hero.heroAttack(hero, enemy, model, response);
+			String damageDealt=String.valueOf(model.get("damageDealt"));
+			int lifeSteal=(int)(Integer.parseInt(damageDealt)*0.20);
+			if(hero.hp+lifeSteal<=hero.maxHp) {
+				hero.hp+=lifeSteal;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+			int tempHealth = hero.hp;
+			model.addAttribute("lifesteal"," and healing yourself for "+String.valueOf(lifeSteal));
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Mana Steal")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			hero.attackMin=(int)(hero.attackMin*0.80);
+			hero.attackMax=(int)(hero.attackMax*0.80);
+			hero.heroAttack(hero, enemy, model, response);
+			String damageDealt=String.valueOf(model.get("damageDealt"));
+			int lifeSteal=(int)(Integer.parseInt(damageDealt)*0.20);
+			if(hero.mana+lifeSteal<=hero.maxMana) {
+			hero.mana+=lifeSteal;
+			}else {
+				hero.mana=hero.maxMana;
+			}
+			int tempHealth = hero.hp;
+			model.addAttribute("manasteal"," and restoring "+String.valueOf(lifeSteal)+" mana");
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Empowered Attack")) {
+			
+			
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempHeroArmor=hero.armor;
+			int tempHeroMagicResist=hero.magicResist;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.attackMin=(int)(hero.attackMin*1.2);
+			hero.attackMax=(int)(hero.attackMax*1.2);
+			hero.armor=(int)(hero.armor*0.5);
+			hero.magicResist=(int)(hero.magicResist*0.5);
+			hero.heroAttack(hero, enemy, model, response);
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.armor=tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			hero.armor=tempHeroArmor;
+			hero.magicResist=tempHeroMagicResist;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			}
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}else if(theSkill.equals("Double Trouble")) {
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			hero.attackMin=(int)(hero.attackMin*0.7);
+			hero.attackMax=(int)(hero.attackMax*0.7);
+			int count=0;
+			if(Utils.critical(75)) {
+				count++;
+				hero.heroAttack(hero, enemy, model, response);
+			}
+			if(enemy.health<=0) {
+				model.addAttribute("missedHits"," From both attacks you manage to hit the enemy "+String.valueOf(count)+" times");
+				model.addAttribute("damageDealt",String.valueOf((tempEnemyHealth-enemy.health)));
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+			}
+			if(Utils.critical(75)) {
+				count++;
+				hero.heroAttack(hero, enemy, model, response);
+			}
+			model.addAttribute("missedHits"," From both attacks you manage to hit the enemy "+String.valueOf(count)+" times");
+			model.addAttribute("damageDealt",String.valueOf((tempEnemyHealth-enemy.health)));
+			
+			Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60*60*24*2);
+			response.addCookie(theEnemy);
+			if(enemy.health<=0) {
+				Cookie bossState=new Cookie("bossState","dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60*60*24*2);
+				response.addCookie(bossState);	
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				
+				Cookie heroCookie = hero.createCookie();
+				heroCookie.setPath("/");
+				heroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroCookie);
+				return "fightvictory";
+				
+			} 
+			enemy.enemyAttack(hero, enemy, model, response);
+			hero.attackMin=tempHeroAttackMin;
+			hero.attackMax=tempHeroAttackMax;
+			Cookie heroCookie = hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(heroCookie);
+			if (hero.hp <= 0) {
+				return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+			} else if (enemy.health <= 0) {
+				return "fightvictory";
+			} else {
+				return "fight";
+			}
+		}
+		return "fight";
+	}
+
+	String fight(Enemy enemy, HttpServletResponse response, ModelMap model, Hero hero) {
+		int tempEnemyHealth = enemy.health;
+		int tempHealth = hero.hp;
+
+		hero.heroAttack(hero, enemy, model, response);
+		if (enemy.health <= 0) {
+			return "fightvictory";
 		} else {
-			model.addAttribute("enemyCritically","");
-		}
-		int theEnemyDamage;
-		theEnemyDamage=(int)(attack(enemyAttackMin,enemyAttackMax)*multiply) - defense; 
-		if(theEnemyDamage<=0) {
-			hero.hp = hero.hp - 1;
-		}
-		 else {
-			hero.hp-=theEnemyDamage;
+			enemy.enemyAttack(hero, enemy, model, response);
 		}
 		if (hero.hp <= 0) {
-			Cookie c = hero.createCookie();
-
-			c.setPath("/");
-			c.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(c);
-			ArrayList<String> images=new ArrayList<String>();
-			
-			images.add("defeat");
-			images.add("defeat2");
-			images.add("defeat3");
-			images.add("defeat4");
-			images.add("defeat5");
-			images.add("defeat6");
-			images.add("defeat7");
-			
-			int theIndex=attack(0,images.size()-1);
-			model.addAttribute("defeatScreen",images.get(theIndex));
-			Cookie enem=new Cookie("enemy","greshka");
-			enem.setPath("/");
-			enem.setMaxAge(60*60*24*2);
-			response.addCookie(enem);
-			berserkCritical=0;
-			berserkPassiveDamageIncrease=0;
-			bloodlustBonusDamageMin=0;
-			bloodlustBonusDamageMax=0;
-			rangerSightBonusDamageMin=0;
-			rangerSightBonusDamageMax=0;
-			int damageDealt = tempEnemyHealth-enemyHealth;
-			int enemyDamage=tempHealth-hero.hp;
-			model.addAttribute("message2", hero.createDisplayText());
-			model.addAttribute("damageDealt", String.valueOf(damageDealt));
-			model.addAttribute("enemy", String.valueOf(enemyHealth));
-			model.addAttribute("enemyName",resource);
-			model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
-			return "defeat";
-
+			return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
 		}
-		if(hero.heroClass.equals("Mage"))
-		{
-			hero.attackMin-=hero.magicResist/2;
-			hero.attackMax-=hero.magicResist/2;
-		}
-		else if(hero.heroClass.equals("Warrior"))
-		{
-			hero.attackMin-=hero.armor/2;
-			hero.attackMax-=hero.armor/2;
-		}
-		berserkPassiveDamageIncrease=0;
-		bloodlustBonusDamageMin=0;
-		bloodlustBonusDamageMax=0;
-		berserkCritical=0;
-		rangerSightBonusDamageMin=0;
-		rangerSightBonusDamageMax=0;
-		necromancerPassiveDamageMin=0;
-		necromancerPassiveDamageMax=0;
 		Cookie c = hero.createCookie();
-		enemy.health=enemyHealth;
-		theBadCookie=enemy.toCookie();
+		theBadCookie = enemy.toCookie();
 		Cookie e = new Cookie("enemy", theBadCookie);
 		e.setMaxAge(60 * 60 * 24 * 2);
 		e.setPath("/");
@@ -299,194 +1086,820 @@ public class FightController {
 		c.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(c);
 		response.addCookie(e);
-		int damageDealt = tempEnemyHealth-enemyHealth;
-		int enemyDamage=tempHealth-hero.hp;
-		model.addAttribute("message2", hero.createDisplayText());
-		model.addAttribute("damageDealt", String.valueOf(damageDealt));
-		model.addAttribute("enemy", String.valueOf(enemy.health));
-		model.addAttribute("enemyName",resource);
-		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));
-		return "nobodyDied";
+		return "fight";
 	}
-	
-	@RequestMapping(value="/fightWithSpell",method=RequestMethod.GET)
-	 String fightWithSpell(ModelMap model, HttpServletResponse response,@CookieValue("enemy")String enemyCookie,@CookieValue("resource")String resourceCookie,@CookieValue("hero")String heroCookie)
-	{
-		Hero hero=Hero.fromCookie(heroCookie);
-		model.addAttribute("resource",resourceCookie);
-		if (hero.heroClass.equals("Mage")) {
-			if (hero.mana - 20 < 0) {
-				model.addAttribute("message", hero.createDisplayText());
-				return "noMana";
 
-			}
-			hero.mana -= 20;
-			String critically = "";
-			enemy = Enemy.fromCookie(enemyCookie);
-			int currentEnemyHealth = enemy.health;
-			if (critical(hero.critChance)) {
-				enemy.health -= (hero.maxMana * 0.30) * 1.8;
-				critically = " CRITICALLY";
-
-			} else {
-				enemy.health -= hero.maxMana * 0.30;
-			}
-			currentEnemyHealth = currentEnemyHealth - enemy.health;
-			model.addAttribute("spellDamage", "You cast Fireball" + critically + " Damaging the enemy for "
-					+ String.valueOf(currentEnemyHealth) + " Damage");
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,0,0, response, model, hero);
-			if (fightOutcome.equals("nobodyDied")) {
-				return "fight";
-			}
-			return fightOutcome;
+	@RequestMapping(value = "/fightWithSpell", method = RequestMethod.GET)
+	String fightWithSpell(ModelMap model, HttpServletResponse response, @CookieValue("enemy") String enemyCookie,
+			@CookieValue("resource") String resourceCookie, @CookieValue("hero") String heroCookie,
+			@CookieValue("spellCast") String spellCastCookie, @CookieValue("skills") String skillsCookie,
+			@CookieValue(value="poison", defaultValue="0")String poisonCookie) {
+		Hero hero = Hero.fromCookie(heroCookie);
+		Enemy enemy = Enemy.fromCookie(enemyCookie);
+		if(!poisonCookie.equals("0")) {
+			enemy.health-=Integer.parseInt(poisonCookie);
+			model.addAttribute("poison","The poison damages the enemy dealing "+poisonCookie+" damage");
 		}
+		model.addAttribute("resource", resourceCookie);
+
+		if (hero.heroClass.equals("Mage")) {
+			if (spellCastCookie.equals("Fireball")) {
+//				model.addAttribute("spell", "Fireball");
+				if (hero.mana - 30 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				int tempEnemyHealth=enemy.health;
+				int tempHealth=hero.hp;
+				enemy = hero.mageFireball(hero, enemy, model, response, spellCastCookie);
+				Cookie theEnemy=new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60*60*24*2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold+=enemy.dropsGold;
+					Cookie heroNewCookie=hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60*60*24*2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState=new Cookie("bossState","dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60*60*24*2);
+					response.addCookie(bossState);
+					model.addAttribute("message2",hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				}
+				 else {
+					 hero=enemy.enemyAttack(hero, enemy, model, response);
+					 if(hero.hp<=0) {
+						 return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					 }
+					 Cookie heroNewCookie=hero.createCookie();
+					 heroNewCookie.setPath("/");
+					 heroNewCookie.setMaxAge(60*60*24*2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fightWithSpell";
+				}
+			} else if (spellCastCookie.equals("Portal")) {
+				if (hero.mana - 30 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				if(enemy.name.equals("Island Shark") || enemy.name.equals("Whitescale Dragon") || enemy.name.equals("Ocean Horror") || enemy.name.equals("Megalodon")) {
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "cannotTeleport";
+									
+				}
+				hero.magePortal(hero, model, response);
+				Cookie c = hero.createCookie();
+				c.setPath("/");
+				c.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(c);
+				return "escapedWithPortal";
+			} else if (spellCastCookie.equals("Freezing Touch")) {
+				if (hero.mana - 40 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+//				int tempEnemyHealth = enemy.health;
+//				int tempHealth = hero.hp;
+				enemy = hero.mageFreezingTouch(hero, enemy, model, response, spellCastCookie);
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "stunnedEnemy";
+				}
+			} else if (spellCastCookie.equals("Magic Affinity")) {
+				if (hero.mana - 50 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				int tempEnemyHealth = enemy.health;
+				int tempHealth = hero.hp;
+				enemy = hero.mageMagicAffinity(hero, enemy, model, response, spellCastCookie);
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					hero = enemy.enemyAttack(hero, enemy, model, response);
+					if (hero.hp <= 0) {
+						return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					}
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fightWithSpell";
+				}
+
+			}
+		}
+
 		if (hero.heroClass.equals("Warrior")) {
 			if (hero.mana - 20 < 0) {
 				model.addAttribute("message", hero.createDisplayText());
 				return "noMana";
 
 			}
-			hero.mana -= 20;
-			enemy = Enemy.fromCookie(enemyCookie);
-			int currentEnemyHealth = enemy.health;
-			enemy.health -= (hero.maxHp - hero.hp) * 0.10;
-			currentEnemyHealth = currentEnemyHealth - enemy.health;
-			hero.hp += currentEnemyHealth;
-			model.addAttribute("spellDamage", "You cast Endurance Damaging the enemy for "
-					+ String.valueOf(currentEnemyHealth) + " and healing yourself for that amount.");
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,0,0, response, model, hero);
+			hero.warriorEndurance(hero, enemy, model, response);
+			String fightOutcome = fight(enemy, response, model, hero);
 			if (fightOutcome.equals("nobodyDied")) {
 				return "fight";
 			}
 			return fightOutcome;
 		}
+
 		if (hero.heroClass.equals("Ranger")) {
-			if (hero.mana - 20 < 0) {
-				model.addAttribute("message", hero.createDisplayText());
-				return "noMana";
+			if (spellCastCookie.equals("Ranger Sight")) {
+				if (hero.mana - 40 < 0) {
+					model.addAttribute("message", hero.createDisplayText());
+					return "noMana";
 
+				}
+				String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+				model.addAttribute("spell",theSpell[0]);
+				model.addAttribute("tooltip",theSpell[1]);
+				Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				hero.mana -= 40;
+				enemy = Enemy.fromCookie(enemyCookie);
+				hero.rangerSightBonusDamageMin = (int) (hero.attackMin * 0.80);
+				hero.rangerSightBonusDamageMax = (int) (hero.attackMax * 0.80);
+				model.addAttribute("spellDamage",
+						"You cast Ranger Sight increasing your Damage to "
+								+ String.valueOf(hero.attackMin + hero.rangerSightBonusDamageMin) + "-"
+								+ String.valueOf(hero.attackMax + hero.rangerSightBonusDamageMax));
+				Cookie leHeroCookie = hero.createCookie();
+				leHeroCookie.setPath("/");
+				leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(leHeroCookie);
+				String fightOutcome = fight(enemy, response, model, hero);
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				response.addCookie(newSkillsCookie);
+				if (fightOutcome.equals("nobodyDied")) {
+					return "fight";
+				}
+				return fightOutcome;
 			}
-			hero.mana -= 20;
-			enemy = Enemy.fromCookie(enemyCookie);
-			//int currentEnemyHealth = enemy.health;
-			//enemy.health -= (hero.maxHp - hero.hp) * 0.10;
-			//currentEnemyHealth = currentEnemyHealth - enemy.health;
-			//hero.hp += currentEnemyHealth;
-			rangerSightBonusDamageMin=(int)(hero.attackMin*0.80);
-			rangerSightBonusDamageMax=(int)(hero.attackMax*0.80);
-			model.addAttribute("spellDamage", "You cast Ranger Sight increasing your Damage to "+String.valueOf(hero.attackMin+rangerSightBonusDamageMin)+"-"
-					+ String.valueOf(hero.attackMax+rangerSightBonusDamageMax));
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,rangerSightBonusDamageMin,rangerSightBonusDamageMax, response, model, hero);
-			if (fightOutcome.equals("nobodyDied")) {
-				return "fight";
+			if(spellCastCookie.equals("Poison Arrow")) {
+				if (hero.mana - 30 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				hero.mana-=30;
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+				model.addAttribute("spell",theSpell[0]);
+				model.addAttribute("tooltip",theSpell[1]);
+				Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				int tempEnemyHealth = enemy.health;
+				int tempHealth = hero.hp;
+				int poisonDamage=(int)(hero.attackMax*0.30);
+				enemy.health-=poisonDamage;
+				int petDamageMin=(int)(hero.attackMin*0.15);
+				int petDamageMax=(int)(hero.attackMax*0.15);
+				model.addAttribute("yourPetAttacks","Your pet attacks");
+				model.addAttribute("dealing"," dealing ");
+				boolean petCrit=Utils.critical(hero.critChance);
+				if (petCrit) {
+					model.addAttribute("petCritically"," CRITICALLY");
+					enemy.health-=Utils.attack(petDamageMin,petDamageMax)*1.8;
+					tempEnemyHealth-=enemy.health;
+					model.addAttribute("petDamage",String.valueOf(tempEnemyHealth)+" Damage");
+				}else {
+					
+					enemy.health-=Utils.attack(petDamageMin,petDamageMax);
+					tempEnemyHealth-=enemy.health;
+					model.addAttribute("petDamage",String.valueOf(tempEnemyHealth)+" Damage");
+				}
+				int armorReduced=(int)(hero.attackMin*0.20);
+				if(enemy.armor-armorReduced<=0) {
+					enemy.armor-=armorReduced;
+				}else {
+					enemy.armor=0;
+				}
+//				enemy = hero.berserkAxeThrow(hero, enemy, model, response, spellCastCookie);
+				model.addAttribute("spellDamage","You poison the enemy dealing "+String.valueOf(poisonDamage)+" damage every turn and reducing his armor with "+armorReduced);
+				Cookie poison=new Cookie("poison",String.valueOf(poisonDamage));
+				poison.setMaxAge(60*60*24*2);
+				poison.setPath("/");
+				response.addCookie(poison);
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					hero = enemy.enemyAttack(hero, enemy, model, response);
+					if (hero.hp <= 0) {
+						return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					}
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fightWithSpell";
+				} 
+			} else if (spellCastCookie.equals("Frost Arrow")) {
+				if (hero.mana - 40 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+//				int tempEnemyHealth = enemy.health;
+//				int tempHealth = hero.hp;
+				enemy = hero.rangerFrostArrow(hero, enemy, model, response, spellCastCookie);
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "stunnedEnemy";
+				}
+			} else if(spellCastCookie.equals("Perfect Duo")) {
+				if (hero.mana - 50 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				hero.mana-=50;
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+				model.addAttribute("spell",theSpell[0]);
+				model.addAttribute("tooltip",theSpell[1]);
+				Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				int tempEnemyHealth = enemy.health;
+				int tempHealth = hero.hp;
+				int petDamageMin=(int)(hero.attackMin);
+				int petDamageMax=(int)(hero.attackMax);
+				boolean crit=false;
+				if(Utils.critical(hero.critChance)){
+					crit=true;
+				}else if(Utils.critical(hero.critChance)) {
+					crit=true;
+				}
+				String critically="";
+				if(crit) {
+					critically=" CRITICALLY ";
+					int damageDealt=Utils.attack(hero.attackMin, hero.attackMax);
+					damageDealt=(int)(damageDealt*1.8);
+					enemy.health-=damageDealt;
+					model.addAttribute("damageDealt", String.valueOf(damageDealt));
+				}else {
+					int damageDealt=Utils.attack(hero.attackMin, hero.attackMax);
+					enemy.health-=damageDealt;
+					model.addAttribute("damageDealt", String.valueOf(damageDealt));
+				}
+				tempEnemyHealth=enemy.health;
+				model.addAttribute("yourPetAttacks","Your pet attacks");
+				model.addAttribute("dealing"," dealing ");	
+				model.addAttribute("critically",critically);
+				model.addAttribute("spellDamage","You cast Perfect Duo Making your pet's Attack Min and Max the same as yours and if one of you performs a critical, the other one does too");
+				if (crit) {
+					model.addAttribute("petCritically"," CRITICALLY");
+					enemy.health-=Utils.attack(petDamageMin,petDamageMax)*1.8;
+					tempEnemyHealth-=enemy.health;
+					model.addAttribute("petDamage",String.valueOf(tempEnemyHealth)+" Damage");
+				}else {
+					
+					enemy.health-=Utils.attack(petDamageMin,petDamageMax);
+					tempEnemyHealth-=enemy.health;
+					model.addAttribute("petDamage",String.valueOf(tempEnemyHealth)+" Damage");
+				}
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictory";
+				} else {
+					hero = enemy.enemyAttack(hero, enemy, model, response);
+					if (hero.hp <= 0) {
+						return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					}
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fight";
+				} 
 			}
-			return fightOutcome;
 		}
-		if(hero.heroClass.equals("Berserk")){
-			if (hero.mana - 20 < 0) {
-				model.addAttribute("message", hero.createDisplayText());
+
+		if (hero.heroClass.equals("Berserk")) {
+			if (spellCastCookie.equals("Bloodlust")) {
+				if (hero.mana - 40 < 0) {
+					model.addAttribute("message", hero.createDisplayText());
+					return "noMana";
+
+				}
+				hero.mana -= 40;
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				String[]theSpell=hero.generateHeroSpellText(hero, spellCastCookie, response);
+				model.addAttribute("spell",theSpell[0]);
+				model.addAttribute("tooltip",theSpell[1]);
+				Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				enemy = Enemy.fromCookie(enemyCookie);
+				double bloodlustPercentIncrease = 1.5 * hero.critChance;
+				int berserkPassiveDamage = (hero.maxHp - hero.hp) / 25;
+				hero.bloodlustBonusDamageMin = (int) ((hero.attackMin + berserkPassiveDamage)
+						* (bloodlustPercentIncrease) * 0.01);
+				hero.bloodlustBonusDamageMax = (int) ((hero.attackMax + berserkPassiveDamage)
+						* (bloodlustPercentIncrease) * 0.01);
+				model.addAttribute("spellDamage", "You cast Bloodlust  increasing your Damage by "
+						+ String.valueOf(bloodlustPercentIncrease) + "%.Your damage is now "
+						+ String.valueOf(hero.attackMin + berserkPassiveDamage + hero.bloodlustBonusDamageMin) + "-"
+						+ String.valueOf(hero.attackMax + berserkPassiveDamage + hero.bloodlustBonusDamageMax)
+						+ " and your next attack is a critical");
+				Cookie leHeroCookie = hero.createCookie();
+				leHeroCookie.setPath("/");
+				leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(leHeroCookie);
+				hero.berserkCritical = 100;
+				String fightOutcome = fight(enemy, response, model, hero);
+				if (fightOutcome.equals("nobodyDied")) {
+					return "fight";
+				}
+				return fightOutcome;
+			}else if (spellCastCookie.equals("Axe Throw")) {
+				if (hero.mana - 30 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				int tempEnemyHealth = enemy.health;
+				int tempHealth = hero.hp;
+				enemy = hero.berserkAxeThrow(hero, enemy, model, response, spellCastCookie);
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+					hero.gold += enemy.dropsGold;
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					hero = enemy.enemyAttack(hero, enemy, model, response);
+					if (hero.hp <= 0) {
+						return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					}
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fightWithSpell";
+				} 
+
+			
+			} else if (spellCastCookie.equals("Vigor Strike")) {
+				if (hero.mana - 40 < 0) {
+					model.addAttribute("message2", hero.createDisplayText());
+					String[] skillsArr = skillsCookie.split(",");
+					model.addAttribute("skill1", skillsArr[0]);
+					model.addAttribute("skill2", skillsArr[1]);
+					return "noMana";
+				}
+				ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+				Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+				newSkillsCookie.setPath("/");
+				newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(newSkillsCookie);
+				model.addAttribute("skill1", newSkills.get(0)[0]);
+				model.addAttribute("skill2", newSkills.get(1)[0]);
+				model.addAttribute("tooltip1", newSkills.get(0)[1]);
+				model.addAttribute("tooltip2", newSkills.get(1)[1]);
+				int tempEnemyHealth = enemy.health;
+				//casting Vigor Strike
+				enemy = hero.berserkVigorStrike(hero, enemy, model, response, spellCastCookie);
+				//end of cast
+				int tempHealth = hero.hp;
+				Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+				theEnemy.setPath("/");
+				theEnemy.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(theEnemy);
+				if (enemy.health <= 0) {
+					if(hero.hp+hero.hpRegen<=hero.maxHp) {
+						hero.hp+=hero.hpRegen;
+					}else {
+						hero.hp=hero.maxHp;
+					}
+					if(hero.mana+hero.manaRegen<=hero.maxMana) {
+						hero.mana+=hero.manaRegen;
+					}else {
+						hero.mana=hero.maxMana;
+					}
+//					hero.gold += enemy.dropsGold;
+					
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					Cookie bossState = new Cookie("bossState", "dead");
+					bossState.setPath("/");
+					bossState.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(bossState);
+					model.addAttribute("message2", hero.createDisplayText());
+					model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+					return "fightvictoryWithSpell";
+				} else {
+					hero = enemy.enemyAttack(hero, enemy, model, response);
+					if (hero.hp <= 0) {
+						return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+					}
+					Cookie heroNewCookie = hero.createCookie();
+					heroNewCookie.setPath("/");
+					heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+					response.addCookie(heroNewCookie);
+					model.addAttribute("message2", hero.createDisplayText());
+					return "fightWithSpell";
+				}
+		} else if (spellCastCookie.equals("Enrage")) {
+			if (hero.mana - 50 < 0) {
+				model.addAttribute("message2", hero.createDisplayText());
+				String[] skillsArr = skillsCookie.split(",");
+				model.addAttribute("skill1", skillsArr[0]);
+				model.addAttribute("skill2", skillsArr[1]);
 				return "noMana";
-
 			}
-			hero.mana -= 20;
-			enemy = Enemy.fromCookie(enemyCookie);
-			double bloodlustPercentIncrease=1.5*hero.critChance;
-			int berserkPassiveDamage=(hero.maxHp-hero.hp)/25;
-			bloodlustBonusDamageMin=(int)((hero.attackMin+berserkPassiveDamage)*(bloodlustPercentIncrease)*0.01);
-			bloodlustBonusDamageMax=(int)((hero.attackMax+berserkPassiveDamage)*(bloodlustPercentIncrease)*0.01);
-			model.addAttribute("spellDamage", "You cast Bloodlust  increasing your Damage by "+String.valueOf(bloodlustPercentIncrease)+"%.Your damage is now "+String.valueOf(hero.attackMin+berserkPassiveDamage+bloodlustBonusDamageMin)+"-"
-					+ String.valueOf(hero.attackMax+berserkPassiveDamage+bloodlustBonusDamageMax)+" and your next attack is a critical");
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			berserkCritical=100;
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,rangerSightBonusDamageMin,rangerSightBonusDamageMax, response, model, hero);
-			if (fightOutcome.equals("nobodyDied")) {
-				return "fight";
-			}
-			return fightOutcome;
-		}
-		if(hero.heroClass.equals("Giant")){
-			enemy = Enemy.fromCookie(enemyCookie);
-			int healthLost=(int)(hero.hp*0.25);
-			int earthShockCritChance=healthLost+hero.critChance;
-			int earthShockDamage=(int)(hero.maxHp*0.10);
-			hero.hp-=healthLost;
-			String critically="";
-			if (critical(earthShockCritChance)) {
-				earthShockDamage=(int)(earthShockDamage*1.8);
-				enemy.health -=earthShockDamage;
-				critically = " CRITICALLY";
-
+			ArrayList<String[]> newSkills = hero.generateHeroSkillText(hero, response);
+			Cookie newSkillsCookie = new Cookie("skills", newSkills.get(0)[0] + "," + newSkills.get(1)[0]);
+			newSkillsCookie.setPath("/");
+			newSkillsCookie.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(newSkillsCookie);
+			model.addAttribute("skill1", newSkills.get(0)[0]);
+			model.addAttribute("skill2", newSkills.get(1)[0]);
+			model.addAttribute("tooltip1", newSkills.get(0)[1]);
+			model.addAttribute("tooltip2", newSkills.get(1)[1]);
+			int tempEnemyHealth = enemy.health;
+			int tempHealth = hero.hp;
+			int tempHeroAttackMin=hero.attackMin;
+			int tempHeroAttackMax=hero.attackMax;
+			int tempHeroArmor=hero.armor;
+			int tempHeroMagicResist=hero.magicResist;
+			int tempCritChance=hero.critChance;
+			hero.attackMin=(int)(hero.attackMin*0.80);
+			hero.attackMax=(int)(hero.attackMax*0.80);
+			hero.critChance+=tempHeroArmor+tempHeroMagicResist;
+			enemy = hero.berserkEnrage(hero, enemy, model, response, spellCastCookie);
+			hero.armor=0;
+			hero.magicResist=0;
+			hero.critChance=tempCritChance;
+			Cookie theEnemy = new Cookie("enemy", enemy.toCookie());
+			theEnemy.setPath("/");
+			theEnemy.setMaxAge(60 * 60 * 24 * 2);
+			response.addCookie(theEnemy);
+			if (enemy.health <= 0) {
+				if(hero.hp+hero.hpRegen<=hero.maxHp) {
+					hero.hp+=hero.hpRegen;
+				}else {
+					hero.hp=hero.maxHp;
+				}
+				if(hero.mana+hero.manaRegen<=hero.maxMana) {
+					hero.mana+=hero.manaRegen;
+				}else {
+					hero.mana=hero.maxMana;
+				}
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.armor=tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				Cookie heroNewCookie = hero.createCookie();
+				heroNewCookie.setPath("/");
+				heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroNewCookie);
+				Cookie bossState = new Cookie("bossState", "dead");
+				bossState.setPath("/");
+				bossState.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(bossState);
+				model.addAttribute("message2", hero.createDisplayText());
+				model.addAttribute("hpRegen",String.valueOf(hero.hpRegen));
+				model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
+				return "fightvictoryWithSpell";
 			} else {
-				enemy.health -= earthShockDamage;
+				hero = enemy.enemyAttack(hero, enemy, model, response);
+				if (hero.hp <= 0) {
+					return hero.heroDefeat(hero, enemy, model, response, tempEnemyHealth, tempHealth);
+				}
+				hero.attackMin=tempHeroAttackMin;
+				hero.attackMax=tempHeroAttackMax;
+				hero.armor=tempHeroArmor;
+				hero.magicResist=tempHeroMagicResist;
+				Cookie heroNewCookie = hero.createCookie();
+				heroNewCookie.setPath("/");
+				heroNewCookie.setMaxAge(60 * 60 * 24 * 2);
+				response.addCookie(heroNewCookie);
+				model.addAttribute("message2", hero.createDisplayText());
+				return "fightWithSpell";
 			}
-			model.addAttribute("spellDamage", "You cast Earth Shock damaging yourself for "+String.valueOf(healthLost)+" and"+critically+" damaging the enemy for "+String.valueOf(earthShockDamage)+" damage");
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,rangerSightBonusDamageMin,rangerSightBonusDamageMax, response, model, hero);
+	}
+		}
+
+		if (hero.heroClass.equals("Giant")) {
+			hero.giantEarthShock(hero, enemy, model, response);
+			String fightOutcome = fight(enemy, response, model, hero);
 			if (fightOutcome.equals("nobodyDied")) {
 				return "fight";
 			}
 			return fightOutcome;
 		}
+
 		if (hero.heroClass.equals("Necromancer")) {
 			if (hero.mana - 20 < 0) {
 				model.addAttribute("message", hero.createDisplayText());
 				return "noMana";
 
 			}
-			hero.mana -= 20;
-			String critically = "";
-			enemy = Enemy.fromCookie(enemyCookie);
-			int currentEnemyHealth = enemy.health;
-			if (critical(hero.critChance)) {
-				enemy.health -= (hero.maxMana * 0.15+hero.souls) * 1.8;
-				critically = " CRITICALLY";
-
-			} else {
-				enemy.health -= hero.maxMana * 0.15 + hero.souls;
-			}
-			int siphonLifeHealing=(int)(hero.maxMana*0.10+hero.souls);
-			currentEnemyHealth = currentEnemyHealth - enemy.health;
-			hero.hp+=siphonLifeHealing;
-			model.addAttribute("spellDamage", "You cast Siphon Life" + critically + " Damaging the enemy for "
-					+ String.valueOf(currentEnemyHealth) + " Damage and healing yourself for "+String.valueOf(siphonLifeHealing));
-			Cookie leHeroCookie = hero.createCookie();
-			leHeroCookie.setPath("/");
-			leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
-			response.addCookie(leHeroCookie);
-			String fightOutcome = fight(enemy.health, enemy.attackType, enemy.damageMin, enemy.damageMax, enemy.armor,
-					enemy.dropsGold, enemy.critChance,0,0, response, model, hero);
+			hero.necromancerSiphonLife(hero, enemy, model, response);
+			String fightOutcome = fight(enemy, response, model, hero);
 			if (fightOutcome.equals("nobodyDied")) {
 				return "fight";
 			}
 			return fightOutcome;
-		}
-		else {
+		} else {
 			return "fight";
 		}
-		
 
 	}
 }
