@@ -36,12 +36,12 @@ height: 100%;
 <head>
 <title>Second Zone</title>
 </head>
-<body class="bg" background= "http://localhost:8081/AdventureGame/resources/images/RedWoods.jpg">
+<body class="bg" background= "resources/images/RedWoods.jpg">
 
 	<div style="text-align:center">
 	<h1 style="color:yellow"><i>You slay the final enemy of this Land and Advance to <span class="yellowText">Red Woods</span></i></h1>
 	<h2 style="color:Chartreuse"><i>Health and Mana are restored to full</i></h2>
-	<a href="http://localhost:8081/AdventureGame/redWoods/" class="button">CONTINUE TO NEXT ZONE</a>
+	<a href="redWoods" class="button">CONTINUE TO NEXT ZONE</a>
 	</div>
 </body>
 </html>

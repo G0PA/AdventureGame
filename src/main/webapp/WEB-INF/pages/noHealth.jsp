@@ -25,19 +25,8 @@ height: 100%;
   background-size: cover;
 
 }
-.redText{
-color: red;
-}
-.crimsonText{
-color: Crimson;
-}
-.blueText{
-color: Chartreuse;
-}
-.grayText{
-color:DarkGreen;
-}
-.maroonText{
+.maroonText
+{
 color:Maroon;
 }
 .tooltip {
@@ -45,7 +34,6 @@ color:Maroon;
     display: inline-block;
     border-bottom: 1px dotted black;
 }
-
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 600px;
@@ -60,9 +48,6 @@ color:Maroon;
     z-index: 1;
 }
 
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
@@ -163,26 +148,17 @@ line-height: 3em;
 color:brown
 }
 </style>
-
-<body background= "resources/images/${resource}.jpg" class="bg">
-	<h1 style="background-color:Chartreuse;">${message2}</h1>
+<head>
+</head>
+<body background= "resources/images/${resource}.jpg" class=bg>
+<h1 style="background-color:Chartreuse;">${message2}</h1>
+	<h1>You do not have enough Health for this Ability</h1>
+	<h1>${cheater}</h1>
 	<div onclick="location.href='fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
   <span class="tooltiptext2"><i><span class="violetText">${tooltip1}</span></i></span>
 </div>
 <div onclick="location.href='fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
   <span class="tooltiptext3"><i><span class="brownText">${tooltip2}</span></i></span>
 </div>
-	<div onclick="location.href='fightWithSpell';" style="cursor:pointer;" class="tooltip"><i>Cast ${spell}</i> 
-  <span class="tooltiptext"><i><span class="yellowText">${tooltip}</span></i></span>
-</div>
-	<h2 style="color:yellow"><i>${spellDamage}</i></h2>
-	<h2 style="color:yellow"><i>${hit1}</i></h2>
-	<h2 style="color:yellow"><i>${hit2}</i></h2>
-	<h2 style="color:yellow"><i>${hit3}</i></h2>
-	<h2 style="color:yellow"><i>${hit4}</i></h2>
-	<h3 style="color:yellow"><i>${poison}</i></h3>
-	<h4 style="color:yellow"><i>${yourPetAttacks}${petCritically}${dealing}${petDamage} </i></h4>
-	<h3 style="color:Maroon;"> <i>Enemy health left: <span class="redText">${enemy}</span></i></h3>
-	<h3 style="color:red;"><i>${enemyName} ${enemyCritically}<span class="maroonText">damages you dealing </span>${enemyDamage} <span class="maroonText">damage</span></i></h3>
 </body>
 </html>

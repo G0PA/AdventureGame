@@ -76,8 +76,8 @@ background-color: red; /* Green */
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<h2 style="color:Chartreuse;"> ${event}</h2>
 	
-	<a href="http://localhost:8081/AdventureGame/outcome1" class="button">${firstButton}</a>
-	<a href="http://localhost:8081/AdventureGame/outcome2" class="button">${secondButton}</a>
+	<a href="outcome1" class="button">${firstButton}</a>
+	<a href="outcome2" class="button">${secondButton}</a>
 	
 </body>
 </html>

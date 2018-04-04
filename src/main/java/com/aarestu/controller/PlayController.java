@@ -7,12 +7,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
+@Scope("session")
 public class PlayController {
 	int count=0;
 	ArrayList<Enemy> enemies= new ArrayList<Enemy>();
@@ -23,14 +25,15 @@ public class PlayController {
 	Settlement theSettlement;
 	ArrayList<Enemy> bosses= new ArrayList<Enemy>();
 	int settlementTimer=101;
-	
-	
+	static int deaths=0;
 	final static Logger logger=Logger.getLogger(PlayController.class);
 	Hero hero=new Hero();
 	Hero hero2;
 	@RequestMapping(value="/play",method=RequestMethod.GET)
 	public String plays(ModelMap model, HttpServletResponse response) {
 		settlementTimer=101;
+		deaths++;
+		logger.debug("deaths count: "+deaths);
 		Cookie leftEnemies=new Cookie("leftEnemies","25");
 		leftEnemies.setPath("/");
 		leftEnemies.setMaxAge(60*60*24*2);
@@ -47,8 +50,6 @@ public class PlayController {
 		response.addCookie(c);
 		response.addCookie(passedMaps2);
 		response.addCookie(bossState2);
-		logger.debug("Cookie name: "+c.getName()); 
-		logger.debug("the cookie in PlayController is : "+c.getValue());
 		model.addAttribute("message", hero.createDisplayText());
 		Cookie passedEvents=new Cookie("passedEvents","-9");
 		passedEvents.setMaxAge(60*60*24*2);
@@ -56,8 +57,9 @@ public class PlayController {
 		response.addCookie(passedEvents);
 		return "chooseClass";
 	}
+
 	@RequestMapping("/hello")
-	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,@CookieValue(value="spellCast",defaultValue ="none")String spellCastCookie,HttpServletResponse response)
+	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue("enemy")String enemyCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,@CookieValue(value="spellCast",defaultValue ="none")String spellCastCookie,HttpServletResponse response)
 	{
 
 		hero2=Hero.fromCookie(fooCookie);
@@ -65,6 +67,14 @@ public class PlayController {
 		poison.setPath("/");
 		poison.setMaxAge(60*60*24*2);
 		response.addCookie(poison);
+		Cookie regenCookie=new Cookie("regeneration","0");
+		regenCookie.setPath("/");
+		regenCookie.setMaxAge(60*60*24*2);
+		response.addCookie(regenCookie);
+		Cookie golemCookie=new Cookie("golem","0");
+		golemCookie.setPath("/");
+		golemCookie.setMaxAge(60*60*24*2);
+		response.addCookie(golemCookie);
 		if(hero2.enemyEncountersLeft==26) {
 			Cookie firstBoss=new Cookie("firstBoss","notReached");
 			firstBoss.setPath("/");
@@ -83,34 +93,24 @@ public class PlayController {
 			response.addCookie(zone);
 			return "secondZone";
 		}
-//		if(hero2.heroClass.equals("Mage"))
-//		{
-//			model.addAttribute("spell","Fireball");
-//		}else if(hero2.heroClass.equals("Warrior"))
-//		{
-//			model.addAttribute("spell","Endurance");
-//		}else if(hero2.heroClass.equals("Ranger"))
-//		{
-//			model.addAttribute("spell","Ranger Sight");
-//		}else if(hero2.heroClass.equals("Berserk"))
-//		{
-//			model.addAttribute("spell","Bloodlust");
-//		} 
-//	else 
+
 		if (hero2.heroClass.equals("Giant")) {
-			model.addAttribute("spell", "Earth Shock");
-			hero2.hp += hero2.mana * 2;
-			hero2.maxHp += hero2.maxMana * 2;
-			hero2.hpRegen += hero2.manaRegen * 2;
+			hero2.hp += hero2.mana;
+			hero2.maxHp += hero2.maxMana;
+			hero2.hpRegen += hero2.manaRegen;
+			int rageHealth=(int)(hero2.rage*0.10);
+			model.addAttribute("rage","You lose all rage and Increase your Current and Max Health with "+String.valueOf(rageHealth));
+			hero2.maxHp+=rageHealth;
+			hero2.hp+=rageHealth;
+			hero2.rage=0;
 			hero2.mana = 0;
 			hero2.manaRegen = 0;
 			hero2.maxMana = 0;
-		}
-//		}else if(hero2.heroClass.equals("Necromancer")) {
-//			model.addAttribute("spell","Siphon Life");
-//		}
-		
-		
+			Cookie heroCookie=hero2.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60*60*24*2);
+			response.addCookie(heroCookie);
+		}		
 		Cookie passed=new Cookie("passed","passed");
 		passed.setPath("/");
 		passed.setMaxAge(60*60*24*2);
@@ -118,6 +118,8 @@ public class PlayController {
 		if(bossStateCookie.equals("alive"))
 		{
 			model.addAttribute("cheater","No cheating : )");
+			Enemy enemy=Enemy.fromCookie(enemyCookie);
+			model.addAttribute("resource",enemy.resourcePath);
 			return "hello";		
 		}
 		if(bossStateCookie.equals("inSettlement"))
@@ -131,6 +133,7 @@ public class PlayController {
 		}
 
 		settlementTimer--;
+		logger.debug("settlement Timer count is: "+settlementTimer);
 		if(settlementTimer%3==0)
 		{
 			int settlementIndex=Utils.attack(0,settlements.size()-1);

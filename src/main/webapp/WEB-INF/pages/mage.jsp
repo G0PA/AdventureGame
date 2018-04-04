@@ -199,27 +199,27 @@ color:yellow;
 <head>
 <title>Welcome</title>
 </head>
-<body background= "http://localhost:8081/AdventureGame/resources/images/mageWallpaper.jpg"class=bg>
+<body background= "resources/images/mageWallpaper.jpg"class=bg>
 <div class="asd">
 	<h1 style="color:yellow"><font size="10"><i>Mage</i></font></h1>
 	<h1 style="color:white"><i>Passive: every 2 points of Magic Resist increases Attack Damage Min and Max with 1</i></h1>
 	<h1 style="color:white"><i><span class="yellowText">Spells:</span></i></h1>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/mage';" style="cursor:pointer;" class="tooltip"><i>Fireball</i> 
+	<div onclick="location.href='mage';" style="cursor:pointer;" class="tooltip"><i>Fireball</i> 
   <span class="tooltiptext"><i><span class="yellowText">Deals damage equal to 25% of your Maximum Mana(Has same Critical Chance as your normal attacks and ignores armor). -30 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/mage';" style="cursor:pointer;" class="tooltip"><i>Portal</i> 
+<div onclick="location.href='mage';" style="cursor:pointer;" class="tooltip"><i>Portal</i> 
   <span class="tooltiptext"><i><span class="yellowText">Teleports you away from the fight. -30 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/mage';" style="cursor:pointer;" class="tooltip"><i>Freezing Touch</i> 
+<div onclick="location.href='mage';" style="cursor:pointer;" class="tooltip"><i>Freezing Touch</i> 
   <span class="tooltiptext"><i><span class="yellowText">Deals damage equal to 15% of your Maximum Mana(Cannot be a Critical, but ignores armor) and Freezing the enemy making him unable to attack this round. -40 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/mage';" style="cursor:pointer;" class="tooltip"><i>Magic Affinity</i> 
+<div onclick="location.href='mage';" style="cursor:pointer;" class="tooltip"><i>Magic Affinity</i> 
   <span class="tooltiptext"><i><span class="yellowText">Deals damage equal to 30% of your Maximum Mana which is further increased by 1.5% for every point of Magic Resist,ignores armor and has your Critical Strike chance percentage +1% for every point of Magic Resist. -50 Mana</span></i></span>
 </div>
 	<h1></h1>
-	<a href="http://localhost:8081/AdventureGame/greenWoods" class="button">CHOOSE MAGE</a>
-	<a href="http://localhost:8081/AdventureGame/play" class="button">RETURN</a>
+	<a href="greenWoods" class="button">CHOOSE MAGE</a>
+	<a href="play" class="button">RETURN</a>
 	</div>
 	
 </body>

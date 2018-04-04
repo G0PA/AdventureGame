@@ -198,16 +198,17 @@ color:Chartreuse;
 <div class="asd">
 	<h1 style="color:Chartreuse"><font size="10"><i>RANGER</i></font></h1>
 	<h1 style="color:white"><i>Passive: Your pet fights with you, having 15% of your Attack Min and Max and same Critical Chance</i></h1>
-		<div onclick="location.href='http://localhost:8081/AdventureGame/ranger';" style="cursor:pointer;" class="tooltip"><i>Ranger Sight</i> 
-  <span class="tooltiptext"><i><span class="yellowText">increases your Attack Damage Min and Max with 80%. -40 Mana</span></i></span>
+	<h1 style="color:white"><i><span class="yellowText">Spells:</span></i></h1>
+		<div onclick="location.href='ranger';" style="cursor:pointer;" class="tooltip"><i>Ranger Sight</i> 
+  <span class="tooltiptext"><i><span class="yellowText">Increases your Attack Damage Min and Max with 80%. -40 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/ranger';" style="cursor:pointer;" class="tooltip"><i>Frozen Arrow</i> 
+<div onclick="location.href='ranger';" style="cursor:pointer;" class="tooltip"><i>Frozen Arrow</i> 
   <span class="tooltiptext"><i><span class="yellowText">Fire a freezing arrow dealing 65% of your Attack Damage Max and freezing the enemy making him unable to attack this round.Can be a Critical and ignores Armor. -40 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/ranger';" style="cursor:pointer;" class="tooltip"><i>Poison Arrow</i> 
-  <span class="tooltiptext"><i><span class="yellowText">Fire a poisonous arrow dealing 30% of your Attack Damage Max every turn and ignoring armor until the fight ends,also reduce the enemy armor by 20% of your Attack Damage Min(Cannot be reduced under 0). -30 Mana</span></i></span>
+<div onclick="location.href='ranger';" style="cursor:pointer;" class="tooltip"><i>Poison Arrow</i> 
+  <span class="tooltiptext"><i><span class="yellowText">Fire a poisonous arrow dealing 30% of your Attack Damage Max every turn and ignoring armor until the fight ends.Enemy armor is reduced by 20% of your Attack Damage Min until the end of the fight(Cannot be reduced under 0). -30 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/ranger';" style="cursor:pointer;" class="tooltip"><i>Perfect Duo</i> 
+<div onclick="location.href='ranger';" style="cursor:pointer;" class="tooltip"><i>Perfect Duo</i> 
   <span class="tooltiptext"><i><span class="yellowText">Your pet's Attack Damage Min and Max becomes equal to yours for this round and if either you or your pet make a Critical the other one makes a Critical too. -50 Mana</span></i></span>
 </div>
 <h1></h1>

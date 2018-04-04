@@ -24,10 +24,10 @@ background-color: red; /* Green */
 <head>
 <title>Welcome</title>
 </head>
-<body background= "http://localhost:8081/AdventureGame/resources/images/start.jpg">
+<body background= "resources/images/start.jpg">
 
 	<div style="text-align:center">
-	<a href="http://localhost:8081/AdventureGame/play/" class="button">PLAY</a>
+	<a href="play" class="button">PLAY</a>
 	</div>
 </body>
 </html>

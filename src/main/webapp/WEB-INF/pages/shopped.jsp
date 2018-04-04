@@ -78,7 +78,7 @@ background-color: red; /* Green */
 		<h2 style="color:Chartreuse;">${notEnoughGold} Item Purchase</h2>
 	
 	
-	<a href="http://localhost:8081/AdventureGame/settlement" class="button">CONTINUE</a>
+	<a href="settlement" class="button">CONTINUE</a>
 	
 </body>
 </html>

@@ -154,10 +154,10 @@ color:brown
 <h1 style="background-color:Chartreuse;">${message2}</h1>
 	<h1>You do not have enough Mana</h1>
 	<h1>${cheater}</h1>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
+	<div onclick="location.href='fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
   <span class="tooltiptext2"><i><span class="violetText">${tooltip1}</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
+<div onclick="location.href='fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
   <span class="tooltiptext3"><i><span class="brownText">${tooltip2}</span></i></span>
 </div>
 </body>

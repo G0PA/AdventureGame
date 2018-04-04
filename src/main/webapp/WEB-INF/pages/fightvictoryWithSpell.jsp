@@ -45,7 +45,7 @@ color: blue;
 	<h2 style="color:yellow"><i>${hit4}</i></h2>
 	<h3 style="color:yellow"><i>${poison}</i></h3>
 	<h4 style="color:yellow"><i>${yourPetAttacks}${petCritically}${dealing}${petDamage} </i></h4>
-	<a href="http://localhost:8081/AdventureGame/${zone}" class="button">VICTORY</a>
+	<a href="${zone}" class="button">VICTORY</a>
 	<h2 style="color:MediumBlue"><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<h2 style="color:Yellow"><i>${soul}</i></h2>
 	<h1><span class="grayText">Gold earned:</span> <span class="blueText">+${gold}</span></h1>

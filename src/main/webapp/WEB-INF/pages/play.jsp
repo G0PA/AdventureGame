@@ -30,8 +30,8 @@ height: 100%;
 <head>
 <title>Welcome</title>
 </head>
-<body background= "http://localhost:8081/AdventureGame/resources/images/start.jpg"class=bg>
+<body background= "resources/images/start.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">Travel</a>
+	<a href="hello" class="button">Travel</a>
 </body>
 </html>

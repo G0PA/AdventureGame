@@ -30,6 +30,6 @@ height: 100%;
 </head>
 <body background= "resources/images/event.jpg" class=bg>
 	<h1 style="color:yellow;">A special Event has occurred</h1>
-	<a href="http://localhost:8081/AdventureGame/event" class="button">CONTINUE</a>
+	<a href="event" class="button">CONTINUE</a>
 </body>
 </html>

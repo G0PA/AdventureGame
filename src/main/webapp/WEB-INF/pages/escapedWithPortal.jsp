@@ -34,6 +34,6 @@ color: blue;
 <body background= "resources/images/portal.jpg" class=bg>
 	<h1>${spellDamage}</h1>
 	<h2 style="color:CornflowerBlue "><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
-	<a href="http://localhost:8081/AdventureGame/${zone}" class="button">CONTINUE</a>
+	<a href="${zone}" class="button">CONTINUE</a>
 </body>
 </html>

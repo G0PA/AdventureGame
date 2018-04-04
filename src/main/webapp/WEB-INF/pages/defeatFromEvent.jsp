@@ -49,6 +49,6 @@ color:blue;
 <body background= "resources/images/${defeatScreen}.jpg" class=bg>
 	<h1 style="background-color:Chartreuse;">${message2}</h1>
 	<h1 style="color:red;">You Were Defeated</h1>
-	<a href="http://localhost:8081/AdventureGame/play" class="button">PLAY AGAIN</a>
+	<a href="play" class="button">PLAY AGAIN</a>
 </body>
 </html>

@@ -166,13 +166,13 @@ color:blue
 
 <body background= "resources/images/${resource}.jpg" class="bg">
 	<h1 style="background-color:Chartreuse;">${message2}</h1>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
+	<div onclick="location.href='fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
   <span class="tooltiptext2"><i><span class="violetText">${tooltip1}</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
+<div onclick="location.href='fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
   <span class="tooltiptext3"><i><span class="brownText">${tooltip2}</span></i></span>
 </div>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/fightWithSpell';" style="cursor:pointer;" class="tooltip"><i>Cast ${spell}</i> 
+	<div onclick="location.href='fightWithSpell';" style="cursor:pointer;" class="tooltip"><i>Cast ${spell}</i> 
   <span class="tooltiptext"><i><span class="yellowText">${tooltip}</span></i></span>
 </div>
 	<h2 style="color:yellow"><i>${spellDamage}</i></h2>

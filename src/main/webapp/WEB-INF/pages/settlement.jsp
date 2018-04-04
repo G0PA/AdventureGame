@@ -80,24 +80,24 @@ color:blue;
 	<h1 style="color:Chartreuse;"> ${settlementName}</h1>
 		<h2 style="color:Chartreuse;">You can shop</h2>
 	<div id="zdr">
-	<a href="http://localhost:8081/AdventureGame/item1" class="button">${name}<span class="greenText">${currentHealth}${maxHealth}${mana}${maxMana}</span><span class="blue">${hpRegen}${manaRegen}</span><span class="greenText">${attackMin}${attackMax}${armor}${magicResist}${critChance}</span><span class="redText">${costsGold}</span></a>
+	<a href="item1" class="button">${name}<span class="greenText">${currentHealth}${maxHealth}${mana}${maxMana}</span><span class="blue">${hpRegen}${manaRegen}</span><span class="greenText">${attackMin}${attackMax}${armor}${magicResist}${critChance}</span><span class="redText">${costsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item2" class="button">${secondName}<span class="greenText">${secondCurrentHealth}${secondMaxHealth}${secondMana}${secondMaxMana}</span><span class="blue">${secondHpRegen}${secondManaRegen}</span><span class="greenText">${secondAttackMin}${secondAttackMax}${secondArmor}${secondMagicResist}${secondCritChance}</span><span class="redText">${secondCostsGold}</span></a>
+	<a href="item2" class="button">${secondName}<span class="greenText">${secondCurrentHealth}${secondMaxHealth}${secondMana}${secondMaxMana}</span><span class="blue">${secondHpRegen}${secondManaRegen}</span><span class="greenText">${secondAttackMin}${secondAttackMax}${secondArmor}${secondMagicResist}${secondCritChance}</span><span class="redText">${secondCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item3" class="button">${thirdName}<span class="greenText">${thirdCurrentHealth}${thirdMaxHealth}${thirdMana}${thirdMaxMana}</span><span class="blue">${thirdHpRegen}${thirdManaRegen}</span><span class="greenText">${thirdAttackMin}${thirdAttackMax}${thirdArmor}${thirdMagicResist}${thirdCritChance}</span><span class="redText">${thirdCostsGold}</span></a>
+	<a href="item3" class="button">${thirdName}<span class="greenText">${thirdCurrentHealth}${thirdMaxHealth}${thirdMana}${thirdMaxMana}</span><span class="blue">${thirdHpRegen}${thirdManaRegen}</span><span class="greenText">${thirdAttackMin}${thirdAttackMax}${thirdArmor}${thirdMagicResist}${thirdCritChance}</span><span class="redText">${thirdCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item4" class="button">${fourthName}<span class="greenText">${fourthCurrentHealth}${fourthMaxHealth}${fourthMana}${fourthMaxMana}</span><span class="blue">${fourthHpRegen}${fourthManaRegen}</span><span class="greenText">${fourthAttackMin}${fourthAttackMax}${fourthArmor}${fourthMagicResist}${fourthCritChance}</span><span class="redText">${fourthCostsGold}</span></a>
+	<a href="item4" class="button">${fourthName}<span class="greenText">${fourthCurrentHealth}${fourthMaxHealth}${fourthMana}${fourthMaxMana}</span><span class="blue">${fourthHpRegen}${fourthManaRegen}</span><span class="greenText">${fourthAttackMin}${fourthAttackMax}${fourthArmor}${fourthMagicResist}${fourthCritChance}</span><span class="redText">${fourthCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/item5" class="button">${fifthName}<span class="greenText">${fifthCurrentHealth}${fifthMaxHealth}${fifthMana}${fifthMaxMana}</span><span class="blue">${fifthHpRegen}${fifthManaRegen}</span><span class="greenText">${fifthAttackMin}${fifthAttackMax}${fifthArmor}${fifthMagicResist}${fifthCritChance}</span><span class="redText">${fifthCostsGold}</span></a>
+	<a href="item5" class="button">${fifthName}<span class="greenText">${fifthCurrentHealth}${fifthMaxHealth}${fifthMana}${fifthMaxMana}</span><span class="blue">${fifthHpRegen}${fifthManaRegen}</span><span class="greenText">${fifthAttackMin}${fifthAttackMax}${fifthArmor}${fifthMagicResist}${fifthCritChance}</span><span class="redText">${fifthCostsGold}</span></a>
 	</div>
 	<div>
-	<a href="http://localhost:8081/AdventureGame/sleep" class="button3">SLEEP: <span class="greenText">${sleepInfo}</span> <span class="redText">-1 Enemy Encounter</span></a>
+	<a href="sleep" class="button3">SLEEP: <span class="greenText">${sleepInfo}</span> <span class="redText">-1 Enemy Encounter</span></a>
 	</div>
-	<a href="http://localhost:8081/AdventureGame/leaveSettlement" class="button2">LEAVE SETTLEMENT</a>
+	<a href="leaveSettlement" class="button2">LEAVE SETTLEMENT</a>
 	
 </body>
 </html>

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
+@Scope("session")
 public class RedWoodsController {
 	int count=0;
 	ArrayList<Enemy> enemies= new ArrayList<Enemy>();
@@ -33,24 +35,35 @@ public class RedWoodsController {
 			@CookieValue("spellCast")String spellCastCookie,
 			HttpServletResponse response) {
 		hero=Hero.fromCookie(fooCookie);
-		if(hero.heroClass.equals("Mage"))
-		{
-			model.addAttribute("spell","Fireball");
-		}else if(hero.heroClass.equals("Warrior"))
-		{
-			model.addAttribute("spell","Endurance");
-		}else if(hero.heroClass.equals("Ranger"))
-		{
-			model.addAttribute("spell","Ranger Sight");
-		}else if(hero.heroClass.equals("Berserk"))
-		{
-			model.addAttribute("spell","Bloodlust");
-		}
-		else if(hero.heroClass.equals("Giant")) {
-			model.addAttribute("spell","Earth Shock");
-		}else if(hero.heroClass.equals("Necromancer")) {
-			model.addAttribute("spell","Siphon Life");
-		}
+		Cookie poison=new Cookie("poison","0");
+		poison.setPath("/");
+		poison.setMaxAge(60*60*24*2);
+		response.addCookie(poison);
+		Cookie regenCookie=new Cookie("regeneration","0");
+		regenCookie.setPath("/");
+		regenCookie.setMaxAge(60*60*24*2);
+		response.addCookie(regenCookie);
+		Cookie golemCookie=new Cookie("golem","0");
+		golemCookie.setPath("/");
+		golemCookie.setMaxAge(60*60*24*2);
+		response.addCookie(golemCookie);
+		if (hero.heroClass.equals("Giant")) {
+			hero.hp += hero.mana;
+			hero.maxHp += hero.maxMana;
+			hero.hpRegen += hero.manaRegen;
+			int rageHealth=(int)(hero.rage*0.10);
+			model.addAttribute("rage","You lose all rage and Increase your Current and Max Health with "+String.valueOf(rageHealth));
+			hero.maxHp+=rageHealth;
+			hero.hp+=rageHealth;
+			hero.rage=0;
+			hero.mana = 0;
+			hero.manaRegen = 0;
+			hero.maxMana = 0;
+			Cookie heroCookie=hero.createCookie();
+			heroCookie.setPath("/");
+			heroCookie.setMaxAge(60*60*24*2);
+			response.addCookie(heroCookie);
+		}		
 		if(hero.enemyEncountersLeft<=0) {
 
 			Enemy megalodon=new Enemy("megalodon","Megalodon",1,375,41,50,13,100,18);
@@ -228,6 +241,12 @@ public class RedWoodsController {
 		spellCast.setPath("/");
 		spellCast.setMaxAge(60*60*24*2);
 		response.addCookie(spellCast);
+		ArrayList<String[]> skills=hero.generateHeroSkillText(hero, response);
+		model.addAttribute("skill1",skills.get(0)[0]);
+		model.addAttribute("skill2",skills.get(1)[0]);
+		model.addAttribute("tooltip1",skills.get(0)[1]);
+		model.addAttribute("tooltip2",skills.get(1)[1]);
+		
 		model.addAttribute("enemyInfo",theEnemy);
 		model.addAttribute("resource",theBoss.resourcePath);
 		Cookie c2=hero.createCookie();

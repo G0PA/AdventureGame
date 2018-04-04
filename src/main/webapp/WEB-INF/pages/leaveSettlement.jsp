@@ -38,6 +38,6 @@ color=blue;
 	<h1 style="color:green;">${sleep}</h1>
 	<h2 style="color:MediumBlue"><i>You regenerate <span class="blue">${hpRegen}</span> health and <span class="blue">${manaRegen}</span> mana</i></h2>
 	<h1 style="color:crimson;">You Left the Settlement</h1>
-	<a href="http://localhost:8081/AdventureGame/${zone}" class="button">CONTINUE</a>
+	<a href="${zone}" class="button">CONTINUE</a>
 </body>
 </html>

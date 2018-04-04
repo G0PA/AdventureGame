@@ -46,6 +46,9 @@ background-color: #1E90FF; /* Green */
 {
 color: Crimson;
 }
+.blue{
+color:Chartreuse;
+}
 </style>
 <head>
 <title>Settlement</title>
@@ -53,9 +56,10 @@ color: Crimson;
 <body background= "resources/images/${resource}.jpg"class=bg>
 	<h1 style="background-color:Chartreuse;">${message}</h1>
 	<h1>${cheating}</h1>
+	<h2 style="color:Green"><i><span class="blue">${rage}</span></i></h2>
 	<h1 style="color:Chartreuse;">SETTLEMENT</h1>
 	<h1 style="color:Chartreuse;"> You came across ${settlementName}</h1>
-	<a href="http://localhost:8081/AdventureGame/settlement" class="button">GO IN</a>
-	<a href="http://localhost:8081/AdventureGame/skipSettlement" class="button2">SKIP SETTLEMENT(+1 enemy encounter until Boss)</a>
+	<a href="settlement" class="button">GO IN</a>
+	<a href="skipSettlement" class="button2">SKIP SETTLEMENT(+1 enemy encounter until Boss)</a>
 </body>
 </html>

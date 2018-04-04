@@ -25,6 +25,7 @@ public class Hero {
 	int hpRegen=2;
 	int manaRegen=2;
 	int souls=0;
+	int rage=0;
 	String zone="Green Woods";
 	boolean isValid = true;
 
@@ -79,6 +80,9 @@ public class Hero {
 			if(hero.heroClass.equals("Necromancer")){
 				hero.souls=Integer.parseInt(heroArr[15]);
 			}
+			if(hero.heroClass.equals("Giant")) {
+				hero.rage=Integer.parseInt(heroArr[15]);
+			}
 			
 			return hero;
 		} catch (Exception e) {
@@ -92,7 +96,13 @@ public class Hero {
 					String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s,%d", heroClass, hp, maxHp, mana,
 							maxMana, attackMin, attackMax, armor, magicResist, gold, critChance, enemyEncountersLeft,
 							hpRegen, manaRegen, zone,souls));
-		} else {
+		}else if(heroClass.equals("Giant")) {
+				return new Cookie("hero",
+						String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s,%d", heroClass, hp, maxHp, mana,
+								maxMana, attackMin, attackMax, armor, magicResist, gold, critChance, enemyEncountersLeft,
+								hpRegen, manaRegen, zone,rage));
+		}
+		else {
 			return new Cookie("hero",
 					String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s", heroClass, hp, maxHp, mana, maxMana,
 							attackMin, attackMax, armor, magicResist, gold, critChance, enemyEncountersLeft, hpRegen,
@@ -136,7 +146,8 @@ public class Hero {
 				",   Current Zone: "+zone;
 		}else if(heroClass.equals("Giant")) {
 			return  "class = " +heroClass+
-					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+  
+					",   health = " + hp +"/" + maxHp +" (+"+hpRegen+" regen)"+
+					",   rage = "+ rage +
 					",   attack = " + attackMin+ "-" + attackMax+
 					",   armor = " + armor +
 					",   magic resist = " + magicResist + 
@@ -543,6 +554,79 @@ public class Hero {
 			}
 		return enemy;
 	}
+	public Enemy giantSmash(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		String critically = "";
+		int currentEnemyHealth = enemy.health;
+		int tempHeroAttackMin=hero.attackMin;
+		int tempHeroAttackMax=hero.attackMax;
+		int tempHeroCritChance=hero.critChance;
+		double attackPercentIncrease=hero.rage*1.5;
+		attackPercentIncrease=(1+(attackPercentIncrease*0.01));
+		hero.attackMin=(int)(hero.attackMin*attackPercentIncrease);
+		hero.attackMax=(int)(hero.attackMax*attackPercentIncrease);
+		hero.critChance+=hero.rage/10;
+		enemy=hero.heroAttack(hero, enemy, model, response);
+		currentEnemyHealth = currentEnemyHealth - enemy.health;
+		model.addAttribute("spellDamage", "You cast Smash making your damage "+hero.attackMin+"-"+hero.attackMax + " and your Critical  "+hero.critChance+"%");
+		Cookie leHeroCookie = hero.createCookie();
+		leHeroCookie.setPath("/");
+		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+		hero.attackMin=tempHeroAttackMin;
+		hero.attackMax=tempHeroAttackMax;
+		hero.critChance=tempHeroCritChance;
+		hero.rage=0;
+		Cookie heroCookie=hero.createCookie();
+		heroCookie.setPath("/");
+		heroCookie.setMaxAge(60*60*24*2);
+		response.addCookie(heroCookie);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		response.addCookie(leHeroCookie);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
+		return enemy;
+	}
+	public Enemy giantRageControl(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		int currentEnemyHealth = enemy.health;
+		int damageDealt=(int)(hero.maxHp*0.10);
+		int rageGained=(int)(damageDealt*1.5);
+		hero.rage+=rageGained;
+		hero.hp-=damageDealt;
+		enemy.health-=damageDealt;
+		currentEnemyHealth = currentEnemyHealth - enemy.health;
+		model.addAttribute("spellDamage", "You cast Rage Control damaging yourself and the enemy for " + damageDealt + " and increasing your Rage with "+String.valueOf(rageGained));
+		Cookie leHeroCookie = hero.createCookie();
+		leHeroCookie.setPath("/");
+		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+		Cookie heroCookie=hero.createCookie();
+		heroCookie.setPath("/");
+		heroCookie.setMaxAge(60*60*24*2);
+		response.addCookie(heroCookie);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		response.addCookie(leHeroCookie);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
+		return enemy;
+	}
 	public Enemy berserkEnrage(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
 		hero.mana -= 50;
 		
@@ -662,9 +746,8 @@ public class Hero {
 		return enemy;
 	}
 	public Enemy warriorEndurance(Hero hero, Enemy enemy,ModelMap model,HttpServletResponse response) {
-		hero.mana -= 20;
 		int currentEnemyHealth = enemy.health;
-		enemy.health -= (hero.maxHp - hero.hp) * 0.10;
+		enemy.health -= (hero.maxHp - hero.hp) * 0.15;
 		currentEnemyHealth = currentEnemyHealth - enemy.health;
 		hero.hp += currentEnemyHealth;
 		model.addAttribute("spellDamage", "You cast Endurance Damaging the enemy for "
@@ -673,12 +756,49 @@ public class Hero {
 		leHeroCookie.setPath("/");
 		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(leHeroCookie);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
 		return enemy;
 	}
-	public Enemy giantEarthShock(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response) {
-		int healthLost=(int)(hero.hp*0.25);
+	public Enemy warriorShieldBash(Hero hero,Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		hero.mana-=40;
+		int damageDealt=hero.armor*3;
+		String critically="";
+		if(Utils.critical(hero.critChance)) {
+			damageDealt=(int)(damageDealt*1.8);
+			critically=" CRITICALLY";
+		}
+		enemy.health-=damageDealt;
+		Cookie leHeroCookie = hero.createCookie();
+		leHeroCookie.setPath("/");
+		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+		Cookie enemyCookie=new Cookie("enemy",enemy.toCookie());
+		enemyCookie.setPath("/");
+		enemyCookie.setMaxAge(60 * 60 * 24 * 2);
+		response.addCookie(enemyCookie);
+		response.addCookie(leHeroCookie);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		model.addAttribute("spellDamage","You cast Shield Bash stunning the enemy and"+critically+" damaging them for "+String.valueOf(damageDealt));
+		model.addAttribute("enemy",enemy.health);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
+		return enemy;
+	}
+	
+	
+	public Enemy giantEarthShock(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response, String spellCastCookie) {
+		int healthLost=(int)(hero.hp*0.30);
 		int earthShockCritChance=healthLost+hero.critChance;
-		int earthShockDamage=(int)(hero.maxHp*0.10);
+		int earthShockDamage=(int)(hero.maxHp*0.20);
 		hero.hp-=healthLost;
 		String critically="";
 		if (Utils.critical(earthShockCritChance)) {
@@ -689,6 +809,13 @@ public class Hero {
 		} else {
 			enemy.health -= earthShockDamage;
 		}
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
 		model.addAttribute("spellDamage", "You cast Earth Shock damaging yourself for "+String.valueOf(healthLost)+" and"+critically+" damaging the enemy for "+String.valueOf(earthShockDamage)+" damage");
 		Cookie leHeroCookie = hero.createCookie();
 		leHeroCookie.setPath("/");
@@ -696,16 +823,24 @@ public class Hero {
 		response.addCookie(leHeroCookie);
 		return enemy;
 	}
-	public Enemy necromancerSiphonLife(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response) {
-		hero.mana -= 20;
+	public Enemy necromancerSiphonLife(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		hero.mana -= 50;
 		String critically = "";
+	
+	String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+	model.addAttribute("spell",theSpell[0]);
+	model.addAttribute("tooltip",theSpell[1]);
+	Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+	spellCast.setPath("/");
+	spellCast.setMaxAge(60*60*24*2);
+	response.addCookie(spellCast);
 		int currentEnemyHealth = enemy.health;
 		if (Utils.critical(hero.critChance)) {
-			enemy.health -= (hero.maxMana * 0.15+hero.souls) * 1.8;
+			enemy.health -= (hero.maxMana * 0.25+hero.souls) * 1.8;
 			critically = " CRITICALLY";
 
 		} else {
-			enemy.health -= hero.maxMana * 0.15 + hero.souls;
+			enemy.health -= hero.maxMana * 0.25 + hero.souls;
 		}
 		int siphonLifeHealing=(int)(hero.maxMana*0.10+hero.souls);
 		currentEnemyHealth = currentEnemyHealth - enemy.health;
@@ -716,6 +851,93 @@ public class Hero {
 		leHeroCookie.setPath("/");
 		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
 		response.addCookie(leHeroCookie);
+		return enemy;
+	}
+	public Enemy necromancerVitalityDrain(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		hero.mana-=30;
+		int currentEnemyHealth = enemy.health;
+		int tempHeroAttackMin=hero.attackMin;
+		int tempHeroAttackMax=hero.attackMax;
+		int tempHeroCritChance=hero.critChance;
+		int tempEnemyAttackMin=enemy.damageMin;
+		int tempEnemyAttackMax=enemy.damageMax;
+		int tempEnemyCritChance=enemy.critChance;
+		double attackPercentIncrease=hero.rage*1.5;
+		hero.attackMin=(int)(hero.attackMin*1.35);
+		hero.attackMax=(int)(hero.attackMax*1.35);
+		hero.critChance=hero.critChance*2;
+		enemy.damageMin=(int)(enemy.damageMin*0.65);
+		enemy.damageMax=(int)(enemy.damageMax*0.65);
+		enemy.critChance=(int)(enemy.critChance*0.50);
+		enemy=hero.heroAttack(hero, enemy, model, response);
+		currentEnemyHealth = currentEnemyHealth - enemy.health;
+		model.addAttribute("spellDamage", "You vitality Drain making your Damage "+hero.attackMin+"-"+hero.attackMax + " and your Critical  "+hero.critChance+"%, while reducing the enemy's Damage by 35% and halving his Critical Strike chance");
+		if(enemy.health>=0) {
+			hero=enemy.enemyAttack(hero, enemy, model, response);
+		}
+		Cookie leHeroCookie = hero.createCookie();
+		leHeroCookie.setPath("/");
+		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+		hero.attackMin=tempHeroAttackMin;
+		hero.attackMax=tempHeroAttackMax;
+		hero.critChance=tempHeroCritChance;
+		enemy.damageMin=tempEnemyAttackMin;
+		enemy.damageMax=tempEnemyAttackMax;
+		enemy.critChance=tempEnemyCritChance;
+		hero.rage=0;
+		Cookie heroCookie=hero.createCookie();
+		heroCookie.setPath("/");
+		heroCookie.setMaxAge(60*60*24*2);
+		response.addCookie(heroCookie);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		response.addCookie(leHeroCookie);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
+		return enemy;
+	}
+	public Enemy necromancerUnholyStrike(Hero hero, Enemy enemy, ModelMap model, HttpServletResponse response,String spellCastCookie) {
+		hero.mana -= 40;
+		String critically = "";
+		int healthLost=(int)(hero.hp*0.20);
+		hero.hp-=healthLost;
+		int currentEnemyHealth = enemy.health;
+		if (Utils.critical(hero.critChance+hero.souls/2)) {
+			enemy.health -= ((hero.maxMana * 0.30)+hero.souls) * 1.8;
+			critically = " CRITICALLY";
+
+		} else {
+			enemy.health -= (hero.maxMana * 0.30)+hero.souls;
+		}
+		currentEnemyHealth = currentEnemyHealth - enemy.health;
+		model.addAttribute("spellDamage", "You cast Unholy Strike" + critically + " Damaging the enemy for "
+				+ String.valueOf(currentEnemyHealth) + " But losing "+healthLost+" health");
+		Cookie leHeroCookie = hero.createCookie();
+		leHeroCookie.setPath("/");
+		leHeroCookie.setMaxAge(60 * 60 * 24 * 2);
+		String[] theSpell=hero.generateHeroSpellText(hero,spellCastCookie,response);
+		model.addAttribute("spell",theSpell[0]);
+		model.addAttribute("tooltip",theSpell[1]);
+		Cookie spellCast=new Cookie("spellCast",theSpell[0]);
+		spellCast.setPath("/");
+		spellCast.setMaxAge(60*60*24*2);
+		response.addCookie(spellCast);
+		response.addCookie(leHeroCookie);
+		model.addAttribute("gold",String.valueOf(enemy.dropsGold));
+		if(hero.zone.equals("Green Woods")) {
+			model.addAttribute("zone","hello");
+			}else {
+				model.addAttribute("zone","redWoods");
+			}
 		return enemy;
 	}
 	public String[] generateHeroSpellText(Hero hero,String spellCastCookie,HttpServletResponse response) {
@@ -778,14 +1000,14 @@ public class Hero {
 				spellCast.setMaxAge(60*60*24*2);
 				response.addCookie(spellCast);
 				return spells.get(theSpell);
-		}else {
+		}else if(hero.heroClass.equals("Ranger")){
 			String[] rangerSight=new String[2];
 			rangerSight[0]="Ranger Sight";
-			rangerSight[1]="increases your Attack Damage Min and Max with 80%. -40 Mana";
+			rangerSight[1]="Increases your Attack Damage Min and Max with 80%. -40 Mana";
 			spells.add(rangerSight);
 			String[] poisonArrow=new String[2];
 			poisonArrow[0]="Poison Arrow";
-			poisonArrow[1]="Fire a poisonous arrow dealing 30% of your Attack Damage Max every turn and ignoring armor until the fight ends,also reduce the enemy armor by 20% of your Attack Damage Min(Cannot be reduced under 0). -30 Mana";
+			poisonArrow[1]="Fire a poisonous arrow dealing 30% of your Attack Damage Max every turn and ignoring armor until the fight ends.Enemy armor is reduced by 20% of your Attack Damage Min until the end of the fight(Cannot be reduced under 0). -30 Mana";
 			spells.add(poisonArrow);
 			String[] frostArrow=new String[2];
 			frostArrow[0]="Frost Arrow";
@@ -807,7 +1029,95 @@ public class Hero {
 				spellCast.setMaxAge(60*60*24*2);
 				response.addCookie(spellCast);
 				return spells.get(theSpell);
+		} else if(hero.heroClass.equals("Warrior")){
+			String[] endurance = new String[2];
+			endurance[0]="Endurance";
+			endurance[1]="Deal damage equal to 15% of your Missing Health and Heal yourself for that amount.Cannot Critically hit but ignores armor.-40 Mana";
+			spells.add(endurance);
+			String[] shieldBash=new String[2];
+			shieldBash[0]="Shield Bash";
+			shieldBash[1]="Stun the enemy for this round and do 3 Damage to him for every point of Armor you have(Ignores armor and can be a Critical).-40 Mana";
+			spells.add(shieldBash);
+			String[] plateArmor=new String[2];
+			plateArmor[0]="Plate Armor";
+			plateArmor[1]="Double your Armor, Magic Resist and Critical Chance for this round and Increase your Attack Min and Max with 20%.-30 Mana";
+			spells.add(plateArmor);
+			String[] reckoning=new String[2];
+			reckoning[0]="Reckoning";
+			reckoning[1]="Every 10 points of Current Health and every point of Armor and Magic Resist Increase your Attack Min/Max and Critical Chance by 1.-50 Mana";
+			spells.add(reckoning);
+			int theSpell;
+			while (true) {
+				theSpell = Utils.attack(0, spells.size() - 1);
+				if (!spells.get(theSpell)[0].equals(spellCastCookie)) {
+					break;
+				}
+			}
+				Cookie spellCast=new Cookie("spellCast",spells.get(theSpell)[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				return spells.get(theSpell);
+		}else if(hero.heroClass.equals("Giant")){
+			String[] earthShock=new String[2];
+			earthShock[0]="Earth Shock";
+			earthShock[1]="Deals damage equal to 20% of your Maximum Health while losing 30% Current Health.Chance for Critical is your Critical Chance + the amount of health you lost from the ability (ignores enemy armor, but does not generate Rage)";
+			spells.add(earthShock);
+			String[] regeneration=new String[2];
+			regeneration[0]="Regeneration";
+			regeneration[1]="Lose all of your current rage.15% of the rage lost comes as regeneration at the start of every round until the fight ends.Deal damage equal to 30% of the Rage Lost this round(Cannot be a critical but ignores armor)";
+			spells.add(regeneration);
+			String[] smash=new String[2];
+			smash[0]="Smash";
+			smash[1]="Perform a more powerful attack, increasing your Attack Min and Max with 1.5% for every point of Rage(does not ignore armor,but can be a Critical).Critical Strike chance is increased by 1 for every 10 points of Rage for this round.The ability consumes all Rage";
+			spells.add(smash);
+			String[] rageControl=new String[2];
+			rageControl[0]="Rage Control";
+			rageControl[1]="Damage yourself and the enemy for 10% of your Maximum Health(Cannot be a critical, but ignores armor).Generate 1.5 Rage for every point of Health lost from this ability";
+			spells.add(rageControl);
+			int theSpell;
+			while (true) {
+				theSpell = Utils.attack(0, spells.size() - 1);
+				if (!spells.get(theSpell)[0].equals(spellCastCookie)) {
+					break;
+				}
+			}
+				Cookie spellCast=new Cookie("spellCast",spells.get(theSpell)[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				return spells.get(theSpell);
+		} else {
+			String[] siphonLife=new String[2];
+			siphonLife[0]="Siphon Life";
+			siphonLife[1]="Deal damage equal to 25% of your Maximum Mana +1 per soul(has same Critical chance as your normal attacks and ignores armor) and heal yourself for 10% of your Maximum Mana +1 per soul. -50 Mana";
+			spells.add(siphonLife);
+			String [] fleshGolem=new String[2];
+			fleshGolem[0]="Flesh Golem";
+			fleshGolem[1]="Summon a flesh golem that fights with you until the enemy is defeated.You lose 10% of your Maximum Health aswell as 1 health per soul.The Golem deals damage equal to the health you lost every turn(Has same Crit chance as your Hero,but does not ignore armor).-40 Mana";
+			spells.add(fleshGolem);
+			String [] vitalityDrain=new String[2];
+			vitalityDrain[0]="Vitality Drain";
+			vitalityDrain[1]="For this Round only - reduce enemy Attack Min and Max with 35% and halve his Critical Chance. Increase your Own Attack Min and Max with 35% and Double your Critical Chance.-30 Mana";
+			spells.add(vitalityDrain);
+			String[] unholyStrike=new String[2];
+			unholyStrike[0]="Unholy Strike";
+			unholyStrike[1]="Lose 20% current Health but deal damage to the enemy equal to 30% of your Maximum Mana +1 per soul that ignores armor and can be a Critical.Increase Critical Chance by 1% for every 2 souls you have.-40 Mana";
+			spells.add(unholyStrike);
+			int theSpell;
+			while (true) {
+				theSpell = Utils.attack(0, spells.size() - 1);
+				if (!spells.get(theSpell)[0].equals(spellCastCookie)) {
+					break;
+				}
+			}
+				Cookie spellCast=new Cookie("spellCast",spells.get(theSpell)[0]);
+				spellCast.setPath("/");
+				spellCast.setMaxAge(60*60*24*2);
+				response.addCookie(spellCast);
+				return spells.get(theSpell);
 		}
+
 	}
 
 	public ArrayList<String[]> generateHeroSkillText(Hero hero, HttpServletResponse response) {

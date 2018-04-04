@@ -157,13 +157,13 @@ color:brown
 	<h1>${boss}</h1>
 	<h2 style="color:red;">While trying to flee ${resource} damaged you <span class="maroonText">${enemyCritically}</span>dealing <span class="maroonText">${enemyDamage}</span> damage</h2>
 	<h2 style="color:red;">While trying to flee ${resource} damaged you <span class="maroonText">${enemyCritically2}</span>dealing <span class="maroonText">${enemyDamage2}</span> damage</h2>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
+	<div onclick="location.href='fight1';" style="cursor:pointer;" class="tooltip2"><i>${skill1}</i> 
   <span class="tooltiptext2"><i><span class="violetText">${tooltip1}</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
+<div onclick="location.href='fight2';" style="cursor:pointer;" class="tooltip3"><i>${skill2}</i> 
   <span class="tooltiptext3"><i><span class="brownText">${tooltip2}</span></i></span>
 </div>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/fightWithSpell';" style="cursor:pointer;" class="tooltip"><i>Cast ${spell}</i> 
+	<div onclick="location.href='fightWithSpell';" style="cursor:pointer;" class="tooltip"><i>Cast ${spell}</i> 
   <span class="tooltiptext"><i><span class="yellowText">${tooltip}</span></i></span>
 </div>
 </body>

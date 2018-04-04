@@ -79,7 +79,7 @@ background-color: red; /* Green */
 		
 	
 	
-	<a href="http://localhost:8081/AdventureGame/hello" class="button">CONTINUE</a>
+	<a href="hello" class="button">CONTINUE</a>
 	
 </body>
 </html>

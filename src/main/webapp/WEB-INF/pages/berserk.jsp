@@ -207,17 +207,18 @@ color:violet;
 <div class="asd">
 	<h1 style="color:violet"><font size="10"><i>Berserk</i></font></h1>
 	<h1 style="color:white"><i>Passive: Every 25 missing health Increase Damage Min and Max with 1</i></h1>
-	<div onclick="location.href='http://localhost:8081/AdventureGame/berserk';" style="cursor:pointer;" class="tooltip"><i>Bloodlust</i> 
+	<h1 style="color:white"><i><span class="yellowText">Spells:</span></i></h1>
+	<div onclick="location.href='berserk';" style="cursor:pointer;" class="tooltip"><i>Bloodlust</i> 
   <span class="tooltiptext"><i><span class="yellowText">You cast an empowered Attack.The Attack is a Critical and your Attack Damage Min and Max are increased by 1.5% for every point of Critical Strike you have. -40 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/berserk';" style="cursor:pointer;" class="tooltip"><i>Axe Throw</i> 
+<div onclick="location.href='berserk';" style="cursor:pointer;" class="tooltip"><i>Axe Throw</i> 
   <span class="tooltiptext"><i><span class="yellowText">Throw an enchanted axe ignoring armor and dealing damage equal to 3 times your Critical Strike chance.Critical Chance for this ability is two times your Critical Strike chance. -30 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/berserk';" style="cursor:pointer;" class="tooltip"><i>Vigor Strike</i> 
+<div onclick="location.href='berserk';" style="cursor:pointer;" class="tooltip"><i>Vigor Strike</i> 
   <span class="tooltiptext"><i><span class="yellowText">Do a normal Attack, but for every 40 Missing Health steal 5 health from the enemy.-40 Mana</span></i></span>
 </div>
-<div onclick="location.href='http://localhost:8081/AdventureGame/berserk';" style="cursor:pointer;" class="tooltip"><i>Enrage</i> 
-  <span class="tooltiptext"><i><span class="yellowText">Lose all your Armor and Magic resist for this round, aswell as 25% of your current Health.Perform 4 attacks, each one has a 50% chance of hitting the enemy +1 for every point of Armor/Magic resist lost and each doing 75% of your Damage Min and Max.-50 Mana</span></i></span>
+<div onclick="location.href='berserk';" style="cursor:pointer;" class="tooltip"><i>Enrage</i> 
+  <span class="tooltiptext"><i><span class="yellowText">Lose all your Armor and Magic resist for this round, aswell as 25% of your current Health.Perform 4 attacks, each one has a 50% chance of hitting the enemy +1 for every point of Armor/Magic resist lost and each doing 80% of your Damage Min and Max.-50 Mana</span></i></span>
 </div>
 <h1></h1>
 	<a href="greenWoods" class="button">CHOOSE BERSERK</a>

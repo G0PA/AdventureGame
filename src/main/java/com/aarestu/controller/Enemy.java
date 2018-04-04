@@ -99,6 +99,9 @@ public class Enemy {
 			hero.hp-=theEnemyDamage;
 		}
 		int enemyDamage=tempHealth-hero.hp;
+		if(hero.heroClass.equals("Giant")) {
+			hero.rage+=enemyDamage;
+		}
 		model.addAttribute("enemy", String.valueOf(enemy.health));
 		model.addAttribute("enemyName",enemy.name);
 		model.addAttribute("enemyDamage",String.valueOf(enemyDamage));

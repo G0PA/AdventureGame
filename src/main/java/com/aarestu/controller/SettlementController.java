@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 @Controller
+@Scope("session")
 public class SettlementController {
 	Hero hero;
 	String theBadCookie="";
@@ -199,6 +201,15 @@ public class SettlementController {
 			leftEnemiesCookie="0";
 		}
 		hero=Hero.fromCookie(heroCookie);
+		if(!bossStateCookie.equals("inSettlement") && !bossStateCookie.equals("shopping")) {
+			model.addAttribute("cheater","no cheating : )");
+			if(hero.zone.equals("Green Woods")) {
+				return "hello";
+			}else {
+			return "redWoods";
+					 }
+		}
+		
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
 		model.addAttribute("message", hero.createDisplayText());
@@ -601,8 +612,8 @@ public class SettlementController {
 		}
 		if (tempItem.mana != 0) {
 			if(hero.heroClass.equals("Giant")) {
-				if(hero.hp+tempItem.mana*2<=hero.maxHp) {
-				hero.hp+=tempItem.mana*2;
+				if(hero.hp+tempItem.mana<=hero.maxHp) {
+				hero.hp+=tempItem.mana;
 				}else {
 					hero.hp=hero.maxHp;
 				}
@@ -640,9 +651,9 @@ public class SettlementController {
 		}
 		if(hero.heroClass.equals("Giant")) {
 			model.addAttribute("spell","Earth Shock");
-			hero.hp+=hero.mana*2;
-			hero.maxHp+=hero.maxMana*2;
-			hero.hpRegen+=hero.manaRegen*2;
+			hero.hp+=hero.mana;
+			hero.maxHp+=hero.maxMana;
+			hero.hpRegen+=hero.manaRegen;
 			hero.mana=0;
 			hero.manaRegen=0;
 			hero.maxMana=0;
@@ -687,8 +698,8 @@ public class SettlementController {
 		}
 		if (tempItem2.mana != 0) {
 			if(hero.heroClass.equals("Giant")) {
-				if(hero.hp+tempItem2.mana*2<=hero.maxHp) {
-				hero.hp+=tempItem2.mana*2;
+				if(hero.hp+tempItem2.mana<=hero.maxHp) {
+				hero.hp+=tempItem2.mana;
 				}else {
 					hero.hp=hero.maxHp;
 				}
@@ -728,9 +739,9 @@ public class SettlementController {
 		
 		if(hero.heroClass.equals("Giant")) {
 			model.addAttribute("spell","Earth Shock");
-			hero.hp+=hero.mana*2;
-			hero.maxHp+=hero.maxMana*2;
-			hero.hpRegen+=hero.manaRegen*2;
+			hero.hp+=hero.mana;
+			hero.maxHp+=hero.maxMana;
+			hero.hpRegen+=hero.manaRegen;
 			hero.mana=0;
 			hero.manaRegen=0;
 			hero.maxMana=0;
@@ -777,8 +788,8 @@ public class SettlementController {
 		}
 		if (tempItem3.mana != 0) {
 			if(hero.heroClass.equals("Giant")) {
-				if(hero.hp+tempItem3.mana*2<=hero.maxHp) {
-				hero.hp+=tempItem3.mana*2;
+				if(hero.hp+tempItem3.mana<=hero.maxHp) {
+				hero.hp+=tempItem3.mana;
 				}else {
 					hero.hp=hero.maxHp;
 				}
@@ -818,9 +829,9 @@ public class SettlementController {
 		
 		if(hero.heroClass.equals("Giant")) {
 			model.addAttribute("spell","Earth Shock");
-			hero.hp+=hero.mana*2;
-			hero.maxHp+=hero.maxMana*2;
-			hero.hpRegen+=hero.manaRegen*2;
+			hero.hp+=hero.mana;
+			hero.maxHp+=hero.maxMana;
+			hero.hpRegen+=hero.manaRegen;
 			hero.mana=0;
 			hero.manaRegen=0;
 			hero.maxMana=0;
@@ -867,8 +878,8 @@ public class SettlementController {
 		}
 		if (tempItem4.mana != 0) {
 			if(hero.heroClass.equals("Giant")) {
-				if(hero.hp+tempItem4.mana*2<=hero.maxHp) {
-				hero.hp+=tempItem4.mana*2;
+				if(hero.hp+tempItem4.mana<=hero.maxHp) {
+				hero.hp+=tempItem4.mana;
 				}else {
 					hero.hp=hero.maxHp;
 				}
@@ -907,9 +918,9 @@ public class SettlementController {
 		}
 		if(hero.heroClass.equals("Giant")) {
 			model.addAttribute("spell","Earth Shock");
-			hero.hp+=hero.mana*2;
-			hero.maxHp+=hero.maxMana*2;
-			hero.hpRegen+=hero.manaRegen*2;
+			hero.hp+=hero.mana;
+			hero.maxHp+=hero.maxMana;
+			hero.hpRegen+=hero.manaRegen;
 			hero.mana=0;
 			hero.manaRegen=0;
 			hero.maxMana=0;
@@ -955,8 +966,8 @@ public class SettlementController {
 		}
 		if (tempItem5.mana != 0) {
 			if(hero.heroClass.equals("Giant")) {
-				if(hero.hp+tempItem5.mana*2<=hero.maxHp) {
-				hero.hp+=tempItem5.mana*2;
+				if(hero.hp+tempItem5.mana<=hero.maxHp) {
+				hero.hp+=tempItem5.mana;
 				}else {
 					hero.hp=hero.maxHp;
 				}
@@ -994,9 +1005,9 @@ public class SettlementController {
 		}
 		if(hero.heroClass.equals("Giant")) {
 			model.addAttribute("spell","Earth Shock");
-			hero.hp+=hero.mana*2;
-			hero.maxHp+=hero.maxMana*2;
-			hero.hpRegen+=hero.manaRegen*2;
+			hero.hp+=hero.mana;
+			hero.maxHp+=hero.maxMana;
+			hero.hpRegen+=hero.manaRegen;
 			hero.mana=0;
 			hero.manaRegen=0;
 			hero.maxMana=0;

@@ -127,29 +127,29 @@ height: 100%;
 </style>
 <script>
 function redirect(){
-	window.location = "http://localhost:8081/AdventureGame/mage";
+	window.location = "mage";
 }
 function redirect2(){
-	window.location = "http://localhost:8081/AdventureGame/berserk";
+	window.location = "berserk";
 }
 function redirect3(){
-	window.location = "http://localhost:8081/AdventureGame/ranger";
+	window.location = "ranger";
 }
 function redirect4(){
-	window.location = "http://localhost:8081/AdventureGame/warrior";
+	window.location = "warrior";
 }
 function redirect5(){
-	window.location = "http://localhost:8081/AdventureGame/giant";
+	window.location = "giant";
 }
 function redirect6(){
-	window.location = "http://localhost:8081/AdventureGame/necromancer";
+	window.location = "necromancer";
 }
 </script>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Choose a Class</title>
 </head>
-<body background= "http://localhost:8081/AdventureGame/resources/images/chooseHeroBackground.jpg"class=bg>
+<body background= "resources/images/chooseHeroBackground.jpg"class=bg>
 <h1 class="header"style="color:yellow"><i>Choose a Class</i></h1>
 
 <input class="images" type="image" onClick="redirect()" src="https://i.gyazo.com/e7168fd9d60a735c04e3728d7fc1a8d1.png" alt="Submit" width="470" height="1000">

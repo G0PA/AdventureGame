@@ -55,6 +55,6 @@ color:blue;
 	<h3 style="color:red;"><i>${enemyName} ${enemyCritically}<span class="maroonText">damages you dealing </span>${enemyDamage} <span class="maroonText">damage</span></i></h3>
 	<h3 style="color:red;"><i>${enemyDamage2} </i></h3>
 	<h1 style="color:red;">You Were Defeated</h1>
-	<a href="http://localhost:8081/AdventureGame/play" class="button">PLAY AGAIN</a>
+	<a href="play" class="button">PLAY AGAIN</a>
 </body>
 </html>
