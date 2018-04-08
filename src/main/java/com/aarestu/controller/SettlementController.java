@@ -209,7 +209,6 @@ public class SettlementController {
 			return "redWoods";
 					 }
 		}
-		
 		model.addAttribute("leftEnemies",leftEnemiesCookie);
 		model.addAttribute("resource",resourceCookie);
 		model.addAttribute("message", hero.createDisplayText());
@@ -288,7 +287,7 @@ public class SettlementController {
 			Item specialManaPotion=new Item("Special Mana Potion",50).setMana(150);
 			Item plateArmor=new Item("Plate Armor",57).setArmor(4).setMagicResist(4);
 			Item tunic=new Item("Tunic",59).setCurrentHealth(30).setHealthLimit(50).setMaxMana(50).setMana(30);
-			Item largeMixedPotion=new Item("Large Mixed Potion",58).setCurrentHealth(100).setMaxMana(50);
+			Item largeMixedPotion=new Item("Large Mixed Potion",58).setCurrentHealth(100).setMana(100);
 			Item largeEnergyBoost=new Item("Large Energy Boost",54).setCurrentHealth(25).setAttackMin(2).setAttackMax(2).setArmor(2).setMagicResist(2).setCritChance(2);
 			Item mageHat=new Item("Mage Hat",68).setMaxMana(60).setMana(40).setMagicResist(2).setCritChance(2);
 			Item amuletOfRestoration=new Item("Amulet of Restoration",59).setHpRegen(6).setManaRegen(6).setCurrentHealth(30).setMana(30);

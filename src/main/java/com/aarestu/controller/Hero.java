@@ -17,9 +17,9 @@ public class Hero {
 	int maxMana=100;
 	int attackMin=13;
 	int attackMax=16;
-	int armor=4;
-	int magicResist=4;
-	int gold = 10;
+	int armor=5;
+	int magicResist=5;
+	int gold = 15;
 	int critChance = 5;
 	int enemyEncountersLeft=26;
 	int hpRegen=2;
@@ -287,7 +287,7 @@ public class Hero {
 			hero.mana=hero.maxMana;
 		}
 			if(hero.heroClass.equals("Necromancer")) {
-				if(Utils.critical(66)) {
+				if(Utils.critical(75)) {
 					model.addAttribute("soul","You steal the enemy's Soul");
 				hero.souls++;
 				}

@@ -1938,6 +1938,9 @@ public class FightController {
 				theEnemy.setMaxAge(60 * 60 * 24 * 2);
 				response.addCookie(theEnemy);
 				if (enemy.health <= 0) {
+					if(Utils.critical(75)){
+						hero.souls++;
+					}
 					if(hero.hp+hero.hpRegen<=hero.maxHp) {
 						hero.hp+=hero.hpRegen;
 					}else {
@@ -1962,6 +1965,7 @@ public class FightController {
 					model.addAttribute("manaRegen",String.valueOf(hero.manaRegen));
 					model.addAttribute("gold",enemy.dropsGold);
 					return "fightvictoryWithSpell";
+					
 				} else {
 					hero = enemy.enemyAttack(hero, enemy, model, response);
 					if (hero.hp <= 0) {
@@ -2034,6 +2038,9 @@ public class FightController {
 				theEnemy.setMaxAge(60 * 60 * 24 * 2);
 				response.addCookie(theEnemy);
 				if (enemy.health <= 0) {
+					if(Utils.critical(75)){
+						hero.souls++;
+					}
 					if(hero.hp+hero.hpRegen<=hero.maxHp) {
 						hero.hp+=hero.hpRegen;
 					}else {
@@ -2095,6 +2102,9 @@ public class FightController {
 				theEnemy.setMaxAge(60 * 60 * 24 * 2);
 				response.addCookie(theEnemy);
 				if (enemy.health <= 0) {
+					if(Utils.critical(75)){
+						hero.souls++;
+					}
 					if(hero.hp+hero.hpRegen<=hero.maxHp) {
 						hero.hp+=hero.hpRegen;
 					}else {
@@ -2156,6 +2166,9 @@ public class FightController {
 				theEnemy.setMaxAge(60*60*24*2);
 				response.addCookie(theEnemy);
 				if (enemy.health <= 0) {
+					if(Utils.critical(75)){
+						hero.souls++;
+					}
 					if(hero.hp+hero.hpRegen<=hero.maxHp) {
 						hero.hp+=hero.hpRegen;
 					}else {

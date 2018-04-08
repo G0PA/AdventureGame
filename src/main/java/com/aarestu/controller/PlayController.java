@@ -57,9 +57,9 @@ public class PlayController {
 		response.addCookie(passedEvents);
 		return "chooseClass";
 	}
-
+	
 	@RequestMapping("/hello")
-	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue("enemy")String enemyCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,@CookieValue(value="spellCast",defaultValue ="none")String spellCastCookie,HttpServletResponse response)
+	public String index(ModelMap model,@CookieValue(value="hero",defaultValue="defaultHero") String fooCookie,@CookieValue(value="enemy",defaultValue="none")String enemyCookie,@CookieValue(value="settlement",defaultValue="0") String settlementCookie,@CookieValue(value="bossState",defaultValue="dead") String bossStateCookie,@CookieValue(value="leftEnemies",defaultValue="15") String leftEnemiesString,@CookieValue(value="passedMaps",defaultValue="-9") String passedMaps,@CookieValue(value="firstBoss",defaultValue="notReached")String firstBossCookie,@CookieValue(value="spellCast",defaultValue ="none")String spellCastCookie,HttpServletResponse response)
 	{
 
 		hero2=Hero.fromCookie(fooCookie);
@@ -168,6 +168,10 @@ public class PlayController {
 			firstBoss.setPath("/");
 			firstBoss.setMaxAge(60*60*24);
 			response.addCookie(firstBoss);
+			Cookie passedMapss=new Cookie("passedMaps","-1");
+			passedMapss.setPath("/");
+			passedMapss.setMaxAge(60*60*24*2);
+			response.addCookie(passedMapss);
 //			String attackType="";
 //			if (type == 1) {
 //				attackType = "PHYSICAL";

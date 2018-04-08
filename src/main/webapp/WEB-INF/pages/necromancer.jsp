@@ -155,7 +155,7 @@ color:blue;
 <body background= "resources/images/necromancerWallpaper.jpg"class=bg>
 <div class="asd">
 	<h1 style="color:blue"><font size="10"><i>Necromancer</i></font></h1>
-	<h1 style="color:white"><i>Passive: Every enemy kill has a 66% chance to grant you 1 soul.For every 2 souls increase damage Min and Max with 1</i></h1>
+	<h1 style="color:white"><i>Passive: Every enemy kill has a 75% chance to grant you 1 soul.For every 2 souls increase damage Min and Max with 1</i></h1>
 		<div onclick="location.href='necromancer';" style="cursor:pointer;" class="tooltip"><i>Vitality Drain</i> 
   <span class="tooltiptext"><i><span class="yellowText">For this Round only - reduce enemy Attack Min and Max with 35% and halve his Critical Chance. Increase your Own Attack Min and Max with 35% and Double your Critical Chance.-30 Mana</span></i></span>
 </div>
